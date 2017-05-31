@@ -1,0 +1,6 @@
+framework module Pods_S1ngular {
+  umbrella header "Pods-S1ngular-umbrella.h"
+
+  export *
+  module * { export * }
+}
