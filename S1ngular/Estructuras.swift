@@ -9,6 +9,19 @@
 import Foundation
 import UIKit
 
+struct MessageItem{
+    let text: String
+    let image: UIImage?
+    let date: NSDate
+    let id: Int
+    
+    init(text:String,image:UIImage?,date:NSDate,id:Int){
+        self.text = text
+        self.image = image
+        self.date = date
+        self.id = id
+    }
+}
 struct GeneralTableItem {
     let id: Int
     let nombre:String

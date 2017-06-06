@@ -14,10 +14,19 @@ class HomeTableViewController: UITableViewController {
     @IBOutlet weak var creditsButton: UIView!
     
     let loadingView = UIView()
-    
     let spinner = UIActivityIndicatorView()
     let loadingLabel = UILabel()
+    
     var fotitos = Dictionary<String, String>()
+    
+    @IBOutlet weak var nuevosSingulares: UILabel!
+    @IBOutlet weak var nuevosMensajes: UILabel!
+    @IBOutlet weak var nuevosCheckins: UILabel!
+    @IBOutlet weak var nuevosTests: UILabel!
+    
+    let headers: HTTPHeaders = [
+        "Authorization": "Bearer "+DataUserDefaults.getUserToken()
+    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,15 +39,13 @@ class HomeTableViewController: UITableViewController {
         self.creditsButton.layer.shadowRadius = 3
         DataUserDefaults.setDefaultData()
         self.getUserData()
+        self.visitarHome()
     }
     
     func getUserData(){
         self.setLoadingScreen()
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer "+DataUserDefaults.getUserToken()
-        ]
         
-        Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: headers)
+        Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
             .responseJSON {
             response in
                 let json = JSON(response.result.value)
@@ -166,12 +173,47 @@ class HomeTableViewController: UITableViewController {
                             
                         }
                     }
+                    /******************//******************//******************/
+                    /*Cambiar esto por el codigo que obtendra el ID de usuario*/
+                    DataUserDefaults.setCurrentId(id: 17)
+                    /******************//******************//******************/
+                    
                     self.removeLoadingScreen()
                 }else{
                     self.removeLoadingScreen()
                 }
             }
             
+        }
+    }
+    
+    func visitarHome(){
+        self.setLoadingScreen()
+        Alamofire.request(Constantes.VISITAR_HOME_URL, headers: self.headers)
+            .responseJSON {
+                response in
+                
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if(status){
+                        if let s1Nuevos = json["home"]["singulares_nuevos"].int{
+                            self.nuevosSingulares.text = "¡\(s1Nuevos) NUEVOS s1!"
+                        }
+                        if let mensajesNuevos = json["home"]["mensajes_nuevos"].int{
+                            self.nuevosMensajes.text = "¡\(mensajesNuevos) MENSAJES NUEVOS!"
+                        }
+                        if let testsNuevos = json["home"]["nuevos_test"].int{
+                            self.nuevosTests.text = "¡\(testsNuevos) NUEVOS TESTS!"
+                        }
+                        if let checkinsNuevos = json["home"]["chekins_cercanos"].int{
+                            self.nuevosCheckins.text = "¡\(checkinsNuevos) S1NGULARES A TU ALREDEDOR!"
+                        }
+                        self.removeLoadingScreen()
+                    }else{
+                        self.removeLoadingScreen()
+                    }
+                }
         }
     }
     
@@ -237,13 +279,14 @@ class HomeTableViewController: UITableViewController {
         let y = (self.tableView.frame.height / 2) - (height / 2)
         loadingView.frame = CGRect(x:x, y:y, width:width, height:height)
         loadingView.clipsToBounds = true
+        loadingView.layer.cornerRadius = 5
         loadingView.backgroundColor = Colores.BGPink
         
         // Sets loading text
         self.loadingLabel.textColor = Colores.BGWhite
         self.loadingLabel.textAlignment = NSTextAlignment.center
         self.loadingLabel.text = "Cargando..."
-        self.loadingLabel.frame = CGRect(x:0+15, y:0+5, width:150, height:30)
+        self.loadingLabel.frame = CGRect(x:0+15, y:0+7, width:150, height:30)
         
         // Sets spinner
         self.spinner.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge

@@ -8,20 +8,32 @@
 
 import UIKit
 
-class ChatS1ViewController: UIViewController {
+class ChatS1ViewController: UIViewController,UITextFieldDelegate{
     @IBOutlet weak var subtituloView: UIView!
     @IBOutlet weak var subtituloTexto: UILabel!
     @IBOutlet weak var profilePersona: UIBarButtonItem!
     @IBOutlet weak var bloquearBarButton: UIBarButtonItem!
+    @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var bottomConstTF: NSLayoutConstraint!
+    @IBOutlet weak var audioButton: UIImageView!
+    @IBOutlet weak var mensajeTextField: UITextField!
+    
     
     let imageTestUrl = "http://2.bp.blogspot.com/-lnt7x6S-QDE/VXB4iM3jktI/AAAAAAAAEZc/Evr1d3aQJ5M/s1600/kiss.jpg"
     
     var imageTes = UIImageView()
     var bloquearButton = UIButton()
     var tapViewImage = UIGestureRecognizer()
+    var audioTapView = UIGestureRecognizer()
+    var idVerPerfil = Int()
+    
+    var childViewController = ChatS1TableViewController()
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        idVerPerfil = DataUserDefaults.getIdVerPerfil()
         
         self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
         
@@ -57,6 +69,58 @@ class ChatS1ViewController: UIViewController {
         bloquearButton.addTarget(self, action:#selector(gotoBloquear(sender:)), for: .touchUpInside)
         bloquearBarButton.customView = bloquearButton
         
+        mensajeTextField.delegate = self
+        mensajeTextField.returnKeyType = .send
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(tryCloseKeyboard), name: NSNotification.Name(rawValue: "closeKeyboardNotif"), object: nil)
+        
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let vc = segue.destination as? ChatS1TableViewController, segue.identifier == "ChildChatSegue"{
+            self.childViewController = vc
+        }
+    }
+    
+    
+    func tryCloseKeyboard(notification:NSNotification){
+        self.view.endEditing(true)
+    }
+    
+    func keyboardWillShow(notification:NSNotification) {
+        adjustingHeight(show: true, notification: notification)
+    }
+    
+    func keyboardWillHide(notification:NSNotification) {
+        adjustingHeight(show: false
+            , notification: notification)
+    }
+    
+    func adjustingHeight(show:Bool, notification:NSNotification) {
+        
+        var userInfo = notification.userInfo!
+        
+        let keyboardFrame:CGRect = (userInfo[UIKeyboardFrameBeginUserInfoKey] as! NSValue).cgRectValue
+        
+        let animationDurarion = userInfo[UIKeyboardAnimationDurationUserInfoKey] as! TimeInterval
+        
+        let changeInHeight = keyboardFrame.height - 30
+        
+        UIView.animate(withDuration: animationDurarion, animations: { () -> Void in
+            if show{
+                self.bottomConstraint.constant += changeInHeight
+                self.bottomConstTF.constant += changeInHeight
+            }else{
+                self.bottomConstraint.constant = 60
+                self.bottomConstTF.constant = 8
+            }
+        })
+        
     }
     
     func gotoBloquear(sender: UIButton){
@@ -88,12 +152,35 @@ class ChatS1ViewController: UIViewController {
         self.view.insertSubview(view, at:0)
         
     }
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        if textField == self.mensajeTextField {
+            debugPrint("empezare a escribir!!!")
+            self.childViewController.scrollView.scrollToEdge(position: .Bottom, animated: false)
+            return true
+        }
+        return false
+    }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == self.mensajeTextField {
+            
+            //self.view.endEditing(true)
+            // Enviar
+            self.childViewController.enviarMensaje(mensaje: self.mensajeTextField.text!)
+            self.mensajeTextField.text = ""
+            
+        }
+        
+        return true
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
     
     @IBAction func close(_ sender: Any) {
         _ = self.navigationController?.popToRootViewController(animated: true)

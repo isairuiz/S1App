@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7D147DBC1EE4E9D0005ED8D9 /* ResultadoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D147DBB1EE4E9D0005ED8D9 /* ResultadoTableViewController.swift */; };
 		7D2399DE1EC2A44800996179 /* EditarMiPerfil2ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2399DD1EC2A44800996179 /* EditarMiPerfil2ViewController.swift */; };
 		7D2399E01EC2A46C00996179 /* EditarMiPerfil2TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2399DF1EC2A46C00996179 /* EditarMiPerfil2TableViewController.swift */; };
 		7D2399E21EC2AB3200996179 /* EditarMiPerfil3ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2399E11EC2AB3200996179 /* EditarMiPerfil3ViewController.swift */; };
@@ -30,8 +31,11 @@
 		7DDD16F51EDBDC60004347DB /* FotosS1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DDD16F41EDBDC60004347DB /* FotosS1ViewController.swift */; };
 		7DDD16F71EDE14AE004347DB /* BloquearS1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DDD16F61EDE14AE004347DB /* BloquearS1ViewController.swift */; };
 		7DDD16F91EDE14D3004347DB /* BloquearS1TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DDD16F81EDE14D3004347DB /* BloquearS1TableViewController.swift */; };
+		7DE899451EE082A400A07B68 /* ChatBubbleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE899441EE082A400A07B68 /* ChatBubbleData.swift */; };
 		7DEBBF971EDE3B4E00D23E27 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DEBBF961EDE3B4E00D23E27 /* NotificationService.swift */; };
 		7DEBBF9B1EDE3B4E00D23E27 /* OneSignalNotificationServiceExtension2.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 7DEBBF941EDE3B4E00D23E27 /* OneSignalNotificationServiceExtension2.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7DEBBFA21EDF5DF600D23E27 /* SpeechBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DEBBFA11EDF5DF600D23E27 /* SpeechBubble.swift */; };
+		7DEBBFA41EDF6AE900D23E27 /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DEBBFA31EDF6AE900D23E27 /* ChatTableViewCell.swift */; };
 		7DEEF0971EB9B5B900DD624F /* ConfMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DEEF0961EB9B5B900DD624F /* ConfMenuTableViewController.swift */; };
 		7DEEF0991EBAA1E900DD624F /* ConfMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DEEF0981EBAA1E900DD624F /* ConfMenuViewController.swift */; };
 		7DF066961ECBE59A0010E382 /* SingleTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DF066951ECBE59A0010E382 /* SingleTableViewController.swift */; };
@@ -126,6 +130,7 @@
 		174530A7C08428C7587908AF /* Pods-S1ngularTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-S1ngularTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-S1ngularTests/Pods-S1ngularTests.debug.xcconfig"; sourceTree = "<group>"; };
 		2D6C0693D0880FABA2256DB5 /* Pods_S1ngular.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_S1ngular.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FA4CF1689701624E2EF57E5 /* Pods_S1ngular_OneSignalNotificationServiceExtension2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_S1ngular_OneSignalNotificationServiceExtension2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7D147DBB1EE4E9D0005ED8D9 /* ResultadoTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultadoTableViewController.swift; sourceTree = "<group>"; };
 		7D2399DD1EC2A44800996179 /* EditarMiPerfil2ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditarMiPerfil2ViewController.swift; sourceTree = "<group>"; };
 		7D2399DF1EC2A46C00996179 /* EditarMiPerfil2TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditarMiPerfil2TableViewController.swift; sourceTree = "<group>"; };
 		7D2399E11EC2AB3200996179 /* EditarMiPerfil3ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditarMiPerfil3ViewController.swift; sourceTree = "<group>"; };
@@ -150,10 +155,13 @@
 		7DDD16F41EDBDC60004347DB /* FotosS1ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FotosS1ViewController.swift; sourceTree = "<group>"; };
 		7DDD16F61EDE14AE004347DB /* BloquearS1ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloquearS1ViewController.swift; sourceTree = "<group>"; };
 		7DDD16F81EDE14D3004347DB /* BloquearS1TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloquearS1TableViewController.swift; sourceTree = "<group>"; };
+		7DE899441EE082A400A07B68 /* ChatBubbleData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatBubbleData.swift; sourceTree = "<group>"; };
 		7DEBBF941EDE3B4E00D23E27 /* OneSignalNotificationServiceExtension2.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalNotificationServiceExtension2.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DEBBF961EDE3B4E00D23E27 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		7DEBBF981EDE3B4E00D23E27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7DEBBFA01EDE3D4700D23E27 /* S1ngular.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = S1ngular.entitlements; sourceTree = "<group>"; };
+		7DEBBFA11EDF5DF600D23E27 /* SpeechBubble.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpeechBubble.swift; sourceTree = "<group>"; };
+		7DEBBFA31EDF6AE900D23E27 /* ChatTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		7DEEF0961EB9B5B900DD624F /* ConfMenuTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfMenuTableViewController.swift; sourceTree = "<group>"; };
 		7DEEF0981EBAA1E900DD624F /* ConfMenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfMenuViewController.swift; sourceTree = "<group>"; };
 		7DF066951ECBE59A0010E382 /* SingleTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleTableViewController.swift; sourceTree = "<group>"; };
@@ -449,6 +457,9 @@
 				7DDD16F41EDBDC60004347DB /* FotosS1ViewController.swift */,
 				7DDD16F61EDE14AE004347DB /* BloquearS1ViewController.swift */,
 				7DDD16F81EDE14D3004347DB /* BloquearS1TableViewController.swift */,
+				7DEBBFA11EDF5DF600D23E27 /* SpeechBubble.swift */,
+				7DEBBFA31EDF6AE900D23E27 /* ChatTableViewCell.swift */,
+				7DE899441EE082A400A07B68 /* ChatBubbleData.swift */,
 			);
 			name = S1ngulares;
 			sourceTree = "<group>";
@@ -470,6 +481,7 @@
 				ABE536811DDE8A9600F7B2C6 /* TestsTableViewController.swift */,
 				AB3878C21DF0F77100C814F9 /* MostrarTestViewController.swift */,
 				AB3878C41DF0FA8500C814F9 /* DetalleTestTableViewController.swift */,
+				7D147DBB1EE4E9D0005ED8D9 /* ResultadoTableViewController.swift */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -817,8 +829,10 @@
 				7DEEF0971EB9B5B900DD624F /* ConfMenuTableViewController.swift in Sources */,
 				AB2465D61DB9DA480010A814 /* TextFieldIcon.swift in Sources */,
 				AB43C2CB1DC978DF00CA4E72 /* BienvenidaPaso4ViewController.swift in Sources */,
+				7DEBBFA41EDF6AE900D23E27 /* ChatTableViewCell.swift in Sources */,
 				7DEEF0991EBAA1E900DD624F /* ConfMenuViewController.swift in Sources */,
 				AB15CFE91DBA0E0E002ED6D1 /* BienvenidaPaso1ViewController.swift in Sources */,
+				7D147DBC1EE4E9D0005ED8D9 /* ResultadoTableViewController.swift in Sources */,
 				AB2465901DB83DC60010A814 /* AppDelegate.swift in Sources */,
 				AB2465D01DB9B60D0010A814 /* Colores.swift in Sources */,
 				7D50FECD1EB3B6FC002E1C80 /* Constantes.swift in Sources */,
@@ -834,6 +848,7 @@
 				AB3878CD1DFBB1E800C814F9 /* ClearButtonRounded.swift in Sources */,
 				7DDD16F11EDB5C37004347DB /* ChatS1TableViewController.swift in Sources */,
 				7DD609901EC12014004EB837 /* MIsFotosViewController.swift in Sources */,
+				7DEBBFA21EDF5DF600D23E27 /* SpeechBubble.swift in Sources */,
 				7DF2C62C1EB30BEB003DCB78 /* CustomAlertChildContainer.swift in Sources */,
 				AB2465CC1DB9B5500010A814 /* TabView.swift in Sources */,
 				AB6A78011DCD897A00E2C4C6 /* S1ngularesTableViewController.swift in Sources */,
@@ -844,6 +859,7 @@
 				AB15CFED1DBA2920002ED6D1 /* RangeSlider.swift in Sources */,
 				AB2465981DB83DC60010A814 /* S1ngular.xcdatamodeld in Sources */,
 				AB15CFEB1DBA1358002ED6D1 /* TextFieldRounded.swift in Sources */,
+				7DE899451EE082A400A07B68 /* ChatBubbleData.swift in Sources */,
 				AB2465CE1DB9B58A0010A814 /* TipView.swift in Sources */,
 				AB972D8E1E00DF9C0077463D /* CheckInsTableViewController.swift in Sources */,
 				AB3878CF1DFBB49200C814F9 /* RespuestaTestButton.swift in Sources */,
@@ -942,7 +958,7 @@
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension2/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.s1ngular.s1app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.s1ngular.s1app.ext;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;
@@ -958,7 +974,7 @@
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension2/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.s1ngular.s1app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.s1ngular.s1app.ext;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;
