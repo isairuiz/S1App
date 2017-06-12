@@ -27,6 +27,7 @@ class FotosS1ViewController: UIViewController {
     var swipeLeft = UISwipeGestureRecognizer()
     var swipeRight = UISwipeGestureRecognizer()
     var baseUrl = String()
+    var idPerfil = Int()
     
     
     let headers: HTTPHeaders = [
@@ -41,6 +42,8 @@ class FotosS1ViewController: UIViewController {
         // Borramos la line inferior del Navigationbar para que se una al subtitulo
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
         self.navigationController?.navigationBar.shadowImage = UIImage()
+        
+        idPerfil = DataUserDefaults.getIdVerPerfil()
         
         self.subtituloView.layer.shadowColor = UIColor.black.cgColor
         self.subtituloView.layer.shadowOpacity = 0.5
@@ -83,8 +86,9 @@ class FotosS1ViewController: UIViewController {
     }
 
     func getUserData(){
+        let finalUrl = "\(Constantes.VER_PERFIL_URL)\(idPerfil)"
         self.setLoadingScreen()
-        Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
+        Alamofire.request(finalUrl, headers: self.headers)
             .responseJSON {
                 response in
                 let json = JSON(response.result.value)

@@ -48,6 +48,8 @@
 	<string>Necesitamos usar tu ubicación para hacer check in y compartirlo con otros s1ngulares.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Actualizar tu perfil y compartir imágenes con la comunidad</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Compartir grabaciones de audio con otros s1ngulares</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Brandon_bld.otf</string>

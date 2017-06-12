@@ -16,7 +16,7 @@ class Constantes{
     static let EDITAR_QUE_BUSCO_URL = "http://40.84.231.88/singular/singular/editarquebusco"
     static let AGREGAR_FOTO = "http://40.84.231.88/singular/singular/agregarfotografia"
     static let VER_MI_PERFIL_URL = "http://40.84.231.88/singular/singular/vermiperfil"
-    static let VER_PERFIL_URL = ""
+    static let VER_PERFIL_URL = "http://40.84.231.88/singular/singular/verperfil?id="
     static let DEF_FOTO_PERFIL_URL = "http://40.84.231.88/singular/singular/definirfotografiaperfil"
     static let VISITAR_HOME_URL = "http://40.84.231.88/singular/singular/visitarhome"
 }

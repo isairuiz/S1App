@@ -8,13 +8,9 @@
 
 import UIKit
 
-protocol ButtonActionsDelegate{
-    func confirmButtonPressed(button:UIButton)
-}
 
 class CustomAlert: UIViewController {
 
-    var delegate:ButtonActionsDelegate!
     @IBOutlet weak var iconAlert: UIImageView!
     let layer = CAShapeLayer()
     let path = CGMutablePath()
@@ -83,7 +79,8 @@ class CustomAlert: UIViewController {
     }
     
     @IBAction func ConfirmAlert(_ sender: UIButton) {
-        delegate.confirmButtonPressed(button: sender)
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "buyConfirmedNotif"), object: nil)
+        close()
     }
     /*
     // MARK: - Navigat

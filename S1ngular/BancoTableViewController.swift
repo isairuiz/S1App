@@ -8,14 +8,25 @@
 
 import UIKit
 import MZFormSheetPresentationController
+import StoreKit
 
 
-class BancoTableViewController: UITableViewController, UITextFieldDelegate {
+class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKProductsRequestDelegate,SKPaymentTransactionObserver {
 
-    @IBOutlet weak var item1S1Credits: UITableViewCell!
-    @IBOutlet weak var item2S1Credits: UITableViewCell!
-    @IBOutlet weak var item3S1Credits: UITableViewCell!
+    @IBOutlet weak var item1S1Credits: BancoIAPTableViewCell!
+    @IBOutlet weak var item2S1Credits: BancoIAPTableViewCell!
+    @IBOutlet weak var item3S1Credits: BancoIAPTableViewCell!
+    
     @IBOutlet weak var cuponTextField: UITextField!
+    
+    let loadingView = UIView()
+    let spinner = UIActivityIndicatorView()
+    let loadingLabel = UILabel()
+    
+    var productIDs: Array<String?> = []
+    var productsArray: Array<SKProduct> = []
+    var selectedProductIndex: Int!
+    var transactionInProgress = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,9 +50,9 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate {
         
         self.cuponTextField.delegate = self
         
-        let tapViewItem1 = UITapGestureRecognizer(target: self, action: #selector(self.showCustomAlert(sender:)))
-        let tapViewItem2 = UITapGestureRecognizer(target: self, action: #selector(self.showCustomAlert(sender:)))
-        let tapViewItem3 = UITapGestureRecognizer(target: self, action: #selector(self.showCustomAlert(sender:)))
+        let tapViewItem1 = UITapGestureRecognizer(target: self, action: #selector(self.selectPaquete1(sender:)))
+        let tapViewItem2 = UITapGestureRecognizer(target: self, action: #selector(self.selectPaquete2(sender:)))
+        let tapViewItem3 = UITapGestureRecognizer(target: self, action: #selector(self.selectPaquete3(sender:)))
         
         self.item1S1Credits.addGestureRecognizer(tapViewItem1)
         self.item2S1Credits.addGestureRecognizer(tapViewItem2)
@@ -50,13 +61,116 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate {
         let tapView = UITapGestureRecognizer(target: self, action: #selector(self.finalizarEdicion(_:)))
         self.view.addGestureRecognizer(tapView)
         
+        productIDs.append("0001")
+        productIDs.append("0002")
+        productIDs.append("0003")
         
-
+        requestProductInfo()
+        
+        self.tableView.register(CreditsTableViewCell.self, forCellReuseIdentifier: "s1CreditsCell")
+        self.tableView.register(BancoIAPTableViewCell.self, forCellReuseIdentifier: "cellProduct")
+        self.tableView.register(CuponTableViewCell.self, forCellReuseIdentifier: "cuponCell")
+        
+        SKPaymentQueue.default().add(self)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(startBuyTransaction), name: NSNotification.Name(rawValue: "buyConfirmedNotif"), object: nil)
+        
     }
     
-    func showCustomAlert(sender: UITapGestureRecognizer){
+    
+    
+    func requestProductInfo() {
+        showLoader()
+        if SKPaymentQueue.canMakePayments() {
+            
+            let productIdentifiers = NSSet(array: productIDs)
+            let productRequest = SKProductsRequest(productIdentifiers: productIdentifiers as! Set<String>)
+            productRequest.delegate = self
+            productRequest.start()
+        }
+        else {
+            debugPrint("No se puede utilizar In App Purchases.")
+        }
+    }
+    
+    func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+        if response.products.count != 0{
+            var counter:Int = 0
+            for product in response.products{
+                productsArray.append(product)
+                let indexPath = IndexPath(row: counter, section: 1)
+                let cellProduct:BancoIAPTableViewCell = self.tableView.cellForRow(at: indexPath) as! BancoIAPTableViewCell
+                cellProduct.coinTitle.text = product.localizedTitle
+                cellProduct.coinPrice.text = "$\(product.price).00 MXN"
+                counter += 1
+            }
+            removeLoader()
+        }else{
+            debugPrint("No hay productos en appstore")
+        }
+        if response.invalidProductIdentifiers.count != 0 {
+            debugPrint("Nombre de producto invalido:")
+            debugPrint(response.invalidProductIdentifiers.description)
+        }
+    }
+    
+    func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+        for transaction in transactions {
+            switch transaction.transactionState {
+            case SKPaymentTransactionState.purchased:
+                debugPrint("Transaction complete :)")
+                SKPaymentQueue.default().finishTransaction(transaction)
+                transactionInProgress = false
+                removeLoader()
+                break
+            case SKPaymentTransactionState.failed:
+                debugPrint("Transaction failed :(")
+                SKPaymentQueue.default().finishTransaction(transaction)
+                transactionInProgress = false
+                removeLoader()
+                break
+            default:
+                debugPrint(transaction.transactionState.rawValue)
+                removeLoader()
+            }
+        }
+    }
+    
+    
+    
+    func selectPaquete1(sender: UITapGestureRecognizer){
+        if transactionInProgress{
+            return
+        }
+        selectedProductIndex = 0
+        showCustomAlert()
+    }
+    func selectPaquete2(sender: UITapGestureRecognizer){
+        if transactionInProgress{
+            return
+        }
+        selectedProductIndex = 1
+        showCustomAlert()
+    }
+    func selectPaquete3(sender: UITapGestureRecognizer){
+        if transactionInProgress{
+            return
+        }
+        selectedProductIndex = 2
+        showCustomAlert()
+    }
+    
+    func startBuyTransaction(){
+        showLoader()
+        let payment = SKPayment(product: self.productsArray[self.selectedProductIndex] as SKProduct)
+        SKPaymentQueue.default().add(payment)
+        self.transactionInProgress = true
+    }
+    
+    func showCustomAlert(){
         
         let viewController = self.storyboard!.instantiateViewController(withIdentifier: "CustomAlert")
+        
         let formSheetController = MZFormSheetPresentationViewController(contentViewController: viewController)
         formSheetController.presentationController?.isTransparentTouchEnabled = false
         self.present(formSheetController, animated: true, completion: nil)
@@ -105,6 +219,12 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate {
         tableView.cellForRow(at: indexPath)?.alpha = 1
     }
     
+    func showLoader(){
+        Utilerias.setCustomLoadingScreen(loadingView: self.loadingView, tableView: self.tableView, loadingLabel: self.loadingLabel, spinner: self.spinner)
+    }
+    func removeLoader(){
+        Utilerias.removeCustomLoadingScreen(loadingView: self.loadingView, loadingLabel: self.loadingLabel, spinner: self.spinner)
+    }
     
     // MARK: - Textfield Delegate
     

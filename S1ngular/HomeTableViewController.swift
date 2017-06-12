@@ -24,6 +24,14 @@ class HomeTableViewController: UITableViewController {
     @IBOutlet weak var nuevosCheckins: UILabel!
     @IBOutlet weak var nuevosTests: UILabel!
     
+    @IBOutlet weak var gotoS1Cell: UITableViewCell!
+    @IBOutlet weak var gotoMensajesCell: UITableViewCell!
+    @IBOutlet weak var gotoMisResultadosCell: UITableViewCell!
+    @IBOutlet weak var gotoNuevosTestsCell: UITableViewCell!
+    @IBOutlet weak var gotoCheckinsCell: UITableViewCell!
+    
+    
+    
     let headers: HTTPHeaders = [
         "Authorization": "Bearer "+DataUserDefaults.getUserToken()
     ]
@@ -40,6 +48,39 @@ class HomeTableViewController: UITableViewController {
         DataUserDefaults.setDefaultData()
         self.getUserData()
         self.visitarHome()
+        
+        let tapViewS1 = UITapGestureRecognizer(target: self, action: #selector(self.gotoS1(sender:)))
+        let tapViewMensajes = UITapGestureRecognizer(target: self, action: #selector(self.gotoMensajes(sender:)))
+        let tapViewResultados = UITapGestureRecognizer(target: self, action: #selector(self.gotoResultados(sender:)))
+        let tapViewNuevosTests = UITapGestureRecognizer(target: self, action: #selector(self.gotoNuevosTests(sender:)))
+        let tapViewCheckins = UITapGestureRecognizer(target: self, action: #selector(self.gotoCheckins(sender:)))
+        
+        self.gotoS1Cell.addGestureRecognizer(tapViewS1)
+        self.gotoMensajesCell.addGestureRecognizer(tapViewMensajes)
+        self.gotoMisResultadosCell.addGestureRecognizer(tapViewResultados)
+        self.gotoNuevosTestsCell.addGestureRecognizer(tapViewNuevosTests)
+        self.gotoCheckinsCell.addGestureRecognizer(tapViewCheckins)
+    }
+    
+    func gotoS1(sender: UITapGestureRecognizer){
+        //DataUserDefaults.setFromTabS1Nuevos(isit: true)
+        tabBarController?.selectedIndex = 1
+        
+    }
+    func gotoMensajes(sender: UITapGestureRecognizer){
+        //DataUserDefaults.setFromTabS1Nuevos(isit: false)
+        tabBarController?.selectedIndex = 1
+    }
+    func gotoResultados(sender: UITapGestureRecognizer){
+        //DataUserDefaults.setFromTabTestResult(isit: true)
+        tabBarController?.selectedIndex = 2
+    }
+    func gotoNuevosTests(sender: UITapGestureRecognizer){
+        //DataUserDefaults.setFromTabTestResult(isit: false)
+        tabBarController?.selectedIndex = 2
+    }
+    func gotoCheckins(sender: UITapGestureRecognizer){
+        tabBarController?.selectedIndex = 3
     }
     
     func getUserData(){

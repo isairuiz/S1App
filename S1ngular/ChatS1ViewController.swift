@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ChatS1ViewController: UIViewController,UITextFieldDelegate{
     @IBOutlet weak var subtituloView: UIView!
@@ -17,6 +18,11 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
     @IBOutlet weak var bottomConstTF: NSLayoutConstraint!
     @IBOutlet weak var audioButton: UIImageView!
     @IBOutlet weak var mensajeTextField: UITextField!
+    @IBOutlet weak var infoRecord: UILabel!
+    
+    
+    var recorder: AVAudioRecorder!
+    var player:AVAudioPlayer!
     
     
     let imageTestUrl = "http://2.bp.blogspot.com/-lnt7x6S-QDE/VXB4iM3jktI/AAAAAAAAEZc/Evr1d3aQJ5M/s1600/kiss.jpg"
@@ -58,6 +64,12 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         tapViewImage.cancelsTouchesInView = false
         imageTes.addGestureRecognizer(tapViewImage)
         profilePersona.customView = imageTes
+        
+        
+        //Audio tap button
+        audioTapView = UITapGestureRecognizer(target: self, action: #selector(self.startStopRecording(sender:)))
+        audioButton.addGestureRecognizer(audioTapView)
+        
         
         //Poniendo el boton de bloquear en el navigation bar
         bloquearButton.frame = CGRect(x:0,y:0,width:75,height:30)
@@ -109,7 +121,7 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         
         let animationDurarion = userInfo[UIKeyboardAnimationDurationUserInfoKey] as! TimeInterval
         
-        let changeInHeight = keyboardFrame.height - 30
+        let changeInHeight = keyboardFrame.height - 40
         
         UIView.animate(withDuration: animationDurarion, animations: { () -> Void in
             if show{
@@ -129,6 +141,72 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
     
     func gotoPerfilPersona(sender: UITapGestureRecognizer){
         self.performSegue(withIdentifier: "gotoPerfilPersona", sender: nil)
+    }
+    
+    func startStopRecording(sender: UITapGestureRecognizer){
+        /*if recorder == nil {
+            print("recording. recorder nil")
+            recordButton.setTitle("Pause", for:UIControlState())
+            //recordWithPermission(true)
+            return
+        }*/
+        
+    }
+    
+    func updateAudioMeter(_ timer:Timer) {
+        
+        if recorder.isRecording {
+            let min = Int(recorder.currentTime / 60)
+            let sec = Int(recorder.currentTime.truncatingRemainder(dividingBy: 60))
+            let s = String(format: "%02d:%02d", min, sec)
+            self.infoRecord.text = s
+            recorder.updateMeters()
+            // if you want to draw some graphics...
+            //var apc0 = recorder.averagePowerForChannel(0)
+            //var peak0 = recorder.peakPowerForChannel(0)
+        }
+    }
+    
+    /*func recordWithPermission(_ setup:Bool) {
+        let session:AVAudioSession = AVAudioSession.sharedInstance()
+        // ios 8 and later
+        if (session.responds(to: #selector(AVAudioSession.requestRecordPermission(_:)))) {
+            AVAudioSession.sharedInstance().requestRecordPermission({(granted: Bool)-> Void in
+                if granted {
+                    print("Permission to record granted")
+                    self.setSessionPlayAndRecord()
+                    if setup {
+                        self.setupRecorder()
+                    }
+                    self.recorder.record()
+                    self.meterTimer = Timer.scheduledTimer(timeInterval: 0.1,
+                                                           target:self,
+                                                           selector:#selector(self.updateAudioMeter(_:)),
+                                                           userInfo:nil,
+                                                           repeats:true)
+                } else {
+                    print("Permission to record not granted")
+                }
+            })
+        } else {
+            print("requestRecordPermission unrecognized")
+        }
+    }*/
+    
+    func setSessionPlayAndRecord() {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(AVAudioSessionCategoryPlayAndRecord)
+        } catch let error as NSError {
+            print("could not set session category")
+            print(error.localizedDescription)
+        }
+        do {
+            try session.setActive(true)
+        } catch let error as NSError {
+            print("could not make session active")
+            print(error.localizedDescription)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -152,21 +230,23 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         self.view.insertSubview(view, at:0)
         
     }
+    
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         if textField == self.mensajeTextField {
             debugPrint("empezare a escribir!!!")
-            self.childViewController.scrollView.scrollToEdge(position: .Bottom, animated: false)
-            return true
+            self.childViewController.scrollToBottom()
+            
         }
-        return false
+        return true
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == self.mensajeTextField {
             
-            //self.view.endEditing(true)
-            // Enviar
-            self.childViewController.enviarMensaje(mensaje: self.mensajeTextField.text!)
-            self.mensajeTextField.text = ""
+            if !(self.mensajeTextField.text?.isEmpty)!{
+                self.childViewController.enviarMensaje(mensaje: self.mensajeTextField.text!)
+                self.mensajeTextField.text = ""
+            }
+            
             
         }
         

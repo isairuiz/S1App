@@ -21,7 +21,9 @@ class TabView: UIView {
         get {
             return _tabSeleccionada
         }
-        
+        /*set{
+            _tabSeleccionada = tabSeleccionada
+        }*/
     }
     
     override init(frame: CGRect) {

@@ -44,6 +44,10 @@ class TestsTableViewController: UITableViewController {
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightButton)
         
+        /*if DataUserDefaults.getFromTabTestResult(){
+            tab.tabSeleccionada = 1
+        }*/
+        
         tab = TabView(frame: CGRect(x:0,y:0, width: self.view.frame.size.width, height: 66))
         
         tab.actualizarTextoBotones("NUEVOS", derecha: "RESULTADOS")

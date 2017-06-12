@@ -51,7 +51,10 @@ class DataUserDefaults{
         "idVerPerfil",//35
         "saldo",//Index 36
         "idFotoPerfil",//Index 37
-        "urlFotoPerfil"//Index 38
+        "urlFotoPerfil",//Index 38
+        "idPaqueteMonedas",//Index 39
+        "fromTabS1Nuevos", //Index 40
+        "fromTabTestRes"   //INDEX 41
     ]
     static func setDefaultData(){
         for i in 13 ..< 21{
@@ -68,6 +71,8 @@ class DataUserDefaults{
         defaults.set(0, forKey: keys[37])
         defaults.set("", forKey: keys[23])
         defaults.set("", forKey: keys[24])
+        defaults.set(false, forKey: keys[40])
+        defaults.set(false, forKey: keys[41])
     }
     /*******************TEMP DATA*******************/
     static func saveDataFoto(foto:Data){
@@ -364,9 +369,24 @@ class DataUserDefaults{
         return defaults.integer(forKey: keys[8])
     }
     
-    static func clearUserData(){
-        defaults.set("", forKey: keys[2])
-        defaults.set("", forKey: keys[3])
-        defaults.set("", forKey: keys[7])
+    static func setCurrentIdProcut(id:Int){
+        defaults.set(id, forKey: keys[39])
+    }
+    
+    static func getCurrentIdProduct()->Int{
+        return defaults.integer(forKey: keys[39])
+    }
+    
+    static func setFromTabS1Nuevos(isit:Bool){
+        defaults.set(isit, forKey: keys[40])
+    }
+    static func getFromTabS1Nuevos()->Bool{
+        return defaults.bool(forKey: keys[40])
+    }
+    static func setFromTabTestResult(isit:Bool){
+        defaults.set(isit, forKey: keys[41])
+    }
+    static func getFromTabTestResult()->Bool{
+        return defaults.bool(forKey: keys[41])
     }
 }

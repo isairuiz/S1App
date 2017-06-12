@@ -93,18 +93,19 @@ class ChatS1TableViewController: UITableViewController {
         cell.cellContainer.addConstraint(horizontalConstraint)
         cell.cellContainer.addConstraint(verticalConstraint)
         
-        debugPrint("/********************************************************************************************************************************************************************************************************************************/")
-        debugPrint("tantos mensajes:\(self.listaMessages.count)")
-        debugPrint("tantos mensajes menos 1:\(self.listaMessages.count-1)")
+
         debugPrint("el index path row:\(indexPath.row)")
         if indexPath.row == self.listaMessages.count-1{
-            self.scrollView.scrollToEdge(position: .Bottom, animated: true)
+            self.scrollView.scrollToEdge(position: .Bottom, animated: false)
         }
         
         return cell
         
     }
     
+    func scrollToBottom(){
+        self.tableViewScrollToBottom(animated: false)
+    }
     
     func enviarMensaje(mensaje:String){
         pintarMensajeEnviado(mensaje:mensaje)
@@ -119,12 +120,19 @@ class ChatS1TableViewController: UITableViewController {
         self.tableViewScrollToBottom(animated: false)
 
     }
-
+    
+    
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let isScrolledTop = scrollView.isScrolledToEdge(edge: .Top)
         if isScrolledTop{
             debugPrint("estoy en top!!!")
         }
+    }
+    
+    
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        keyboardWillHide()
     }
     
     

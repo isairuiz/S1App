@@ -14,14 +14,21 @@
 		7D2399E41EC2AB5000996179 /* EditarMiPerfil3TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2399E31EC2AB5000996179 /* EditarMiPerfil3TableViewController.swift */; };
 		7D382CB61EC4C86B00E07267 /* NotificacionesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D382CB51EC4C86B00E07267 /* NotificacionesViewController.swift */; };
 		7D382CB81EC4C87E00E07267 /* NotificacionesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D382CB71EC4C87E00E07267 /* NotificacionesTableViewController.swift */; };
+		7D3A24B61EE764EA00EB2A49 /* BancoIAPTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3A24B51EE764EA00EB2A49 /* BancoIAPTableViewCell.swift */; };
+		7D3A24B81EE7BA4000EB2A49 /* CreditsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3A24B71EE7BA4000EB2A49 /* CreditsTableViewCell.swift */; };
+		7D3A24BA1EE7BA5700EB2A49 /* CuponTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3A24B91EE7BA5700EB2A49 /* CuponTableViewCell.swift */; };
 		7D50FECB1EB39084002E1C80 /* DataUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50FECA1EB39084002E1C80 /* DataUserDefaults.swift */; };
 		7D50FECD1EB3B6FC002E1C80 /* Constantes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50FECC1EB3B6FC002E1C80 /* Constantes.swift */; };
 		7D5B068F1ED16F9F0084AA3C /* YeahTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D5B068E1ED16F9F0084AA3C /* YeahTableViewController.swift */; };
+		7D78CAB11EE701460097BD53 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D78CAB01EE701460097BD53 /* StoreKit.framework */; };
 		7D8DDA181ED96EC0001896E8 /* YeahCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8DDA171ED96EC0001896E8 /* YeahCollectionViewCell.swift */; };
 		7D943DA31EBB065700B66629 /* EditarMiPerfilViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D943DA21EBB065600B66629 /* EditarMiPerfilViewController.swift */; };
 		7D943DA51EBB068700B66629 /* EditarMiPerfilTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D943DA41EBB068700B66629 /* EditarMiPerfilTableViewController.swift */; };
 		7D949A141EB1B7AC008213C5 /* CustomAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D949A131EB1B7AC008213C5 /* CustomAlert.swift */; };
 		7D9675021EC55FC7008A967D /* MisFotosChildViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9675011EC55FC7008A967D /* MisFotosChildViewController.swift */; };
+		7D99D3D51EEA40CB00C9D62D /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D99D3D41EEA40CB00C9D62D /* test.m */; };
+		7DA054501EEB9C42009668D0 /* TuSingleChildTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA0544F1EEB9C42009668D0 /* TuSingleChildTableViewController.swift */; };
+		7DA054521EEB9CA4009668D0 /* AfinidadTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA054511EEB9CA4009668D0 /* AfinidadTableViewCell.swift */; };
 		7DA24D301ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA24D2F1ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift */; };
 		7DB70C441EC62A8700B80125 /* FotosCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DB70C431EC62A8700B80125 /* FotosCollectionViewCell.swift */; };
 		7DD609901EC12014004EB837 /* MIsFotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DD6098F1EC12014004EB837 /* MIsFotosViewController.swift */; };
@@ -137,14 +144,22 @@
 		7D2399E31EC2AB5000996179 /* EditarMiPerfil3TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditarMiPerfil3TableViewController.swift; sourceTree = "<group>"; };
 		7D382CB51EC4C86B00E07267 /* NotificacionesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificacionesViewController.swift; sourceTree = "<group>"; };
 		7D382CB71EC4C87E00E07267 /* NotificacionesTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificacionesTableViewController.swift; sourceTree = "<group>"; };
+		7D3A24B51EE764EA00EB2A49 /* BancoIAPTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BancoIAPTableViewCell.swift; sourceTree = "<group>"; };
+		7D3A24B71EE7BA4000EB2A49 /* CreditsTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreditsTableViewCell.swift; sourceTree = "<group>"; };
+		7D3A24B91EE7BA5700EB2A49 /* CuponTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CuponTableViewCell.swift; sourceTree = "<group>"; };
 		7D50FECA1EB39084002E1C80 /* DataUserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataUserDefaults.swift; sourceTree = "<group>"; };
 		7D50FECC1EB3B6FC002E1C80 /* Constantes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constantes.swift; sourceTree = "<group>"; };
 		7D5B068E1ED16F9F0084AA3C /* YeahTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YeahTableViewController.swift; sourceTree = "<group>"; };
+		7D78CAB01EE701460097BD53 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		7D8DDA171ED96EC0001896E8 /* YeahCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YeahCollectionViewCell.swift; sourceTree = "<group>"; };
 		7D943DA21EBB065600B66629 /* EditarMiPerfilViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditarMiPerfilViewController.swift; sourceTree = "<group>"; };
 		7D943DA41EBB068700B66629 /* EditarMiPerfilTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditarMiPerfilTableViewController.swift; sourceTree = "<group>"; };
 		7D949A131EB1B7AC008213C5 /* CustomAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAlert.swift; sourceTree = "<group>"; };
 		7D9675011EC55FC7008A967D /* MisFotosChildViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MisFotosChildViewController.swift; sourceTree = "<group>"; };
+		7D99D3D31EEA40CA00C9D62D /* S1ngular-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "S1ngular-Bridging-Header.h"; sourceTree = "<group>"; };
+		7D99D3D41EEA40CB00C9D62D /* test.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; };
+		7DA0544F1EEB9C42009668D0 /* TuSingleChildTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TuSingleChildTableViewController.swift; sourceTree = "<group>"; };
+		7DA054511EEB9CA4009668D0 /* AfinidadTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AfinidadTableViewCell.swift; sourceTree = "<group>"; };
 		7DA24D2F1ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MisFotosChildTableViewController.swift; sourceTree = "<group>"; };
 		7DB70C431EC62A8700B80125 /* FotosCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FotosCollectionViewCell.swift; sourceTree = "<group>"; };
 		7DC49F20ED494B8614B12151 /* Pods-S1ngularTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-S1ngularTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-S1ngularTests/Pods-S1ngularTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -235,6 +250,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D78CAB11EE701460097BD53 /* StoreKit.framework in Frameworks */,
 				AB40D0151E0A16000084EE91 /* MapKit.framework in Frameworks */,
 				D4AA5A84F29BA16F37B83135 /* Pods_S1ngular.framework in Frameworks */,
 			);
@@ -418,6 +434,8 @@
 				7DF2C62B1EB30BEB003DCB78 /* CustomAlertChildContainer.swift */,
 				7D50FECA1EB39084002E1C80 /* DataUserDefaults.swift */,
 				7D50FECC1EB3B6FC002E1C80 /* Constantes.swift */,
+				7D99D3D41EEA40CB00C9D62D /* test.m */,
+				7D99D3D31EEA40CA00C9D62D /* S1ngular-Bridging-Header.h */,
 			);
 			name = Common;
 			sourceTree = "<group>";
@@ -425,6 +443,7 @@
 		AB40D0131E0A16000084EE91 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7D78CAB01EE701460097BD53 /* StoreKit.framework */,
 				AB40D0141E0A16000084EE91 /* MapKit.framework */,
 				2D6C0693D0880FABA2256DB5 /* Pods_S1ngular.framework */,
 				8A77B9635089D101AF6D819B /* Pods_S1ngularTests.framework */,
@@ -439,6 +458,9 @@
 			children = (
 				AB6A77FD1DCD7E6900E2C4C6 /* HomeTableViewController.swift */,
 				AB0201841E9F1EE900EA505E /* BancoTableViewController.swift */,
+				7D3A24B51EE764EA00EB2A49 /* BancoIAPTableViewCell.swift */,
+				7D3A24B71EE7BA4000EB2A49 /* CreditsTableViewCell.swift */,
+				7D3A24B91EE7BA5700EB2A49 /* CuponTableViewCell.swift */,
 			);
 			name = Home;
 			sourceTree = "<group>";
@@ -460,6 +482,8 @@
 				7DEBBFA11EDF5DF600D23E27 /* SpeechBubble.swift */,
 				7DEBBFA31EDF6AE900D23E27 /* ChatTableViewCell.swift */,
 				7DE899441EE082A400A07B68 /* ChatBubbleData.swift */,
+				7DA0544F1EEB9C42009668D0 /* TuSingleChildTableViewController.swift */,
+				7DA054511EEB9CA4009668D0 /* AfinidadTableViewCell.swift */,
 			);
 			name = S1ngulares;
 			sourceTree = "<group>";
@@ -588,9 +612,13 @@
 					AB24658B1DB83DC60010A814 = {
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = 94N48GLS2L;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.InAppPurchase = {
 								enabled = 1;
 							};
 							com.apple.Maps.iOS = {
@@ -828,6 +856,7 @@
 				7D2399E41EC2AB5000996179 /* EditarMiPerfil3TableViewController.swift in Sources */,
 				7DEEF0971EB9B5B900DD624F /* ConfMenuTableViewController.swift in Sources */,
 				AB2465D61DB9DA480010A814 /* TextFieldIcon.swift in Sources */,
+				7DA054501EEB9C42009668D0 /* TuSingleChildTableViewController.swift in Sources */,
 				AB43C2CB1DC978DF00CA4E72 /* BienvenidaPaso4ViewController.swift in Sources */,
 				7DEBBFA41EDF6AE900D23E27 /* ChatTableViewCell.swift in Sources */,
 				7DEEF0991EBAA1E900DD624F /* ConfMenuViewController.swift in Sources */,
@@ -841,6 +870,7 @@
 				AB2465C71DB9A3650010A814 /* AccesoTableViewController.swift in Sources */,
 				AB72CE811DCC76CB00875D10 /* Utilierias.swift in Sources */,
 				7DB70C441EC62A8700B80125 /* FotosCollectionViewCell.swift in Sources */,
+				7D99D3D51EEA40CB00C9D62D /* test.m in Sources */,
 				7DF2C62A1EB2FA23003DCB78 /* MakeTransparentHoleOnOverlayView.swift in Sources */,
 				AB3878C51DF0FA8500C814F9 /* DetalleTestTableViewController.swift in Sources */,
 				7D50FECB1EB39084002E1C80 /* DataUserDefaults.swift in Sources */,
@@ -849,6 +879,7 @@
 				7DDD16F11EDB5C37004347DB /* ChatS1TableViewController.swift in Sources */,
 				7DD609901EC12014004EB837 /* MIsFotosViewController.swift in Sources */,
 				7DEBBFA21EDF5DF600D23E27 /* SpeechBubble.swift in Sources */,
+				7DA054521EEB9CA4009668D0 /* AfinidadTableViewCell.swift in Sources */,
 				7DF2C62C1EB30BEB003DCB78 /* CustomAlertChildContainer.swift in Sources */,
 				AB2465CC1DB9B5500010A814 /* TabView.swift in Sources */,
 				AB6A78011DCD897A00E2C4C6 /* S1ngularesTableViewController.swift in Sources */,
@@ -864,6 +895,7 @@
 				AB972D8E1E00DF9C0077463D /* CheckInsTableViewController.swift in Sources */,
 				AB3878CF1DFBB49200C814F9 /* RespuestaTestButton.swift in Sources */,
 				7DF066961ECBE59A0010E382 /* SingleTableViewController.swift in Sources */,
+				7D3A24BA1EE7BA5700EB2A49 /* CuponTableViewCell.swift in Sources */,
 				AB400C9D1DCD914B0083342A /* S1ngularesTableViewCell.swift in Sources */,
 				7D9675021EC55FC7008A967D /* MisFotosChildViewController.swift in Sources */,
 				AB40D0121E0A143E0084EE91 /* HacerCheckInTableViewController.swift in Sources */,
@@ -876,9 +908,11 @@
 				7D382CB81EC4C87E00E07267 /* NotificacionesTableViewController.swift in Sources */,
 				7D2399E21EC2AB3200996179 /* EditarMiPerfil3ViewController.swift in Sources */,
 				7D943DA51EBB068700B66629 /* EditarMiPerfilTableViewController.swift in Sources */,
+				7D3A24B81EE7BA4000EB2A49 /* CreditsTableViewCell.swift in Sources */,
 				7DDD16EF1EDB5C10004347DB /* ChatS1ViewController.swift in Sources */,
 				7D8DDA181ED96EC0001896E8 /* YeahCollectionViewCell.swift in Sources */,
 				7DA24D301ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift in Sources */,
+				7D3A24B61EE764EA00EB2A49 /* BancoIAPTableViewCell.swift in Sources */,
 				AB0201851E9F1EE900EA505E /* BancoTableViewController.swift in Sources */,
 				AB15CFF11DBA29FD002ED6D1 /* BienvenidaPaso1TableViewController.swift in Sources */,
 				7D5B068F1ED16F9F0084AA3C /* YeahTableViewController.swift in Sources */,
@@ -1082,6 +1116,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = S1ngular/S1ngular.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 94N48GLS2L;
@@ -1089,10 +1124,12 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
+				"OTHER_SWIFT_FLAGS[arch=*]" = "-Xfrontend -warn-long-function-bodies=50";
 				PRODUCT_BUNDLE_IDENTIFIER = com.s1ngular.s1app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_OBJC_BRIDGING_HEADER = "S1ngular/S1ngular-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -1103,6 +1140,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = S1ngular/S1ngular.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 94N48GLS2L;
@@ -1114,6 +1152,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "S1ngular/S1ngular-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				"SWIFT_OPTIMIZATION_LEVEL[arch=*]" = "-Owholemodule";
 				SWIFT_VERSION = 3.0;

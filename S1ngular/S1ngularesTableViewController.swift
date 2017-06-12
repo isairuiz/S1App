@@ -21,11 +21,16 @@ class S1ngularesTableViewController: UITableViewController {
 
         self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
         
+        /*if DataUserDefaults.getFromTabS1Nuevos(){
+            tab.tabSeleccionada = 1
+        }*/
+        
         tab = TabView(frame: CGRect(x:0,y:0, width: self.view.frame.size.width, height: 66))
         
         tab.actualizarTextoBotones("CHAT", derecha: "NUEVOS")
         tab.botonIzquierda!.addTarget(self, action: #selector(self.cambiarPrimerTab), for: UIControlEvents.touchUpInside)
         tab.botonDerecha!.addTarget(self, action: #selector(self.cambiarSegundoTab), for: UIControlEvents.touchUpInside)
+        
         
         
         listaNuevos = [
