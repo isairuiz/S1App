@@ -54,7 +54,8 @@ class DataUserDefaults{
         "urlFotoPerfil",//Index 38
         "idPaqueteMonedas",//Index 39
         "fromTabS1Nuevos", //Index 40
-        "fromTabTestRes"   //INDEX 41
+        "fromTabTestRes",   //INDEX 41
+        "idTestComprar", //Index 42
     ]
     static func setDefaultData(){
         for i in 13 ..< 21{
@@ -388,5 +389,11 @@ class DataUserDefaults{
     }
     static func getFromTabTestResult()->Bool{
         return defaults.bool(forKey: keys[41])
+    }
+    static func setIdComprarTest(idTest:Int){
+        defaults.set(idTest, forKey: keys[42])
+    }
+    static func getIdComprarTest()->Int{
+        return defaults.integer(forKey: keys[42])
     }
 }

@@ -15,6 +15,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
 
     @IBOutlet weak var facebookButton: UIView!
     @IBOutlet weak var facebookButtonLabel: UILabel!
+    @IBOutlet weak var fbImage: UIImageView!
     @IBOutlet weak var aceptarButton: UIView!
     @IBOutlet weak var tabLoginViewCell: UITableViewCell!
     
@@ -32,6 +33,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var facebookTableViewCell: UITableViewCell!
     @IBOutlet weak var aceptarTableViewCell: UITableViewCell!
     @IBOutlet weak var terminosCondicionesTableViewCell: UITableViewCell!
+    @IBOutlet weak var recuperContraseñaCell: UITableViewCell!
     
 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -77,6 +79,9 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
         
         let tapFacebook = UITapGestureRecognizer(target: self, action: #selector(self.facebookButtonTap(_:)))
         self.facebookTableViewCell.addGestureRecognizer(tapFacebook   )
+        let tapViewRecuperar = UITapGestureRecognizer(target: self, action: #selector(self.recuperarPassword(_:)))
+        
+        recuperContraseñaCell.addGestureRecognizer(tapViewRecuperar)
         
         self.tableView.layoutIfNeeded()
         
@@ -134,6 +139,30 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
         self.view.endEditing(true)
     }
     
+    func recuperarPassword(_ sender: UITapGestureRecognizer){
+        let alertController = UIAlertController(title: "Recuperar Contraseña", message: "Ingresa tu correo por favor:", preferredStyle: .alert)
+        
+        let confirmAction = UIAlertAction(title: "Recuperar", style: .default) { (_) in
+            if let field = alertController.textFields?[0] {
+                // store your data
+                
+            } else {
+                // user did not fill field
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancelar", style: .cancel) { (_) in }
+        
+        alertController.addTextField { (textField) in
+            textField.placeholder = "Correo"
+        }
+        
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+    
+    }
     
     func cambiarPrimerTab (){
         
@@ -189,6 +218,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     
     func showActIndicatorFB(){
         facebookButtonLabel.isHidden = true
+        fbImage.isHidden = true
         actIndicatorFB.isHidden = false
         actIndicatorFB.startAnimating()
         UIApplication.shared.beginIgnoringInteractionEvents()
@@ -196,6 +226,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     
     func hideActIndicatorFB(){
         facebookButtonLabel.isHidden = false
+        fbImage.isHidden = false
         actIndicatorFB.stopAnimating()
         UIApplication.shared.endIgnoringInteractionEvents()
     }
@@ -452,9 +483,6 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     
     // MARK: - Action
     
-    @IBAction func recuperarPasswordAction(_ sender: AnyObject) {
-        
-    }
     
     
     // MARK: - Tableview

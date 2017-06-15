@@ -11,6 +11,8 @@ import UIKit
 class MostrarTestViewController: UIViewController {
     
     @IBOutlet weak var subtituloView: UIView!
+    var item: TestItem?
+    var childViewController = DetalleTestTableViewController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +29,12 @@ class MostrarTestViewController: UIViewController {
         self.subtituloView.layer.shadowRadius = 3
     }
     
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let vc = segue.destination as? DetalleTestTableViewController, segue.identifier == "testChildSegue"{
+            self.childViewController = vc
+        }
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         

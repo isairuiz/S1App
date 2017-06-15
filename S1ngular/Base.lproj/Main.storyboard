@@ -416,9 +416,6 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                                     <fontDescription key="fontDescription" name="BrandonGrotesque-Bold" family="Brandon Grotesque" pointSize="17"/>
                                                     <state key="normal" title="Recupera tu contraseña"/>
-                                                    <connections>
-                                                        <action selector="recuperarPasswordAction:" destination="biE-MA-qrq" eventType="touchUpInside" id="pzb-hn-sft"/>
-                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <constraints>
@@ -494,7 +491,9 @@
                         <outlet property="facebookButton" destination="gvS-Yu-GJd" id="nca-aB-xYh"/>
                         <outlet property="facebookButtonLabel" destination="xh2-7F-zgr" id="c51-Nf-qvG"/>
                         <outlet property="facebookTableViewCell" destination="69m-Kq-qB1" id="W6z-5M-sUO"/>
+                        <outlet property="fbImage" destination="pvo-X5-NQQ" id="jpU-Pi-fqU"/>
                         <outlet property="passwordTextField" destination="IdG-s0-zc0" id="fLZ-dN-R7V"/>
+                        <outlet property="recuperContraseñaCell" destination="GUq-jW-4eL" id="4aY-w5-QG7"/>
                         <outlet property="tabLoginViewCell" destination="rFu-hV-lD0" id="XnD-gb-ys3"/>
                         <outlet property="terminosCondicionesTableViewCell" destination="JPn-CZ-kHm" id="noo-w0-pPD"/>
                         <segue destination="1ca-YD-9OP" kind="show" identifier="MostrarBienvenida" id="IRZ-y4-gda"/>
@@ -2183,7 +2182,7 @@
                                                                 <constraint firstAttribute="height" constant="42" id="cN5-pF-qdw"/>
                                                             </constraints>
                                                         </imageView>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1,250 S1 Credits" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JKq-qN-hgx">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0 S1 Credits" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JKq-qN-hgx">
                                                             <rect key="frame" x="66" y="23" width="230" height="31.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Light" family="Brandon Grotesque" pointSize="22"/>
                                                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2230,13 +2229,13 @@
                                                                 <constraint firstAttribute="width" constant="42" id="TzS-7q-SmB"/>
                                                             </constraints>
                                                         </imageView>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$ 39.00 MXN" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="33L-Z8-o6G">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$ 0.00 MXN" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="33L-Z8-o6G">
                                                             <rect key="frame" x="66" y="44.5" width="230" height="20.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="14"/>
                                                             <color key="textColor" red="0.26274509800000001" green="0.2901960784" blue="0.35294117650000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="500 S1 Credits" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ftg-iZ-gMu">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0 S1 Credits" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ftg-iZ-gMu">
                                                             <rect key="frame" x="66" y="14" width="230" height="31.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Light" family="Brandon Grotesque" pointSize="22"/>
                                                             <color key="textColor" red="1" green="0.45098039509999999" blue="0.43921568989999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -2286,13 +2285,13 @@
                                                                 <constraint firstAttribute="width" constant="42" id="Xak-QI-v8J"/>
                                                             </constraints>
                                                         </imageView>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$ 39.00 MXN" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jk1-kJ-p94">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$ 0.00 MXN" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jk1-kJ-p94">
                                                             <rect key="frame" x="66" y="44.5" width="230" height="20.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="14"/>
                                                             <color key="textColor" red="0.26274509800000001" green="0.2901960784" blue="0.35294117650000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="500 S1 Credits" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fja-aB-968">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0 S1 Credits" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fja-aB-968">
                                                             <rect key="frame" x="66" y="14" width="230" height="31.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Light" family="Brandon Grotesque" pointSize="22"/>
                                                             <color key="textColor" red="1" green="0.45098039509999999" blue="0.43921568989999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -2342,13 +2341,13 @@
                                                                 <constraint firstAttribute="width" constant="42" id="vY1-96-vue"/>
                                                             </constraints>
                                                         </imageView>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$ 39.00 MXN" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ulp-Bv-OWE">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$ 0.00 MXN" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ulp-Bv-OWE">
                                                             <rect key="frame" x="66" y="44.5" width="230" height="20.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="14"/>
                                                             <color key="textColor" red="0.26274509800000001" green="0.2901960784" blue="0.35294117650000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="500 S1 Credits" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yiy-P7-ufX">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0 S1 Credits" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yiy-P7-ufX">
                                                             <rect key="frame" x="66" y="14" width="230" height="31.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Light" family="Brandon Grotesque" pointSize="22"/>
                                                             <color key="textColor" red="1" green="0.45098039509999999" blue="0.43921568989999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -2443,6 +2442,7 @@
                         <outlet property="item1S1Credits" destination="41j-rx-Ycp" id="lzB-9G-scF"/>
                         <outlet property="item2S1Credits" destination="H1i-an-oSp" id="Atr-Wi-4Em"/>
                         <outlet property="item3S1Credits" destination="XxF-ke-R8I" id="eHx-Rv-Yyg"/>
+                        <outlet property="s1credits" destination="JKq-qN-hgx" id="cMV-Sp-HEh"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rT8-PW-fqA" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -2566,7 +2566,7 @@
             <objects>
                 <tableViewController id="O2u-P5-Ahb" customClass="TuSingleChildTableViewController" customModule="S1ngular" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="e3s-Fg-Vaz">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="168"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="176.5"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <prototypes>
@@ -3115,7 +3115,7 @@
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="Celda" rowHeight="108" id="Q2f-vF-Acy" customClass="S1ngularesTableViewCell" customModule="S1ngular" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="55.5" width="320" height="108"/>
+                                <rect key="frame" x="0.0" y="56" width="320" height="108"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Q2f-vF-Acy" id="7kp-Mu-Qpf">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="108"/>
@@ -3143,13 +3143,13 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="John Valdéz" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mgV-dI-uOa">
-                                                    <rect key="frame" x="108" y="8" width="148" height="34.5"/>
+                                                    <rect key="frame" x="108" y="8" width="148" height="28"/>
                                                     <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="24"/>
                                                     <color key="textColor" red="0.93333333730000001" green="0.94117647410000005" blue="0.9529411793" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="37 metros · 2:30hr" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="366-MI-PfK">
-                                                    <rect key="frame" x="108" y="42.5" width="148" height="12"/>
+                                                    <rect key="frame" x="108" y="36" width="148" height="12"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="10"/>
                                                     <color key="textColor" red="0.58431372550000005" green="0.56470588239999997" blue="0.61960784310000006" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -3240,7 +3240,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="320" height="330"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="D8A-f6-ZiD" id="ZA5-uD-OXp">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="329.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="330"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="AgregarSinSombra" translatesAutoresizingMaskIntoConstraints="NO" id="hJS-lu-aZ1" userLabel="stats button">
@@ -3270,28 +3270,28 @@
                                                     <rect key="frame" x="0.0" y="245" width="320" height="330"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="NOMBRE/APELLIDO/AVATAR" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2SD-r8-yuk">
-                                                            <rect key="frame" x="10" y="5" width="226" height="24.5"/>
+                                                            <rect key="frame" x="10" y="5" width="226" height="20"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="17"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PROFESION" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hab-BY-Vez">
-                                                            <rect key="frame" x="10" y="31.5" width="80" height="20.5"/>
+                                                            <rect key="frame" x="10" y="27" width="80" height="16.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="14"/>
                                                             <color key="textColor" red="1" green="0.45098039220000002" blue="0.43921568630000002" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TabCheckIn" translatesAutoresizingMaskIntoConstraints="NO" id="mtm-wr-pSl">
-                                                            <rect key="frame" x="10" y="60" width="25" height="25"/>
+                                                            <rect key="frame" x="10" y="51.5" width="25" height="25"/>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Parque delta" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zZu-hZ-r9a">
-                                                            <rect key="frame" x="43.5" y="54" width="69.5" height="20.5"/>
+                                                            <rect key="frame" x="38.5" y="45.5" width="79.5" height="16.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Bold" family="Brandon Grotesque" pointSize="14"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="69" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eSo-sC-WCF" userLabel="afinidadTotal">
-                                                            <rect key="frame" x="23" y="110" width="45" height="45"/>
+                                                            <rect key="frame" x="23" y="101.5" width="45" height="45"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="45" id="2Zb-4I-Qf1"/>
@@ -3302,7 +3302,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="COMPATIBILIDAD TOTAL" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9Je-0Q-56n">
-                                                            <rect key="frame" x="76" y="122" width="251" height="21"/>
+                                                            <rect key="frame" x="76" y="113.5" width="251" height="21"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="21" id="ANv-Th-0uR"/>
                                                                 <constraint firstAttribute="width" constant="251" id="ryb-4c-ZTp"/>
@@ -3312,7 +3312,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="30" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yfa-oV-BRg">
-                                                            <rect key="frame" x="63" y="174" width="30" height="30"/>
+                                                            <rect key="frame" x="63" y="165.5" width="30" height="30"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="30" id="4zv-Bd-2Mu"/>
@@ -3323,7 +3323,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="40" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AAh-E5-EMY">
-                                                            <rect key="frame" x="63" y="223" width="30" height="30"/>
+                                                            <rect key="frame" x="63" y="214.5" width="30" height="30"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="30" id="i7E-uT-xfq"/>
@@ -3334,7 +3334,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="50" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cDF-JJ-p7t">
-                                                            <rect key="frame" x="63" y="272" width="30" height="30"/>
+                                                            <rect key="frame" x="63" y="263.5" width="30" height="30"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="30" id="7TM-Cd-gNj"/>
@@ -3345,7 +3345,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Valor 1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5iF-4M-vvS">
-                                                            <rect key="frame" x="101" y="179" width="211" height="21"/>
+                                                            <rect key="frame" x="101" y="170.5" width="211" height="21"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="21" id="Tod-yU-FCm"/>
                                                                 <constraint firstAttribute="width" constant="211" id="xh7-PL-hDT"/>
@@ -3355,7 +3355,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Valor 2" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="97S-u2-lda">
-                                                            <rect key="frame" x="101" y="228" width="211" height="21"/>
+                                                            <rect key="frame" x="101" y="219.5" width="211" height="21"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="211" id="9ds-3B-JJ9"/>
                                                                 <constraint firstAttribute="height" constant="21" id="zFS-Ea-OOH"/>
@@ -3365,7 +3365,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Valor 3" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pxz-5z-wv3">
-                                                            <rect key="frame" x="101" y="277" width="211" height="21"/>
+                                                            <rect key="frame" x="101" y="268.5" width="211" height="21"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="21" id="Aa9-8m-7IB"/>
                                                                 <constraint firstAttribute="width" constant="211" id="qU0-uG-Gfo"/>
@@ -3450,7 +3450,7 @@
                                         <rect key="frame" x="0.0" y="330" width="320" height="150"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="N61-UZ-ltC" id="cTK-2Y-rNG">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="149.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="150"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="QaF-9A-cTz">
@@ -3475,7 +3475,7 @@
                                         <rect key="frame" x="0.0" y="480" width="320" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Hpi-bL-U9m" id="jo1-EH-xId">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="99.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p2L-Vs-vTT">
@@ -3750,7 +3750,7 @@
                                                                 <constraint firstAttribute="height" constant="32" id="SgS-hA-EHb"/>
                                                             </constraints>
                                                         </imageView>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100 S1NGLE CREDITS" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gxy-S1-3CZ">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0 S1NGLE CREDITS" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gxy-S1-3CZ">
                                                             <rect key="frame" x="48" y="45.5" width="208" height="20.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="14"/>
                                                             <color key="textColor" red="0.26274509800000001" green="0.2901960784" blue="0.35294117650000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -4123,6 +4123,7 @@
                         <outlet property="gotoMisResultadosCell" destination="aao-rl-yhe" id="M5f-BM-Y3e"/>
                         <outlet property="gotoNuevosTestsCell" destination="2Jd-mA-xbd" id="oqP-6Z-3Wr"/>
                         <outlet property="gotoS1Cell" destination="c5N-IA-s26" id="FOy-D9-XET"/>
+                        <outlet property="misaldo" destination="gxy-S1-3CZ" id="yjB-DG-36q"/>
                         <outlet property="nuevosCheckins" destination="4P3-EQ-t5t" id="cpE-ie-axu"/>
                         <outlet property="nuevosMensajes" destination="qG1-pq-q6T" id="scV-Yg-p2D"/>
                         <outlet property="nuevosSingulares" destination="chU-ln-qdc" id="kVF-kY-4LN"/>
@@ -4219,7 +4220,7 @@
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="Celda" rowHeight="140" id="DlG-QO-4zs">
-                                <rect key="frame" x="0.0" y="55.5" width="320" height="140"/>
+                                <rect key="frame" x="0.0" y="56" width="320" height="140"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DlG-QO-4zs" id="MI8-8E-SUe">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="140"/>
@@ -4236,7 +4237,7 @@
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="HABLEMOS DE SEXO" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gkQ-4W-Wet">
-                                                    <rect key="frame" x="99" y="8" width="157" height="30.5"/>
+                                                    <rect key="frame" x="99" y="8" width="157" height="24.5"/>
                                                     <fontDescription key="fontDescription" name="BrandonGrotesque-Light" family="Brandon Grotesque" pointSize="21"/>
                                                     <color key="textColor" red="0.93333333730000001" green="0.94117647410000005" blue="0.9529411793" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -4288,7 +4289,7 @@
                                                             </constraints>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" tag="4" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-0000" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wIW-Ux-YYT">
-                                                            <rect key="frame" x="41" y="15" width="42" height="17.5"/>
+                                                            <rect key="frame" x="41" y="17" width="42" height="14"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="42" id="5KA-P5-HqE"/>
                                                             </constraints>
@@ -4342,7 +4343,7 @@
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="CeldaResultados" rowHeight="108" id="up2-yb-U07">
-                                <rect key="frame" x="0.0" y="195.5" width="320" height="108"/>
+                                <rect key="frame" x="0.0" y="196" width="320" height="108"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="up2-yb-U07" id="kFj-6i-Bqz">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="108"/>
@@ -4446,7 +4447,7 @@
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Q0c-le-jZ2">
                                 <rect key="frame" x="0.0" y="44" width="320" height="411"/>
                                 <connections>
-                                    <segue destination="ZVE-zv-vrH" kind="embed" id="tcB-2V-39I"/>
+                                    <segue destination="ZVE-zv-vrH" kind="embed" identifier="testChildSegue" id="tcB-2V-39I"/>
                                 </connections>
                             </containerView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VHC-UF-KUc">
@@ -4804,7 +4805,7 @@
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="0.0" reuseIdentifier="CeldaCheckIn" rowHeight="92" id="nmu-wC-MgI">
-                                <rect key="frame" x="0.0" y="55.5" width="320" height="92"/>
+                                <rect key="frame" x="0.0" y="56" width="320" height="92"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nmu-wC-MgI" id="8pj-Rv-wtz">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="92"/>
@@ -4828,13 +4829,13 @@
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Y FOMENTA EL CIRCUITO S1NGULAR" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u0o-k8-Xpl">
-                                                    <rect key="frame" x="48" y="45.5" width="208" height="20.5"/>
+                                                    <rect key="frame" x="48" y="40" width="208" height="16.5"/>
                                                     <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="14"/>
                                                     <color key="textColor" red="0.26274509800000001" green="0.2901960784" blue="0.35294117650000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="¡HAZ CHECK IN!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3XM-em-WG4">
-                                                    <rect key="frame" x="48" y="14" width="208" height="31.5"/>
+                                                    <rect key="frame" x="48" y="14" width="208" height="26"/>
                                                     <fontDescription key="fontDescription" name="BrandonGrotesque-Light" family="Brandon Grotesque" pointSize="22"/>
                                                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -4865,7 +4866,7 @@
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="Celdad" rowHeight="108" id="gQd-7j-LIi" customClass="CheckInTableViewCell" customModule="S1ngular" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="147.5" width="320" height="108"/>
+                                <rect key="frame" x="0.0" y="148" width="320" height="108"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="gQd-7j-LIi" id="ios-on-hyz">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="108"/>
@@ -4883,13 +4884,13 @@
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="John Valdéz" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f4j-ES-O0V">
-                                                    <rect key="frame" x="108" y="8" width="111.5" height="34.5"/>
+                                                    <rect key="frame" x="108" y="8" width="130" height="28"/>
                                                     <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="24"/>
                                                     <color key="textColor" red="0.93333333730000001" green="0.94117647410000005" blue="0.9529411793" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="37 metros · 2:30hr" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e6s-AA-dfR">
-                                                    <rect key="frame" x="108" y="42.5" width="82" height="12"/>
+                                                    <rect key="frame" x="108" y="36" width="82" height="12"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="10"/>
                                                     <color key="textColor" red="0.58431372550000005" green="0.56470588239999997" blue="0.61960784310000006" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -4970,7 +4971,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="Celda" rowHeight="108" id="z8i-ZW-PTm" customClass="CheckInTableViewCell" customModule="S1ngular" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="255.5" width="320" height="108"/>
+                                <rect key="frame" x="0.0" y="256" width="320" height="108"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="z8i-ZW-PTm" id="9re-Oa-kxL">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="108"/>
@@ -4999,13 +5000,13 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="John Valdéz" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pD3-vx-SfD">
-                                                    <rect key="frame" x="108" y="8" width="148" height="34.5"/>
+                                                    <rect key="frame" x="108" y="8" width="148" height="28"/>
                                                     <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="24"/>
                                                     <color key="textColor" red="0.93333333730000001" green="0.94117647410000005" blue="0.9529411793" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="37 metros · 2:30hr" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a4n-wx-Gco">
-                                                    <rect key="frame" x="108" y="42.5" width="148" height="12"/>
+                                                    <rect key="frame" x="108" y="36" width="148" height="12"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="10"/>
                                                     <color key="textColor" red="0.58431372550000005" green="0.56470588239999997" blue="0.61960784310000006" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -6066,7 +6067,7 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="259.5"/>
                                                 </imageView>
                                                 <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Aun no tienes fotos para mostrar." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6BG-jN-VbP">
-                                                    <rect key="frame" x="30" y="115.5" width="260" height="29"/>
+                                                    <rect key="frame" x="30" y="116.5" width="260" height="29"/>
                                                     <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="20"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <nil key="highlightedColor"/>
@@ -7876,7 +7877,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="320" height="330"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="028-wx-CkA" id="7u5-ch-Gta">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="329.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="330"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="nGl-Bx-XqW">
@@ -7906,22 +7907,22 @@
                                                     <rect key="frame" x="0.0" y="245" width="320" height="330"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="NOMBRE/APELLIDO/AVATAR" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rUR-OB-xfT">
-                                                            <rect key="frame" x="10" y="5" width="226" height="24.5"/>
+                                                            <rect key="frame" x="10" y="5" width="226" height="20"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="17"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PROFESION" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h9g-bD-wJu">
-                                                            <rect key="frame" x="10" y="31.5" width="80" height="20.5"/>
+                                                            <rect key="frame" x="10" y="27" width="80" height="16.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="14"/>
                                                             <color key="textColor" red="1" green="0.45098039220000002" blue="0.43921568630000002" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TabCheckIn" translatesAutoresizingMaskIntoConstraints="NO" id="BoX-jG-N9w">
-                                                            <rect key="frame" x="10" y="60" width="25" height="24"/>
+                                                            <rect key="frame" x="10" y="51.5" width="25" height="24"/>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Parque delta" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="olc-Bu-sO8">
-                                                            <rect key="frame" x="44" y="53" width="69.5" height="21"/>
+                                                            <rect key="frame" x="44" y="44.5" width="79.5" height="21"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="21" id="wsa-CU-dn1"/>
                                                             </constraints>
@@ -7930,7 +7931,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="69" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qsw-7t-wHJ" userLabel="afinidadTotal">
-                                                            <rect key="frame" x="23" y="109" width="45" height="45"/>
+                                                            <rect key="frame" x="23" y="100.5" width="45" height="45"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="45" id="IK5-TI-b75"/>
@@ -7941,7 +7942,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="COMPATIBILIDAD TOTAL" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xNs-0U-0q7">
-                                                            <rect key="frame" x="76" y="121" width="251" height="21"/>
+                                                            <rect key="frame" x="76" y="112.5" width="251" height="21"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="21" id="0TI-P5-UBl"/>
                                                                 <constraint firstAttribute="width" constant="251" id="XCR-Cc-B6M"/>
@@ -7951,7 +7952,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Xs-wW-8lb">
-                                                            <rect key="frame" x="0.0" y="162" width="320" height="168"/>
+                                                            <rect key="frame" x="0.0" y="153.5" width="320" height="176.5"/>
                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                             <connections>
                                                                 <segue destination="O2u-P5-Ahb" kind="embed" identifier="TuSingleChildSegue" id="OvP-EJ-PbV"/>
@@ -8003,7 +8004,7 @@
                                         <rect key="frame" x="0.0" y="330" width="320" height="150"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Xsp-XN-mHR" id="gYE-2U-zbZ">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="149.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="150"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="5Z5-fV-Vv1">
@@ -8090,8 +8091,8 @@
                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="fPv-GQ-51u">
                                 <rect key="frame" x="0.0" y="44" width="320" height="411"/>
                             </imageView>
-                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Aun no hay fotos para mostrar." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CLX-aB-a2P">
-                                <rect key="frame" x="39.5" y="237.5" width="241" height="29"/>
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="El usuario no tiene fotos para mostrar." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CLX-aB-a2P">
+                                <rect key="frame" x="12.5" y="238.5" width="296" height="29"/>
                                 <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="20"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
@@ -8426,44 +8427,44 @@
                                         <rect key="frame" x="0.0" y="0.0" width="320" height="300"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="9Ir-v6-4Wj" id="N4h-0K-4QM">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="299.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="300"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9N5-xj-Act">
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="299.5"/>
                                                 </imageView>
                                                 <visualEffectView opaque="NO" alpha="0.30000001192092896" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="otB-cV-rDp" userLabel="FloatingVIew">
-                                                    <rect key="frame" x="0.0" y="216.5" width="320" height="78.5"/>
+                                                    <rect key="frame" x="0.0" y="227" width="320" height="68"/>
                                                     <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="3Cb-C4-Shg">
-                                                        <rect key="frame" x="0.0" y="0.0" width="320" height="78.5"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="320" height="68"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </view>
                                                     <color key="backgroundColor" red="0.26274509800000001" green="0.2901960784" blue="0.35294117650000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <blurEffect style="dark"/>
                                                 </visualEffectView>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DpV-Ta-qzD" userLabel="Floating2">
-                                                    <rect key="frame" x="0.0" y="216.5" width="320" height="78.5"/>
+                                                    <rect key="frame" x="0.0" y="227" width="320" height="68"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="NOMBRE DEL TEST" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n1k-SY-bxS">
-                                                            <rect key="frame" x="10" y="5" width="148.5" height="24.5"/>
+                                                            <rect key="frame" x="10" y="5" width="156" height="20"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="17"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Titulo del resultado del test" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oKq-Em-ckv">
-                                                            <rect key="frame" x="10" y="31.5" width="148" height="20.5"/>
+                                                            <rect key="frame" x="10" y="27" width="169.5" height="16.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Medium" family="Brandon Grotesque" pointSize="14"/>
                                                             <color key="textColor" red="1" green="0.45098039220000002" blue="0.43921568630000002" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TabCheckIn" translatesAutoresizingMaskIntoConstraints="NO" id="cA9-yh-sqE">
-                                                            <rect key="frame" x="10" y="50.5" width="25" height="25"/>
+                                                            <rect key="frame" x="10" y="40" width="25" height="25"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="25" id="b32-B3-qk1"/>
                                                             </constraints>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Categoria Test" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IKP-22-ujk">
-                                                            <rect key="frame" x="43" y="53" width="115" height="20.5"/>
+                                                            <rect key="frame" x="43" y="44.5" width="136.5" height="16.5"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Bold" family="Brandon Grotesque" pointSize="14"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <nil key="highlightedColor"/>
@@ -8505,7 +8506,7 @@
                                         <rect key="frame" x="0.0" y="300" width="320" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="UsT-Lh-vA4" id="1IW-bx-M9g">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="99.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="8mr-SU-KS6">
@@ -8530,7 +8531,7 @@
                                         <rect key="frame" x="0.0" y="400" width="320" height="78"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KlL-0k-cVk" id="Skm-ru-ufC">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="77.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="78"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9bc-PH-0p1">
@@ -8553,7 +8554,7 @@
                                                             </constraints>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="COMPARTE TU RESULTADO" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9bc-Cq-eSe">
-                                                            <rect key="frame" x="48" y="18" width="208" height="24.5"/>
+                                                            <rect key="frame" x="48" y="20.5" width="208" height="20"/>
                                                             <fontDescription key="fontDescription" name="BrandonGrotesque-Light" family="Brandon Grotesque" pointSize="17"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <nil key="highlightedColor"/>

@@ -71,7 +71,7 @@ class Utilerias {
         UIApplication.shared.endIgnoringInteractionEvents()
         // Hides and stops the text and the spinner
         spinner.stopAnimating()
-        loadingView.removeFromSuperview()
+        loadingView.isHidden = true
 
     }
     

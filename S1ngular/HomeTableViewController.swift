@@ -30,6 +30,7 @@ class HomeTableViewController: UITableViewController {
     @IBOutlet weak var gotoNuevosTestsCell: UITableViewCell!
     @IBOutlet weak var gotoCheckinsCell: UITableViewCell!
     
+    @IBOutlet weak var misaldo: UILabel!
     
     
     let headers: HTTPHeaders = [
@@ -84,7 +85,7 @@ class HomeTableViewController: UITableViewController {
     }
     
     func getUserData(){
-        self.setLoadingScreen()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
         
         Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
             .responseJSON {
@@ -97,6 +98,7 @@ class HomeTableViewController: UITableViewController {
                         debugPrint("saldo:")
                         debugPrint(saldo)
                         DataUserDefaults.setSaldo(saldo: saldo)
+                        self.misaldo.text = "\(saldo) S1NGLE CREDITS"
                     }
                     if let nombre = json["perfil"]["nombre"].string{
                         debugPrint("nombre:")
@@ -219,9 +221,9 @@ class HomeTableViewController: UITableViewController {
                     DataUserDefaults.setCurrentId(id: 17)
                     /******************//******************//******************/
                     
-                    self.removeLoadingScreen()
+                    Utilerias.removeCustomLoadingScreen(loadingView: self.loadingView, loadingLabel: self.loadingLabel, spinner: self.spinner)
                 }else{
-                    self.removeLoadingScreen()
+                    Utilerias.removeCustomLoadingScreen(loadingView: self.loadingView, loadingLabel: self.loadingLabel, spinner: self.spinner)
                 }
             }
             
@@ -229,7 +231,7 @@ class HomeTableViewController: UITableViewController {
     }
     
     func visitarHome(){
-        self.setLoadingScreen()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
         Alamofire.request(Constantes.VISITAR_HOME_URL, headers: self.headers)
             .responseJSON {
                 response in
@@ -250,9 +252,9 @@ class HomeTableViewController: UITableViewController {
                         if let checkinsNuevos = json["home"]["chekins_cercanos"].int{
                             self.nuevosCheckins.text = "¡\(checkinsNuevos) S1NGULARES A TU ALREDEDOR!"
                         }
-                        self.removeLoadingScreen()
+                        Utilerias.removeCustomLoadingScreen(loadingView: self.loadingView, loadingLabel: self.loadingLabel, spinner: self.spinner)
                     }else{
-                        self.removeLoadingScreen()
+                        Utilerias.removeCustomLoadingScreen(loadingView: self.loadingView, loadingLabel: self.loadingLabel, spinner: self.spinner)
                     }
                 }
         }
@@ -311,46 +313,6 @@ class HomeTableViewController: UITableViewController {
     }
     
     
-    private func setLoadingScreen() {
-        UIApplication.shared.beginIgnoringInteractionEvents()
-        // Sets the view which contains the loading text and the spinner
-        let width: CGFloat = 140
-        let height: CGFloat = 50
-        let x = (self.tableView.frame.width / 2) - (width / 2)
-        let y = (self.tableView.frame.height / 2) - (height / 2)
-        loadingView.frame = CGRect(x:x, y:y, width:width, height:height)
-        loadingView.clipsToBounds = true
-        loadingView.layer.cornerRadius = 5
-        loadingView.backgroundColor = Colores.BGPink
-        
-        // Sets loading text
-        self.loadingLabel.textColor = Colores.BGWhite
-        self.loadingLabel.textAlignment = NSTextAlignment.center
-        self.loadingLabel.text = "Cargando..."
-        self.loadingLabel.frame = CGRect(x:0+15, y:0+7, width:150, height:30)
-        
-        // Sets spinner
-        self.spinner.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge
-        self.spinner.frame = CGRect(x:0, y:0, width:50, height:50)
-        self.spinner.startAnimating()
-        
-        // Adds text and spinner to the view
-        loadingView.addSubview(self.spinner)
-        loadingView.addSubview(self.loadingLabel)
-        
-        self.tableView.addSubview(loadingView)
-        
-    }
-    
-    // Remove the activity indicator from the main view
-    private func removeLoadingScreen() {
-        UIApplication.shared.endIgnoringInteractionEvents()
-        // Hides and stops the text and the spinner
-        self.spinner.stopAnimating()
-        self.loadingLabel.isHidden = true
-        self.loadingView.isHidden = true
-        
-    }
 
     /*
     // MARK: - Navigation

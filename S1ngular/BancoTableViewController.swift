@@ -9,7 +9,8 @@
 import UIKit
 import MZFormSheetPresentationController
 import StoreKit
-
+import Alamofire
+import SwiftyJSON
 
 class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKProductsRequestDelegate,SKPaymentTransactionObserver {
 
@@ -17,16 +18,27 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
     @IBOutlet weak var item2S1Credits: BancoIAPTableViewCell!
     @IBOutlet weak var item3S1Credits: BancoIAPTableViewCell!
     
+    @IBOutlet weak var s1credits: UILabel!
     @IBOutlet weak var cuponTextField: UITextField!
     
     let loadingView = UIView()
     let spinner = UIActivityIndicatorView()
     let loadingLabel = UILabel()
     
+    let loadingView2 = UIView()
+    let spinner2 = UIActivityIndicatorView()
+    let loadingLabel2 = UILabel()
+    
     var productIDs: Array<String?> = []
     var productsArray: Array<SKProduct> = []
     var selectedProductIndex: Int!
+    var idPaqueteSingular: Int!
     var transactionInProgress = false
+    
+    let headers: HTTPHeaders = [
+        "Authorization": "Bearer "+DataUserDefaults.getUserToken()
+    ]
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,6 +70,9 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
         self.item2S1Credits.addGestureRecognizer(tapViewItem2)
         self.item3S1Credits.addGestureRecognizer(tapViewItem3)
         
+        self.cuponTextField.returnKeyType = .send
+        
+        self.s1credits.text = "\(DataUserDefaults.getSaldo()) S1 Credits"
         let tapView = UITapGestureRecognizer(target: self, action: #selector(self.finalizarEdicion(_:)))
         self.view.addGestureRecognizer(tapView)
         
@@ -121,7 +136,7 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
                 debugPrint("Transaction complete :)")
                 SKPaymentQueue.default().finishTransaction(transaction)
                 transactionInProgress = false
-                removeLoader()
+                comprarPaqueteS1(id: self.idPaqueteSingular)
                 break
             case SKPaymentTransactionState.failed:
                 debugPrint("Transaction failed :(")
@@ -136,13 +151,57 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
         }
     }
     
+    func comprarPaqueteS1(id:Int){
+        let parameters: Parameters = ["id_paquete": id]
+        Alamofire.request(Constantes.COMPRAR_PAQUETE, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if status{
+                        if let saldos1 = json["saldo"].int{
+                            self.s1credits.text = "\(saldos1) S1 Credits"
+                            DataUserDefaults.setSaldo(saldo: saldos1)
+                        }
+                    }else{
+                    }
+                }
+        }
+    }
     
+    func canjearCupon(cupon:String){
+        let parameters: Parameters = ["codigo": cupon]
+        Alamofire.request(Constantes.CANJEAR_CUPON, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if status{
+                        if let saldo = json["saldo"].int{
+                            self.s1credits.text = "\(saldo) S1 Credits"
+                            DataUserDefaults.setSaldo(saldo: saldo)
+                            if let message = json["mensaje_plain"].string{
+                                self.showAlertWithMessage(title: "¡Bien!", message: message)
+                            }
+                        }
+                    }else{
+                        if let errorMessage = json["mensaje_plain"].string{
+                            self.showAlertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                        }
+                    }
+                    self.cuponTextField.text = ""
+                }
+        }
+    }
     
     func selectPaquete1(sender: UITapGestureRecognizer){
         if transactionInProgress{
             return
         }
         selectedProductIndex = 0
+        idPaqueteSingular = 4
         showCustomAlert()
     }
     func selectPaquete2(sender: UITapGestureRecognizer){
@@ -150,6 +209,7 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
             return
         }
         selectedProductIndex = 1
+        idPaqueteSingular = 5
         showCustomAlert()
     }
     func selectPaquete3(sender: UITapGestureRecognizer){
@@ -157,6 +217,7 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
             return
         }
         selectedProductIndex = 2
+        idPaqueteSingular = 6
         showCustomAlert()
     }
     
@@ -165,6 +226,12 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
         let payment = SKPayment(product: self.productsArray[self.selectedProductIndex] as SKProduct)
         SKPaymentQueue.default().add(payment)
         self.transactionInProgress = true
+    }
+    
+    func showAlertWithMessage(title:String,message:String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     func showCustomAlert(){
@@ -220,7 +287,12 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
     }
     
     func showLoader(){
+        self.loadingView.isHidden = false
+        self.loadingLabel.isHidden = false
+        self.spinner.isHidden = false
+        self.spinner.startAnimating()
         Utilerias.setCustomLoadingScreen(loadingView: self.loadingView, tableView: self.tableView, loadingLabel: self.loadingLabel, spinner: self.spinner)
+        
     }
     func removeLoader(){
         Utilerias.removeCustomLoadingScreen(loadingView: self.loadingView, loadingLabel: self.loadingLabel, spinner: self.spinner)
@@ -231,9 +303,12 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
        
         if textField == self.cuponTextField {
-            
-            self.view.endEditing(true)
-            // Enviar
+            let codigo:String = self.cuponTextField.text!
+            if !codigo.isEmpty{
+                self.canjearCupon(cupon: codigo)
+            }else{
+                debugPrint("no hay codigo")
+            }
         }
         
         return true

@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import SwiftyJSON
 
 struct MessageItem{
     let text: String
@@ -63,9 +64,10 @@ struct TestItem {
     let costo:Int
     let recompensa:Int
     let imagen:String
+    let preguntas:Int
     
     
-    init(id:Int, nombre:String, descripcion:String, costo:Int, recompensa:Int, imagen:String, resultado:String = ""){
+    init(id:Int, nombre:String, descripcion:String, costo:Int, recompensa:Int, imagen:String, resultado:String = "", preguntas:Int){
         self.id = id
         self.nombre = nombre
         self.descripcion = descripcion
@@ -73,7 +75,7 @@ struct TestItem {
         self.recompensa = recompensa
         self.resultado = resultado
         self.imagen = imagen
-        
+        self.preguntas = preguntas
     }
     
     
@@ -88,8 +90,10 @@ struct Test {
     let costo:Int
     let recompensa:Int
     let imagen:String
+    let ambito:String
+    let contestado:Bool
     
-    init(id:Int, nombre:String, descripcion:String, tag:String, costo:Int, recompensa:Int, imagen:String, preguntas:[TestPregunta]){
+    init(id:Int, nombre:String, descripcion:String, tag:String, costo:Int, recompensa:Int, imagen:String, preguntas:[TestPregunta],ambito:String,contestado:Bool){
         self.id = id
         self.nombre = nombre
         self.descripcion = descripcion
@@ -98,7 +102,8 @@ struct Test {
         self.recompensa = recompensa
         self.preguntas = preguntas
         self.imagen = imagen
-        
+        self.ambito = ambito
+        self.contestado = contestado
     }
 }
 
@@ -133,11 +138,15 @@ enum TipoRespuesta {
 struct TestRespuesta {
     let id:Int
     let respuesta:String
+    let descripcion:String
+    let imagen:String
     let color:UIColor
     
-    init(id: Int, respuesta:String = "", color:UIColor = UIColor.clear){
+    init(id: Int, respuesta:String = "", color:UIColor = UIColor.clear,descripcion:String,imagen:String){
         self.id = id
         self.respuesta = respuesta
         self.color = color
+        self.descripcion = descripcion
+        self.imagen = imagen
     }
 }
