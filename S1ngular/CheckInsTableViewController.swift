@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
 
 class CheckInsTableViewController: UITableViewController {
     
@@ -17,6 +19,10 @@ class CheckInsTableViewController: UITableViewController {
     var listaMisCheckIns:[GeneralTableItem] = []
     
     var fondoConfigurado: Bool = false
+    
+    let headers: HTTPHeaders = [
+        "Authorization": "Bearer "+DataUserDefaults.getUserToken()
+    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,24 +48,6 @@ class CheckInsTableViewController: UITableViewController {
             
             
             GeneralTableItem(id: 1, nombre: "Joaquín de Mola", distancia: "103 metros", tiempo: "", lugar: "Starbucks Delta", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "http://cdn.newsapi.com.au/image/v1/8c092d874974a3e4b9fa060a3b30eb05", badge: "85", compartir: false, resaltar: false, restriccion: 50)
-        ]
-        
-        
-        self.listaMisCheckIns = [
-            
-            
-            GeneralTableItem(id: 1, nombre: "YO", distancia: "37 metros", tiempo: "2:30 hrs", lugar: "Starbucks Delta", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "http://trendom.co/wp-content/uploads/2015/11/tumblr_nusfkwzzHv1qflffco1_1280.jpg", badge: "42", compartir: true, resaltar: false, restriccion: 0),
-            
-            GeneralTableItem(id: 1, nombre: "Zac Efron", distancia: "626 metros", tiempo: "7:16 hrs", lugar: "De Barbas", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "http://pixel.nymag.com/imgs/daily/vulture/2016/01/19/19-zac-efron-tweet-mlk.w529.h529.jpg", badge: "85", compartir: false, resaltar: false, restriccion: 0),
-            
-            GeneralTableItem(id: 1, nombre: "Megan Licona", distancia: "220 metros", tiempo: "8:58 hrs", lugar: "Zambuca", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "http://www.stereomar94fm.com.ve/wp-content/uploads/2016/05/ladygaga-500x375.jpg", badge: "69", compartir: false, resaltar: false, restriccion: 10),
-            
-            GeneralTableItem(id: 1, nombre: "YO", distancia: "3 km", tiempo: "1 día", lugar: "Starbucks Delta", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "http://trendom.co/wp-content/uploads/2015/11/tumblr_nusfkwzzHv1qflffco1_1280.jpg", badge: "42", compartir: true, resaltar: false, restriccion: 0),
-            
-            GeneralTableItem(id: 1, nombre: "Pharrell Williams", distancia: "103 metros", tiempo: "2 semanas", lugar: "Chuti de terán", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "http://media.dlccdn.com/artistas/p/pharrell-williams/pharrell-williams_o.jpg", badge: "85", compartir: false, resaltar: false, restriccion: 20)
-            
-            
-            
         ]
         
         
@@ -103,7 +91,9 @@ class CheckInsTableViewController: UITableViewController {
     }
     
     func cambiarSegundoTab (){
-        self.tableView.reloadData()
+        self.listaMisCheckIns.removeAll()
+        self.obtenerMisCheckins()
+        
         
     }
     
@@ -291,6 +281,45 @@ class CheckInsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.performSegue(withIdentifier: "MostrarHacerCheckIn", sender: self)
+    }
+    
+    
+    func obtenerMisCheckins(){
+        let fotoPerfilUrl = DataUserDefaults.getFotoPerfilUrl()
+        let loadingView = UIView()
+        let spinner = UIActivityIndicatorView()
+        let loadingLabel = UILabel()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+        Alamofire.request(Constantes.MIS_CHECKINS, headers: self.headers)
+            .responseJSON {
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if(status){
+                        if !json["checkins"].isEmpty{
+                            let checkins : [JSON] = json["checkins"].arrayValue
+                            for checkin in checkins{
+                                let idCheck  = checkin["id"].int
+                                let fecha = checkin["fecha"].string
+                                _ = checkin["latitud"].double
+                                _ = checkin["longitud"].double
+                                let titulo = checkin["titulo"].string
+                                let contenido = checkin["contenido"].string
+                                let cal = checkin["calificacion"].int
+                                
+                                self.listaMisCheckIns.append(
+                                    GeneralTableItem(id: idCheck!, nombre: "\(String(describing: cal)) Estrellas", distancia: "", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: fotoPerfilUrl, badge: "42", compartir: false, resaltar: false, restriccion: 0)
+                                )
+                            }
+                            self.tableView.reloadData()
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        }
+                    }else{
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                    }
+                }
+        }
     }
 
     /*

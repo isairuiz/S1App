@@ -122,7 +122,7 @@ class TuS1ngleTableViewController: UITableViewController {
                                     if Int(foto.key) == idFotoPerfil{
                                         var urlImage = self.baseUrl
                                         urlImage += foto.value
-                                        self.imagePerifl.downloadedFrom(link: urlImage)
+                                        self.imagePerifl.downloadedFrom(link: urlImage, withBlur:false,maxBlur:0)
                                     }
                                 }
                             }

@@ -7,20 +7,22 @@
 //
 
 import UIKit
+import SwiftyJSON
+import Alamofire
 
 class SingleTableViewController: UITableViewController,UIGestureRecognizerDelegate {
     @IBOutlet weak var FloatingView: UIVisualEffectView!
     @IBOutlet weak var Floating2: UIView!
     @IBOutlet weak var statsButton: UIImageView!
     @IBOutlet weak var imagePerifl: UIImageView!
+    @IBOutlet weak var nombrePersona: UILabel!
+    @IBOutlet weak var profesionPersona: UILabel!
+    @IBOutlet weak var descPersona: UITextView!
     
     
     @IBOutlet weak var lentesButton: UIImageView!
     @IBOutlet weak var afinidadPreview: UILabel!
     @IBOutlet weak var afinidadTotal: UILabel!
-    @IBOutlet weak var afinidad1: UILabel!
-    @IBOutlet weak var afinidad2: UILabel!
-    @IBOutlet weak var afinidad3: UILabel!
     
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet weak var siButton: UIButton!
@@ -33,19 +35,17 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
     var tapViewLentes = UITapGestureRecognizer()
     var tapViewFloating = UITapGestureRecognizer()
     var tapViewStats = UITapGestureRecognizer()
+    
+    var childView = TuSingleChildTableViewController()
+    
+    let jsonPerfilString = DataUserDefaults.getJsonPerfilPersona()
+    var jsonPerfilObject : JSON?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        /*swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(self.respondToSwipeDown))
-        swipeDown.direction = UISwipeGestureRecognizerDirection.down
-        
-        swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(self.respondToSwipeUp))
-        swipeUp.direction = UISwipeGestureRecognizerDirection.up*/
 
         scrollView = UIScrollView(frame: self.view.frame)
         scrollView.delegate = self
-        //swipeDown.delegate = self
-        //swipeUp.delegate = self
         
         
         
@@ -68,9 +68,6 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
         
         makeLabelRounded(label: self.afinidadPreview)
         makeLabelRounded(label: self.afinidadTotal)
-        makeLabelRounded(label: self.afinidad1)
-        makeLabelRounded(label: self.afinidad2)
-        makeLabelRounded(label: self.afinidad3)
         
         
         
@@ -101,6 +98,53 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
         self.noButton.layer.shadowOpacity = 1.0
         self.noButton.layer.shadowRadius = 3
         self.noButton.layer.masksToBounds = false
+        
+        if let dataFromString = jsonPerfilString.data(using: .utf8, allowLossyConversion: false){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+            var fotitos = Dictionary<String, String>()
+            jsonPerfilObject = JSON(data: dataFromString)
+            var jsonAfinidades:[JSON] = []
+            var fotoUrl = String()
+            if !(self.jsonPerfilObject?["afinidad"].isEmpty)!{
+                jsonAfinidades = (self.jsonPerfilObject?["afinidad"].arrayValue)!
+                self.childView.setAfinidadesForTable(afinidades: jsonAfinidades)
+                for afin in jsonAfinidades{
+                    if afin["ambito"].string == "Total"{
+                        if let porcent = afin["porcentaje"].int{
+                            debugPrint("AFINIDAD TOTAL:\(porcent)")
+                            self.afinidadTotal.text = String(porcent)
+                            self.afinidadPreview.text = String(porcent)
+                        }
+                    }
+                }
+            }
+            if !(jsonPerfilObject?["fotografias"].isEmpty)!{
+                fotoUrl += Constantes.BASE_URL
+                fotitos = jsonPerfilObject?["fotografias"].dictionaryObject as! Dictionary<String, String>
+                fotoUrl += Array(fotitos.values)[0]
+                self.imagePerifl.downloadedFrom(link: fotoUrl,withBlur:true,maxBlur:50)
+                
+            }
+            if let nombre = jsonPerfilObject?["nombre"].string{
+                self.nombrePersona.text = nombre
+            }
+            if let profesion = jsonPerfilObject?["profesion"].string{
+                self.profesionPersona.text = profesion
+            }
+            if let desc = jsonPerfilObject?["descripcion"].string{
+                self.descPersona.text = desc
+            }
+            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let vc = segue.destination as? TuSingleChildTableViewController, segue.identifier == "visitarPerfilChildSegue"{
+            self.childView = vc
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

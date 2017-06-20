@@ -24,5 +24,11 @@ class Constantes{
     static let COMPRAR_TEST_URL = "http://40.84.231.88/singular/singular/comprartest"
     static let COMPRAR_PAQUETE = "http://40.84.231.88/singular/singular/comprarpaquete"
     static let CANJEAR_CUPON = "http://40.84.231.88/singular/singular/canjearcupon"
+    static let RESPONDER_TEST = "http://40.84.231.88/singular/singular/respondertest"
+    static let VER_RESULTADO_TEST = "http://40.84.231.88/singular/singular/verresultadotest?id_test="
+    static let MIS_RESULTADOS_TEST = "http://40.84.231.88/singular/singular/verresultadostest"
+    static let MIS_CHECKINS = "http://40.84.231.88/singular/singular/listarmischeckins"
+    static let LISTAR_PROSPECTOS = "http://40.84.231.88/singular/singular/listarprospectos"
+    static let LISTAR_CHATS = ""
     
 }

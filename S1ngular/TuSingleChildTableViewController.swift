@@ -35,10 +35,11 @@ class TuSingleChildTableViewController: UITableViewController {
         
         let itemAfinidad = jsonAfinidades[indexPath.row]
         if let ambito = itemAfinidad["ambito"].string{
-            cell.ambito.text = ambito
-        }
-        if let numero = itemAfinidad["porcentaje"].string{
-            cell.porcentaje.text = numero
+            if ambito != "Total"{
+                cell.ambito.text = ambito
+                let numero = itemAfinidad["porcentaje"].string
+                cell.porcentaje.text = numero
+            }
         }
         
         return cell

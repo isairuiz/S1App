@@ -79,7 +79,7 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! YeahCollectionViewCell
         
-        cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row])
+        cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:false,maxBlur:0)
         
         return cell
         

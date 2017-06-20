@@ -71,7 +71,7 @@ class Utilerias {
         UIApplication.shared.endIgnoringInteractionEvents()
         // Hides and stops the text and the spinner
         spinner.stopAnimating()
-        loadingView.isHidden = true
+        loadingView.removeFromSuperview()
 
     }
     
@@ -79,7 +79,7 @@ class Utilerias {
     
 }
 public extension UIImageView {
-    func downloadedFrom(url: URL, contentMode mode: UIViewContentMode = .scaleAspectFill) {
+    func downloadedFrom(url: URL, contentMode mode: UIViewContentMode = .scaleAspectFill, withBlur:Bool,maxBlur:Float) {
         contentMode = mode
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard
@@ -89,14 +89,19 @@ public extension UIImageView {
                 let image = UIImage(data: data)
                 else { return }
             DispatchQueue.main.async() { () -> Void in
-                self.image = image
+                if withBlur{
+                    self.image = Utilerias.aplicarEfectoDifuminacionImagen(image, intensidad: maxBlur)
+                }else{
+                    self.image = image
+                }
+                
             }
             }.resume()
     }
-    func downloadedFrom(link: String, contentMode mode: UIViewContentMode = .scaleAspectFill) {
+    func downloadedFrom(link: String, contentMode mode: UIViewContentMode = .scaleAspectFill, withBlur:Bool, maxBlur:Float) {
         guard let url = URL(string: link) else { return }
         debugPrint(url)
-        downloadedFrom(url: url, contentMode: mode)
+        downloadedFrom(url: url, contentMode: mode, withBlur:withBlur, maxBlur:maxBlur)
     }
 }
 

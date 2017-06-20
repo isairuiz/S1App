@@ -1124,7 +1124,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
-				"OTHER_SWIFT_FLAGS[arch=*]" = "-Xfrontend -warn-long-function-bodies=50";
 				PRODUCT_BUNDLE_IDENTIFIER = com.s1ngular.s1app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1148,6 +1147,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"-Xfrontend\" \"-warn-long-function-bodies=50\" \"COCOAPODS\"";
+				"OTHER_SWIFT_FLAGS[arch=*]" = "$(inherited) \"-D\" \"-Xfrontend\" \"-warn-long-function-bodies=50\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.s1ngular.s1app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

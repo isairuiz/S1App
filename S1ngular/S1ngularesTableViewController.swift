@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
 
 class S1ngularesTableViewController: UITableViewController {
     
@@ -15,6 +17,13 @@ class S1ngularesTableViewController: UITableViewController {
     var imagenCache = [String: UIImage]()
     var listaChat:[GeneralTableItem] = []
     var listaNuevos:[GeneralTableItem] = []
+    
+    let headers: HTTPHeaders = [
+        "Authorization": "Bearer "+DataUserDefaults.getUserToken()
+    ]
+    var prospectos : [JSON] = []
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,11 +42,11 @@ class S1ngularesTableViewController: UITableViewController {
         
         
         
-        listaNuevos = [
+        /*listaNuevos = [
             GeneralTableItem(id: 18, nombre: "TEST luna", distancia: "", tiempo: "", lugar: "", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua.", avatar: "http://www.meganfox.com/wp-content/uploads/2014/01/5.jpg", badge: "", compartir: false, resaltar: false, restriccion: 50),
             
             GeneralTableItem(id: 19, nombre: "TEST sam", distancia: "", tiempo: "", lugar: "", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua", avatar: "http://ell.h-cdn.co/assets/16/07/980x490/landscape-1455813161-elle-henrycavill.jpg", badge: "", compartir: false, resaltar: false, restriccion: 50)
-        ]
+        ]*/
         
         
         listaChat = [
@@ -47,8 +56,6 @@ class S1ngularesTableViewController: UITableViewController {
             
             GeneralTableItem(id: 17, nombre: "TEST Angel Ruiz", distancia: "626 metros", tiempo: "7:16 hrs", lugar: "De Barbas", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua", avatar: "http://pixel.nymag.com/imgs/daily/vulture/2016/01/19/19-zac-efron-tweet-mlk.w529.h529.jpg", badge: "4", compartir: false, resaltar: false, restriccion: 0),
             
-            
-            
             GeneralTableItem(id: 19, nombre: "TEST Sam", distancia: "2 metros", tiempo: "8:58 hrs", lugar: "", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua", avatar: "http://segnorasque.com/wp-content/uploads/2016/06/jolie.jpeg", badge: "", compartir: false, resaltar: false, restriccion: 20),
             
             GeneralTableItem(id: 1, nombre: "Pharrell Williams", distancia: "3 km", tiempo: "1 día", lugar: "Chuti de terán", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua", avatar: "http://media.dlccdn.com/artistas/p/pharrell-williams/pharrell-williams_o.jpg", badge: "85", compartir: false, resaltar: true, restriccion: 30)
@@ -56,6 +63,8 @@ class S1ngularesTableViewController: UITableViewController {
         
             
         ]
+        
+        //self.listarNuevosProspectos()
 
     }
 
@@ -244,6 +253,7 @@ class S1ngularesTableViewController: UITableViewController {
             var item: GeneralTableItem?
             item = self.listaNuevos[(indexPath! as NSIndexPath).row]
             DataUserDefaults.setIdVerPerfil(id: (item?.id)!)
+            DataUserDefaults.setJsonPerfilPersona(json: prospectos[(indexPath! as NSIndexPath).row].description)
             performSegue(withIdentifier: "gotoVerPerfil", sender: nil)
         }else{
             let indexPath = tableView.indexPathForSelectedRow
@@ -254,25 +264,61 @@ class S1ngularesTableViewController: UITableViewController {
         }
     }
     
-    // MARK: - Acciones y eventos
-    
-    func cambiarPrimerTab (){
-       
-        /*self.tableView.beginUpdates()
-        self.tableView.endUpdates()*/
-        self.tableView.reloadData()
-        
+    func listarChats(){
         
     }
     
-    func cambiarSegundoTab (){
-        
-       
-        
-        /*self.tableView.beginUpdates()
-        self.tableView.endUpdates()*/
+    func listarNuevosProspectos(){
+        let loadingView = UIView()
+        let spinner = UIActivityIndicatorView()
+        let loadingLabel = UILabel()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+        Alamofire.request(Constantes.LISTAR_PROSPECTOS, headers: self.headers)
+            .responseJSON {
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if(status){
+                        if !json["mensaje_plain"].isEmpty{
+                            self.prospectos = json["mensaje_plain"].arrayValue
+                            for prospecto in self.prospectos{
+                                var fotitos = Dictionary<String, String>()
+                                let id  = prospecto["id"].int
+                                let nombre = prospecto["nombre"].string
+                                let sobre_mi = prospecto["sobre_mi"].string
+                                _ = prospecto["foto_visible"].int
+                                var fotoUrl = String()
+                                if !prospecto["fotografias"].isEmpty{
+                                    fotoUrl += Constantes.BASE_URL
+                                    fotitos = prospecto["fotografias"].dictionaryObject as! Dictionary<String, String>
+                                    fotoUrl += Array(fotitos.values)[0]
+                                    
+                                }
+                                self.listaNuevos.append(GeneralTableItem(id: id!, nombre: nombre!, distancia: "", tiempo: "", lugar: "", descripcion: sobre_mi!, avatar: fotoUrl, badge: "", compartir: false, resaltar: false, restriccion: 50))
+                            }
+                            self.tableView.reloadData()
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        }else{
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        }
+                    }else{
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                    }
+                }
+        }
+    }
+    
+    // MARK: - Acciones y eventos
+    
+    func cambiarPrimerTab (){
         self.tableView.reloadData()
-        
+    }
+    
+    func cambiarSegundoTab (){
+        self.listaNuevos.removeAll()
+        self.prospectos.removeAll()
+        listarNuevosProspectos()
     }
     
 

@@ -54,7 +54,7 @@ class EditarMiPerfilTableViewController: UITableViewController {
             self.profesion.text = "Configura tu profesion"
         }
         if fotoPerfilUrl != ""{
-            self.fotoPerfil.downloadedFrom(link: fotoPerfilUrl)
+            self.fotoPerfil.downloadedFrom(link: fotoPerfilUrl,withBlur:false,maxBlur:0)
         }else{
             self.info.isHidden = false
         }

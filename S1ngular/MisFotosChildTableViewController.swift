@@ -83,7 +83,7 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
             var urlImage = baseUrl
             urlImage += value
             if(key == String(idFotoPerfil)){
-                self.fotoPerfil.downloadedFrom(link: urlImage)
+                self.fotoPerfil.downloadedFrom(link: urlImage,withBlur:false,maxBlur:0)
             }
         }
     }
@@ -210,7 +210,7 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
             }else{
                 cell.definirFotoPerfil.isHidden = false
             }
-            cell.foto.downloadedFrom(link: urlImage)
+            cell.foto.downloadedFrom(link: urlImage,withBlur:false,maxBlur:0)
             return cell
         }
         return cell

@@ -56,6 +56,9 @@ class DataUserDefaults{
         "fromTabS1Nuevos", //Index 40
         "fromTabTestRes",   //INDEX 41
         "idTestComprar", //Index 42
+        "jsonTest", //Index 43
+        "testPendiente", //Index 44
+        "jsonPerfilPersona" //Index 45
     ]
     static func setDefaultData(){
         for i in 13 ..< 21{
@@ -395,5 +398,23 @@ class DataUserDefaults{
     }
     static func getIdComprarTest()->Int{
         return defaults.integer(forKey: keys[42])
+    }
+    static func setJsonTest(json:String){
+        defaults.set(json, forKey: keys[43])
+    }
+    static func getJsonTest()->String{
+        return defaults.string(forKey: keys[43])!
+    }
+    static func setTestPendiente(flag:Bool){
+        defaults.set(flag, forKey: keys[44])
+    }
+    static func isTestPendiente()->Bool{
+        return defaults.bool(forKey: keys[44])
+    }
+    static func setJsonPerfilPersona(json:String){
+        defaults.set(json, forKey: keys[45])
+    }
+    static func getJsonPerfilPersona()->String{
+        return defaults.string(forKey: keys[45])!
     }
 }

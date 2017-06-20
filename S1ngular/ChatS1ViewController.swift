@@ -58,7 +58,7 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         imageTes.clipsToBounds = true
         imageTes.contentMode = .scaleAspectFit
         imageTes.layer.cornerRadius = imageTes.frame.size.width / 2;
-        imageTes.downloadedFrom(link: imageTestUrl)
+        imageTes.downloadedFrom(link: imageTestUrl,withBlur:false,maxBlur:0)
         
         tapViewImage = UITapGestureRecognizer(target: self, action: #selector(self.gotoPerfilPersona(sender:)))
         tapViewImage.cancelsTouchesInView = false

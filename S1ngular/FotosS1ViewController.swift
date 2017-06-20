@@ -101,7 +101,7 @@ class FotosS1ViewController: UIViewController {
                             var urlImage = self.baseUrl
                             let urlPrimerFoto = Array(self.fotitos.values)[0]
                             urlImage += urlPrimerFoto
-                            self.imageContainer.downloadedFrom(link: urlImage)
+                            self.imageContainer.downloadedFrom(link: urlImage,withBlur:false,maxBlur:0)
                             self.subtituloTexto.text = "\((self.imageIndex+1))/\(self.fotitos.keys.count)"
                         }else{
                             self.inforMessage.isHidden = false

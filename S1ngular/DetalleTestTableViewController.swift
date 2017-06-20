@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import SwiftyJSON
+import Alamofire
 
 class DetalleTestTableViewController: UITableViewController {
 
@@ -38,6 +40,15 @@ class DetalleTestTableViewController: UITableViewController {
     var testComenzado:Bool = false
     var testFinalizado:Bool = false
     
+    let jsonTestString = DataUserDefaults.getJsonTest()
+    var jsonTestObject : JSON?
+    
+    var idsRespuestasTest : [Int] = []
+    
+    let headers: HTTPHeaders = [
+        "Authorization": "Bearer "+DataUserDefaults.getUserToken()
+    ]
+    
     @IBOutlet weak var resultadoLabel: UILabel!
     
     override func viewDidLoad() {
@@ -57,11 +68,56 @@ class DetalleTestTableViewController: UITableViewController {
         self.badgeView.layoutIfNeeded()
         self.badgeView.layer.cornerRadius = self.badgeView.bounds.height / 2
         
-        
-        
-        
-        let preguntas: [TestPregunta] = [
+        if let dataFromString = jsonTestString.data(using: .utf8, allowLossyConversion: false){
+            jsonTestObject = JSON(data: dataFromString)
+            //debugPrint(jsonTestObject)
+            let id = jsonTestObject?["test"]["id"].int
+            let nombre = jsonTestObject?["test"]["nombre"].string
+            var urlImage = Constantes.BASE_URL
+            urlImage += (jsonTestObject?["test"]["url"].string)!
+            let ambito = jsonTestObject?["test"]["ambito"].string
+            let contestado = jsonTestObject?["test"]["contestado"].bool
             
+            var preguntasTest = [TestPregunta]()
+            
+            if !(jsonTestObject?["test"]["preguntas"].arrayValue.isEmpty)!{
+                var respuestasPregunta = [TestRespuesta]()
+                let preguntasJSON: [JSON] = jsonTestObject!["test"]["preguntas"].arrayValue
+                for pregunta in preguntasJSON{
+                    let idP = pregunta["id"].int
+                    let preg = pregunta["descripcion"].string
+                    let tipoP = pregunta["tipo"].int == 1 ? TipoPregunta.texto : TipoPregunta.imagen
+                    let tipoRes = TipoRespuesta.texto
+                    var url = Constantes.BASE_URL
+                    url += pregunta["url"].string!
+                    if !pregunta["respuestas"].arrayValue.isEmpty{
+                        let respuestasJSON: [JSON] = pregunta["respuestas"].arrayValue
+                        for respuesta in respuestasJSON{
+                            /*Extrayendo respuesta*/
+                            let idR = respuesta["id"].int
+                            let descR = respuesta["descripcion"].string
+                            var urlR = Constantes.BASE_URL
+                            urlR += respuesta["url"].string!
+                            
+                            let respuestaPregunta = TestRespuesta(id: idR!, respuesta: descR!, descripcion: "", imagen: urlR)
+                            
+                            /*Agregando respuesta al array de respuestas*/
+                            respuestasPregunta.append(respuestaPregunta)
+                        }
+                    }
+                    let preguntaTest = TestPregunta(id: idP!, pregunta: preg!, tipo: tipoP, imagen: url, tipoRespuestas: tipoRes, respuestas: respuestasPregunta)
+                    respuestasPregunta.removeAll()
+                    preguntasTest.append(preguntaTest)
+                }
+                let testCompleto = Test(id: id!, nombre: nombre!, descripcion: "", tag: "", costo: 0, recompensa: 0, imagen: urlImage, preguntas: preguntasTest, ambito: ambito!, contestado: contestado!)
+                self.test = testCompleto
+            }
+        }
+        
+        
+        
+        /*let preguntas: [TestPregunta] = [
+    
             TestPregunta(id: 0, pregunta: "Aquí viene la pregunta de cada sección. Se contesta seleccionando una o varias de las opciones, dependiendo el tipo de pregunta.", tipo: .texto, tipoRespuestas: .texto, respuestas: [
                 TestRespuesta(id: 0, respuesta: "Respuesta 1", descripcion: "", imagen: ""),
                 TestRespuesta(id: 0, respuesta: "Respuesta 2",descripcion: "", imagen: ""),
@@ -92,7 +148,7 @@ class DetalleTestTableViewController: UITableViewController {
         ]
         
         self.test = Test(id: 1, nombre: "Nombre del test de 2 o + renglones tiene 10px de separación con botón derecha indicador de num preguta", descripcion: "Descripción del Test con explicación sencilla, rápida, divertida y al punto. Descripción del Test con explicación sencilla, rápida, divertida y al punto (...)", tag: "TAG DEL TEST1", costo: 0, recompensa: 0, imagen: "https://memoirsofasoulsista.files.wordpress.com/2013/01/happy-man.jpg", preguntas: preguntas, ambito: "", contestado: false)
-        
+        */
         
         self.testLabel.text = test.nombre
         self.testLabel.layoutIfNeeded()
@@ -141,6 +197,10 @@ class DetalleTestTableViewController: UITableViewController {
             })
         };
         task.resume()
+        
+        if DataUserDefaults.isTestPendiente(){
+            self.parent?.navigationItem.leftBarButtonItem?.isEnabled = false
+        }
         
     }
     
@@ -221,6 +281,7 @@ class DetalleTestTableViewController: UITableViewController {
         self.testComenzado = true
         //self.navigationController?.navigationItem.leftBarButtonItem?.isEnabled = false
         self.parent?.navigationItem.leftBarButtonItem?.isEnabled = false
+        DataUserDefaults.setTestPendiente(flag: true)
         self.siguientePregunta()
     }
     
@@ -230,8 +291,11 @@ class DetalleTestTableViewController: UITableViewController {
         
         guard self.indicePreguntaActual < self.test.preguntas.count else {
             self.testFinalizado = true
+            
             self.parent?.navigationItem.leftBarButtonItem?.isEnabled = false
-            _ = self.navigationController?.popViewController(animated: true)
+            //_ = self.navigationController?.popViewController(animated: true)
+            
+            self.responderTestS1(idTest: self.test.id)
             
             // Hay qu epensar en algo
             self.resultadoLabel.text = "Este es el resultado final final OK OK"
@@ -241,6 +305,8 @@ class DetalleTestTableViewController: UITableViewController {
         }
         
         let pregunta = self.test.preguntas[self.indicePreguntaActual]
+        
+        debugPrint(pregunta)
         
         if pregunta.tipo == .texto {
             self.preguntaLabel.text = pregunta.pregunta
@@ -289,7 +355,7 @@ class DetalleTestTableViewController: UITableViewController {
         
         self.indiceLabel.text = "\(self.indicePreguntaActual + 1) / \(self.test.preguntas.count)"
         
-        
+        1
         self.respuestasTableViewCell.contentView.subviews.forEach({ $0.removeFromSuperview()  })
         
         var i = CGFloat(0)
@@ -335,15 +401,50 @@ class DetalleTestTableViewController: UITableViewController {
     
     func seleccionarRespuesta(sender: UIView){
         print(sender.tag)
-        
+        self.idsRespuestasTest.append(sender.tag)
         self.siguientePregunta()
     }
     func seleccionarColor(sender: UIGestureRecognizer){
         print(sender.view?.tag)
-        
+        self.idsRespuestasTest.append((sender.view?.tag)!)
         self.siguientePregunta()
     }
     
+    func responderTestS1(idTest:Int){
+        let loadingView = UIView()
+        let loadinLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadinLabel, spinner: spinner)
+        debugPrint(self.idsRespuestasTest)
+        let parameters: Parameters = [
+            "id_test": idTest,
+            "respuestas": self.idsRespuestasTest
+        ]
+        Alamofire.request(Constantes.RESPONDER_TEST, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if status{
+                        DataUserDefaults.setTestPendiente(flag: false)
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "gotoResultado"), object: nil)
+                    }else{
+                        if let message = json["mensaje_plain"].string{
+                            self.showAlertWithMessage(title: "Error", message: message)
+                        }
+                        
+                    }
+                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadinLabel, spinner: spinner)
+                }
+        }
+    }
+    
+    func showAlertWithMessage(title:String,message:String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
     
 
     /*

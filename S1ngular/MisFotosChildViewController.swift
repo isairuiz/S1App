@@ -42,7 +42,7 @@ class MisFotosChildViewController: UIViewController, UICollectionViewDataSource,
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! FotosCollectionViewCell
         
         // Use the outlet in our custom class to get a reference to the UILabel in the cell
-        cell.foto.downloadedFrom(link: self.listaFotos[indexPath.item])
+        cell.foto.downloadedFrom(link: self.listaFotos[indexPath.item],withBlur:false,maxBlur:0)
         
         return cell
     }

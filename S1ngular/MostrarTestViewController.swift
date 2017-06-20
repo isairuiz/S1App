@@ -27,8 +27,13 @@ class MostrarTestViewController: UIViewController {
         self.subtituloView.layer.shadowOpacity = 0.5
         self.subtituloView.layer.shadowOffset = CGSize(width: 0, height: 2)
         self.subtituloView.layer.shadowRadius = 3
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(gotoResultado), name: NSNotification.Name(rawValue: "gotoResultado"), object: nil)
     }
     
+    func gotoResultado(notification:NSNotification){
+        self.performSegue(withIdentifier: "gotoResultado", sender: nil)
+    }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let vc = segue.destination as? DetalleTestTableViewController, segue.identifier == "testChildSegue"{
