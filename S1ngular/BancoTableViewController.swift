@@ -152,6 +152,10 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
     }
     
     func comprarPaqueteS1(id:Int){
+        let lView = UIView()
+        let lLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
         let parameters: Parameters = ["id_paquete": id]
         Alamofire.request(Constantes.COMPRAR_PAQUETE, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
             .responseJSON{
@@ -163,14 +167,23 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
                         if let saldos1 = json["saldo"].int{
                             self.s1credits.text = "\(saldos1) S1 Credits"
                             DataUserDefaults.setSaldo(saldo: saldos1)
+                            Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
                         }
                     }else{
+                        if let errorMessage = json["mensaje_plain"].string{
+                            Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                            self.showAlertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                        }
                     }
                 }
         }
     }
     
     func canjearCupon(cupon:String){
+        let lView = UIView()
+        let lLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
         let parameters: Parameters = ["codigo": cupon]
         Alamofire.request(Constantes.CANJEAR_CUPON, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
             .responseJSON{
@@ -184,10 +197,12 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
                             DataUserDefaults.setSaldo(saldo: saldo)
                             if let message = json["mensaje_plain"].string{
                                 self.showAlertWithMessage(title: "¡Bien!", message: message)
+                                Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
                             }
                         }
                     }else{
                         if let errorMessage = json["mensaje_plain"].string{
+                            Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
                             self.showAlertWithMessage(title: "¡Algo va mal!", message: errorMessage)
                         }
                     }
@@ -287,10 +302,6 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
     }
     
     func showLoader(){
-        self.loadingView.isHidden = false
-        self.loadingLabel.isHidden = false
-        self.spinner.isHidden = false
-        self.spinner.startAnimating()
         Utilerias.setCustomLoadingScreen(loadingView: self.loadingView, tableView: self.tableView, loadingLabel: self.loadingLabel, spinner: self.spinner)
         
     }

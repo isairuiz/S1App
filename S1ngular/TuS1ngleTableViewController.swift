@@ -12,7 +12,7 @@ import SwiftyJSON
 
 class TuS1ngleTableViewController: UITableViewController {
     
-    @IBOutlet weak var FloatingView: UIVisualEffectView!
+    
     @IBOutlet weak var Floating2: UIView!
     @IBOutlet weak var statsButton: UIImageView!
     @IBOutlet weak var imagePerifl: UIImageView!
@@ -170,20 +170,18 @@ class TuS1ngleTableViewController: UITableViewController {
     
     func animateFloatingUpDown(sender: UITapGestureRecognizer){
         if(isShowing){
-            self.tableView.isScrollEnabled = false
+            
             UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseIn],
                            animations: {
-                            self.FloatingView.center.y += (self.FloatingView.superview?.bounds.height)! - 85
                             self.Floating2.center.y += (self.Floating2.superview?.bounds.height)! - 85
                             self.view.layoutIfNeeded()
             }, completion: { (finished: Bool) in
                 self.isShowing = false
             })
         }else{
-            self.tableView.isScrollEnabled = false
+            
             UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseIn],
                            animations: {
-                            self.FloatingView.center.y -= (self.FloatingView.superview?.bounds.height)! - 85
                             self.Floating2.center.y -= (self.Floating2.superview?.bounds.height)! - 85
                             self.view.layoutIfNeeded()
             }, completion: { (finished: Bool) in
@@ -198,7 +196,6 @@ class TuS1ngleTableViewController: UITableViewController {
             isShowing = true
             UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseIn],
                            animations: {
-                            self.FloatingView.center.y -= (self.FloatingView.superview?.bounds.height)! - 85
                             self.Floating2.center.y -= (self.Floating2.superview?.bounds.height)! - 85
                             self.view.layoutIfNeeded()
             }, completion: { (finished: Bool) in

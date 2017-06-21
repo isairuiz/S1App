@@ -66,6 +66,37 @@ class Utilerias {
         
     }
     
+    static func setCustomLoadingScreenForView(loadingView:UIView,view:UIView,loadingLabel:UILabel,spinner:UIActivityIndicatorView) {
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        // Sets the view which contains the loading text and the spinner
+        let width: CGFloat = 140
+        let height: CGFloat = 50
+        let x = (UIScreen.main.bounds.width / 2) - (width / 2)
+        let y = (UIScreen.main.bounds.height / 2) - (height / 2) - 100
+        loadingView.frame = CGRect(x:x, y:y, width:width, height:height)
+        loadingView.clipsToBounds = true
+        loadingView.layer.cornerRadius = 5
+        loadingView.backgroundColor = Colores.BGPink
+        
+        // Sets loading text
+        loadingLabel.textColor = Colores.BGWhite
+        loadingLabel.textAlignment = NSTextAlignment.center
+        loadingLabel.text = "Cargando..."
+        loadingLabel.frame = CGRect(x:0+15, y:0+10, width:150, height:30)
+        
+        // Sets spinner
+        spinner.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge
+        spinner.frame = CGRect(x:0, y:0, width:50, height:50)
+        spinner.startAnimating()
+        
+        // Adds text and spinner to the view
+        loadingView.addSubview(spinner)
+        loadingView.addSubview(loadingLabel)
+        
+        view.addSubview(loadingView)
+        
+    }
+    
     // Remove the activity indicator from the main view
     static func removeCustomLoadingScreen(loadingView:UIView,loadingLabel:UILabel,spinner:UIActivityIndicatorView) {
         UIApplication.shared.endIgnoringInteractionEvents()

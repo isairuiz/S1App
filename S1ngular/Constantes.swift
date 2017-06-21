@@ -30,5 +30,6 @@ class Constantes{
     static let MIS_CHECKINS = "http://40.84.231.88/singular/singular/listarmischeckins"
     static let LISTAR_PROSPECTOS = "http://40.84.231.88/singular/singular/listarprospectos"
     static let LISTAR_CHATS = ""
+    static let RESPONDER_S1 = "http://40.84.231.88/singular/singular/responders1"
     
 }

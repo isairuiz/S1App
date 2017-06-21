@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
 
 class YeahTableViewController: UITableViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
@@ -24,21 +26,19 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
     
     var tapMicro = UIGestureRecognizer()
     
+    let jsonPerfilString = DataUserDefaults.getJsonPerfilPersona()
+    var jsonPerfilObject : JSON?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
         
-        
-        
-        
-        self.fotosPersonas.append("http://2.bp.blogspot.com/-lnt7x6S-QDE/VXB4iM3jktI/AAAAAAAAEZc/Evr1d3aQJ5M/s1600/kiss.jpg")
-        self.fotosPersonas.append("https://pmchollywoodlife.files.wordpress.com/2016/09/zodiac-signs-changed-ftr.jpg?w=600&h=400&crop=1")
+        self.fotosPersonas.append(DataUserDefaults.getFotoPerfilUrl())
         
         self.s1Splash.layer.cornerRadius = self.s1Splash.frame.size.width/2
         self.s1Splash.layer.backgroundColor = Colores.MainK.cgColor
         
-        //self.microfonoButton.layer.cornerRadius = self.microfonoButton.frame.size.width/2
         
         self.microfonoButton.layer.shadowColor = ColoresTexto.InfoKAlpha.cgColor
         self.microfonoButton.layer.shadowOffset = CGSize(width:0.0, height:2.0)
@@ -52,10 +52,17 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
         tapMicro.cancelsTouchesInView = false
         self.microfonoButton.addGestureRecognizer(tapMicro)
         
-        
-        //self.imagenPersona.downloadedFrom(link: img1)
-        //self.imagenPerfil.downloadedFrom(link: img1)
-        
+        if let dataFromString = jsonPerfilString.data(using: .utf8, allowLossyConversion: false){
+            var fotitos = Dictionary<String, String>()
+            jsonPerfilObject = JSON(data: dataFromString)
+            var fotoUrl = String()
+            if !(jsonPerfilObject?["fotografias"].isEmpty)!{
+                fotoUrl += Constantes.BASE_URL
+                fotitos = jsonPerfilObject?["fotografias"].dictionaryObject as! Dictionary<String, String>
+                fotoUrl += Array(fotitos.values)[0]
+                self.fotosPersonas.append(fotoUrl)
+            }
+        }
     }
     
     func gotoChat(sender: UITapGestureRecognizer){
@@ -79,7 +86,12 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! YeahCollectionViewCell
         
-        cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:false,maxBlur:0)
+        if indexPath.row == 1{
+            cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:true,maxBlur:50)
+        }else{
+            cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:false,maxBlur:0)
+        }
+        
         
         return cell
         

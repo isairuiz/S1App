@@ -11,7 +11,6 @@ import SwiftyJSON
 import Alamofire
 
 class SingleTableViewController: UITableViewController,UIGestureRecognizerDelegate {
-    @IBOutlet weak var FloatingView: UIVisualEffectView!
     @IBOutlet weak var Floating2: UIView!
     @IBOutlet weak var statsButton: UIImageView!
     @IBOutlet weak var imagePerifl: UIImageView!
@@ -26,6 +25,10 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
     
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet weak var siButton: UIButton!
+    
+    let headers: HTTPHeaders = [
+        "Authorization": "Bearer "+DataUserDefaults.getUserToken()
+    ]
     
     var idVerPerfil = Int()
     var isShowing = false
@@ -54,15 +57,19 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
         idVerPerfil = DataUserDefaults.getIdVerPerfil()
         
         tapViewLentes = UITapGestureRecognizer(target: self, action: #selector(self.desBlurFoto(sender:)))
-        tapViewLentes.cancelsTouchesInView = false
+        //tapViewLentes.cancelsTouchesInView = false
         lentesButton.addGestureRecognizer(tapViewLentes)
         
         tapViewFloating = UITapGestureRecognizer(target: self, action: #selector(self.animateFloatingUpDown(sender:)))
-        tapViewFloating.cancelsTouchesInView = false
         Floating2.addGestureRecognizer(tapViewFloating)
         
+        /*let gesture = UIPanGestureRecognizer(target: self, action: #selector(navViewDragged(gesture:)))
+        gesture.delegate = self
+        
+        self.Floating2.addGestureRecognizer(gesture)*/
+        
         tapViewStats = UITapGestureRecognizer(target: self, action: #selector(self.showStatsUp(sender:)))
-        tapViewStats.cancelsTouchesInView = false
+        //tapViewStats.cancelsTouchesInView = false
         statsButton.addGestureRecognizer(tapViewStats)
         
         
@@ -141,6 +148,19 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
         }
     }
     
+    func navViewDragged(gesture: UIPanGestureRecognizer){
+        if gesture.state == UIGestureRecognizerState.began ||  gesture.state == UIGestureRecognizerState.changed{
+            let translation = gesture.translation(in: self.view)
+            debugPrint(gesture.view!.center.y)
+            if gesture.view!.center.y < 245+165 && gesture.view!.center.y < 245-165{
+                gesture.view!.center = CGPoint(x:gesture.view!.center.x,y:gesture.view!.center.y + translation.y)
+            }else{
+                gesture.view!.center =  CGPoint(x:gesture.view!.center.x,y:245+165)
+            }
+            gesture.setTranslation(CGPoint(x:0,y:0), in: self.view)
+        }
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let vc = segue.destination as? TuSingleChildTableViewController, segue.identifier == "visitarPerfilChildSegue"{
             self.childView = vc
@@ -169,26 +189,24 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
     
     func desBlurFoto(sender: UITapGestureRecognizer){
         debugPrint("desblurreame esta")
-        self.scrollView.isScrollEnabled = true
+        //self.scrollView.isScrollEnabled = true
     }
     
     
     func animateFloatingUpDown(sender: UITapGestureRecognizer){
         if(isShowing){
-            self.tableView.isScrollEnabled = false
+            //self.tableView.isScrollEnabled = false
             UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseIn],
                            animations: {
-                            self.FloatingView.center.y += (self.FloatingView.superview?.bounds.height)! - 85
                             self.Floating2.center.y += (self.Floating2.superview?.bounds.height)! - 85
                             self.view.layoutIfNeeded()
             }, completion: { (finished: Bool) in
                 self.isShowing = false
             })
         }else{
-            self.tableView.isScrollEnabled = false
+            //self.tableView.isScrollEnabled = false
             UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseIn],
                            animations: {
-                            self.FloatingView.center.y -= (self.FloatingView.superview?.bounds.height)! - 85
                             self.Floating2.center.y -= (self.Floating2.superview?.bounds.height)! - 85
                             self.view.layoutIfNeeded()
             }, completion: { (finished: Bool) in
@@ -203,7 +221,6 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
             
             UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseIn],
                            animations: {
-                            self.FloatingView.center.y -= (self.FloatingView.superview?.bounds.height)! - 85
                             self.Floating2.center.y -= (self.Floating2.superview?.bounds.height)! - 85
                             self.view.layoutIfNeeded()
             }, completion: { (finished: Bool) in
@@ -227,10 +244,9 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
     
     func respondToSwipeDown(gesture: UISwipeGestureRecognizer){
         if(isShowing){
-            self.tableView.isScrollEnabled = false
+            //self.tableView.isScrollEnabled = false
             UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseIn],
                            animations: {
-                            self.FloatingView.center.y += (self.FloatingView.superview?.bounds.height)! - 85
                             self.Floating2.center.y += (self.Floating2.superview?.bounds.height)! - 85
                             self.view.layoutIfNeeded()
             }, completion: { (finished: Bool) in
@@ -241,10 +257,9 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
     }
     func respondToSwipeUp(gesture: UISwipeGestureRecognizer){
         if(isShowing==false){
-            self.tableView.isScrollEnabled = false
+            //self.tableView.isScrollEnabled = false
             UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseIn],
                            animations: {
-                            self.FloatingView.center.y -= (self.FloatingView.superview?.bounds.height)! - 85
                             self.Floating2.center.y -= (self.Floating2.superview?.bounds.height)! - 85
                             self.view.layoutIfNeeded()
             }, completion: { (finished: Bool) in
@@ -253,6 +268,47 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
         }
         
     }
+    
+    
+    func responderS1(respuesta:Int,id:Int){
+        let lView = UIView()
+        let lLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+        let parameters: Parameters = [
+            "id": id,
+            "respuesta":respuesta
+        ]
+        Alamofire.request(Constantes.RESPONDER_S1, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if status{
+                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                        if respuesta == 0{
+                            _ = self.navigationController?.popViewController(animated: true)
+                        }else{
+                            self.performSegue(withIdentifier: "gotoYeah", sender: nil)
+                        }
+                        
+                    }else{
+                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                        if let message = json["mensaje_plain"].string{
+                            self.showAlertWithMessage(title: "Error!", message: message)
+                        }
+                        
+                    }
+                }
+        }
+    }
+    
+    func showAlertWithMessage(title:String,message:String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
 
     // MARK: - Table view data source
 
@@ -260,11 +316,14 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
 
     
     @IBAction func aceptarSingular(_ sender: Any) {
+        //self.responderS1(respuesta:1,id: DataUserDefaults.getIdVerPerfil())
         self.performSegue(withIdentifier: "gotoYeah", sender: nil)
     }
     
     @IBAction func rechazarSingular(_ sender: Any) {
+        //self.responderS1(respuesta:0,id: DataUserDefaults.getIdVerPerfil())
         _ = self.navigationController?.popViewController(animated: true)
+        
     }
     
     func makeLabelRounded(label:UILabel){

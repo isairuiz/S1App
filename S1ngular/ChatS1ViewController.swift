@@ -8,6 +8,8 @@
 
 import UIKit
 import AVFoundation
+import SwiftyJSON
+import Alamofire
 
 class ChatS1ViewController: UIViewController,UITextFieldDelegate{
     @IBOutlet weak var subtituloView: UIView!
@@ -35,13 +37,15 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
     
     var childViewController = ChatS1TableViewController()
     
+    let jsonPerfilString = DataUserDefaults.getJsonPerfilPersona()
+    var jsonPerfilObject : JSON?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         idVerPerfil = DataUserDefaults.getIdVerPerfil()
         
-        self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain]
         
         // Borramos la line inferior del Navigationbar para que se una al subtitulo
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
@@ -58,7 +62,25 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         imageTes.clipsToBounds = true
         imageTes.contentMode = .scaleAspectFit
         imageTes.layer.cornerRadius = imageTes.frame.size.width / 2;
-        imageTes.downloadedFrom(link: imageTestUrl,withBlur:false,maxBlur:0)
+        
+        
+        if let dataFromString = jsonPerfilString.data(using: .utf8, allowLossyConversion: false){
+            var fotitos = Dictionary<String, String>()
+            jsonPerfilObject = JSON(data: dataFromString)
+            var fotoUrl = String()
+            if let nombre = jsonPerfilObject?["nombre"].string{
+                subtituloTexto.text = nombre
+            }
+            if !(jsonPerfilObject?["fotografias"].isEmpty)!{
+                fotoUrl += Constantes.BASE_URL
+                fotitos = jsonPerfilObject?["fotografias"].dictionaryObject as! Dictionary<String, String>
+                fotoUrl += Array(fotitos.values)[0]
+                imageTes.downloadedFrom(link: fotoUrl,withBlur:false,maxBlur:0)
+            }else{
+                imageTes.image = UIImage(named: "UsuarioIcon")
+            }
+        }
+        
         
         tapViewImage = UITapGestureRecognizer(target: self, action: #selector(self.gotoPerfilPersona(sender:)))
         tapViewImage.cancelsTouchesInView = false
