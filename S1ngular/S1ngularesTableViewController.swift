@@ -93,6 +93,9 @@ class S1ngularesTableViewController: UITableViewController {
     // MARK: - Table view data source
     
     override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        if indexPath.section == 1 || indexPath.section == 2{
+            return false
+        }
         return true
     }
     override func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
@@ -102,25 +105,88 @@ class S1ngularesTableViewController: UITableViewController {
         tableView.cellForRow(at: indexPath)?.alpha = 1
     }
     
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 3
+    }
+    
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 1 || section == 2{
+            return 0
+        }
         return 66.0
     }
     
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if self.tab.tabSeleccionada == 0 {
+            if !self.listaChat.isEmpty{
+                if indexPath.section == 1 || indexPath.section == 2{
+                    return 0
+                }
+            }
+            return 140
+        }else{
+            if !self.listaNuevos.isEmpty{
+                if indexPath.section == 1 || indexPath.section == 2{
+                    return 0
+                }
+            }
+        }
+        return 108
+    }
+    
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return self.tab
+        if section == 0{
+            return self.tab
+        }
+        return nil
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         
         if self.tab.tabSeleccionada == 0 {
-            return self.listaChat.count
+            if self.listaChat.isEmpty{
+                if section == 1 {
+                    return 1
+                }
+                if section == 2{
+                    return 0
+                }
+            }else{
+                if section == 1 || section == 2{
+                    return 0
+                }
+                return self.listaChat.count
+            }
+        }else{
+            if self.listaNuevos.isEmpty{
+                if section == 1 {
+                    return 0
+                }
+                if section == 2{
+                    return 1
+                }
+            }else{
+                if section == 1 || section == 2{
+                    return 0
+                }
+            }
         }
         
         return self.listaNuevos.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        if indexPath.section == 1{
+            let cell = tableView.dequeueReusableCell(withIdentifier: "infoCellChats", for: indexPath)
+            return cell
+        }
+        if indexPath.section == 2{
+            let cell = tableView.dequeueReusableCell(withIdentifier: "infoCellSingulares", for: indexPath)
+            return cell
+        }
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "Celda", for: indexPath) as? S1ngularesTableViewCell
         
         // Configure the cell...
@@ -152,8 +218,6 @@ class S1ngularesTableViewController: UITableViewController {
                 }
                 
             }
-            
-            
         } else{
             item = self.listaNuevos[(indexPath as NSIndexPath).row]
             
@@ -287,7 +351,7 @@ class S1ngularesTableViewController: UITableViewController {
                                 let id  = prospecto["id"].int
                                 let nombre = prospecto["nombre"].string
                                 let sobre_mi = prospecto["sobre_mi"].string
-                                _ = prospecto["foto_visible"].int
+                                let foto_visible = prospecto["foto_visible"].floatValue
                                 var fotoUrl = String()
                                 if !prospecto["fotografias"].isEmpty{
                                     fotoUrl += Constantes.BASE_URL
@@ -295,11 +359,12 @@ class S1ngularesTableViewController: UITableViewController {
                                     fotoUrl += Array(fotitos.values)[0]
                                     
                                 }
-                                self.listaNuevos.append(GeneralTableItem(id: id!, nombre: nombre!, distancia: "", tiempo: "", lugar: "", descripcion: sobre_mi!, avatar: fotoUrl, badge: "", compartir: false, resaltar: false, restriccion: 50))
+                                self.listaNuevos.append(GeneralTableItem(id: id!, nombre: nombre!, distancia: "", tiempo: "", lugar: "", descripcion: sobre_mi!, avatar: fotoUrl, badge: "", compartir: false, resaltar: false, restriccion: foto_visible))
                             }
                             self.tableView.reloadData()
                             Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         }else{
+                            self.tableView.reloadData()
                             Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         }
                     }else{
@@ -321,7 +386,6 @@ class S1ngularesTableViewController: UITableViewController {
         listarNuevosProspectos()
     }
     
-
 
     /*
     // MARK: - Navigation

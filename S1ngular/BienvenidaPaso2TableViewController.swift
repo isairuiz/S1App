@@ -40,6 +40,8 @@ class BienvenidaPaso2TableViewController: UITableViewController {
     @IBOutlet weak var unionSwitch: UISwitch!
     @IBOutlet weak var viudoSwitch: UISwitch!
     
+    var migenero = Int()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -61,6 +63,17 @@ class BienvenidaPaso2TableViewController: UITableViewController {
         self.edadesSliderTableViewCell.contentView.addSubview(rangeSlider)
         rangeSlider.addTarget(self, action: #selector(BienvenidaPaso2TableViewController.rangeSliderValueChanged(_:)),
                               for: .valueChanged)
+        
+        migenero = DataUserDefaults.getDataGenero()
+        //Hombre
+        if migenero == 0{
+            self.mujeresSwitch.isOn = true
+            self.hombresSwitch.isOn = false
+        //Mujer
+        }else{
+            self.hombresSwitch.isOn = true
+            self.mujeresSwitch.isOn = false
+        }
         
     }
     // MARK: - Actions y Eventos

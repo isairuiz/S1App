@@ -28,6 +28,7 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
     
     let jsonPerfilString = DataUserDefaults.getJsonPerfilPersona()
     var jsonPerfilObject : JSON?
+    var foto_blur:Float = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,6 +60,8 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
             if !(jsonPerfilObject?["fotografias"].isEmpty)!{
                 fotoUrl += Constantes.BASE_URL
                 fotitos = jsonPerfilObject?["fotografias"].dictionaryObject as! Dictionary<String, String>
+                let foto_visible = jsonPerfilObject?["foto_visible"].floatValue
+                self.foto_blur = foto_visible!
                 fotoUrl += Array(fotitos.values)[0]
                 self.fotosPersonas.append(fotoUrl)
             }
@@ -87,7 +90,7 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! YeahCollectionViewCell
         
         if indexPath.row == 1{
-            cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:true,maxBlur:50)
+            cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:true,maxBlur:self.foto_blur)
         }else{
             cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:false,maxBlur:0)
         }

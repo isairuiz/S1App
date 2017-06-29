@@ -58,7 +58,9 @@ class DataUserDefaults{
         "idTestComprar", //Index 42
         "jsonTest", //Index 43
         "testPendiente", //Index 44
-        "jsonPerfilPersona" //Index 45
+        "jsonPerfilPersona", //Index 45
+        "jsonCheckin",  //Index 46
+        "controllsCheckin" //Index 47
     ]
     static func setDefaultData(){
         for i in 13 ..< 21{
@@ -416,5 +418,17 @@ class DataUserDefaults{
     }
     static func getJsonPerfilPersona()->String{
         return defaults.string(forKey: keys[45])!
+    }
+    static func setJsonCheckin(json:String){
+        defaults.set(json, forKey: keys[46])
+    }
+    static func getJsonCheckin()->String{
+        return defaults.string(forKey: keys[46])!
+    }
+    static func setControllsCheckin(type:Int){
+        defaults.set(type, forKey: keys[47])
+    }
+    static func getControllsCheckin()->Int{
+        return defaults.integer(forKey: keys[47])
     }
 }

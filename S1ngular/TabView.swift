@@ -16,7 +16,7 @@ class TabView: UIView {
     var textoBotonIzquierda = ""
     var textoBotonDerecha = ""
     
-    private var _tabSeleccionada:Int = 0
+    var _tabSeleccionada:Int = 0
     var tabSeleccionada: Int {
         get {
             return _tabSeleccionada

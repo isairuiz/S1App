@@ -28,8 +28,11 @@ class Constantes{
     static let VER_RESULTADO_TEST = "http://40.84.231.88/singular/singular/verresultadotest?id_test="
     static let MIS_RESULTADOS_TEST = "http://40.84.231.88/singular/singular/verresultadostest"
     static let MIS_CHECKINS = "http://40.84.231.88/singular/singular/listarmischeckins"
+    static let LISTAR_CHECKS_OTROS = "http://40.84.231.88/singular/singular/listarcheckins"
     static let LISTAR_PROSPECTOS = "http://40.84.231.88/singular/singular/listarprospectos"
     static let LISTAR_CHATS = ""
     static let RESPONDER_S1 = "http://40.84.231.88/singular/singular/responders1"
+    static let AGREGAR_CHECKIN = "http://40.84.231.88/singular/singular/agregarcheckin"
+    static let ACTUALIZAR_POSICION = "http://40.84.231.88/singular/singular/actualizarposicion"
     
 }

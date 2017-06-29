@@ -66,7 +66,7 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
     
     @IBOutlet weak var finalizarBarButtonItem: UIBarButtonItem!
     
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
     var banderaS1ngulares = false
     var banderaTests = false
     var banderaCheckIn = false
@@ -78,7 +78,6 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        activityIndicator.isHidden = true
         self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
         
         // Borramos la line inferior del Navigationbar para que se una al subtitulo
@@ -240,21 +239,11 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
         _ = self.navigationController?.popViewController(animated: true)
     }
     
-    func showActivityIndicatory() {
-        
-        activityIndicator.isHidden = false
-        activityIndicator.startAnimating()
-        //UIApplication.shared.beginIgnoringInteractionEvents()
-        
-    }
-    
-    func hideActivityIndicator(){
-        activityIndicator.stopAnimating()
-        //UIApplication.shared.endIgnoringInteractionEvents()
-    }
-    
     func processDataForEditarPerfil(){
-        self.showActivityIndicatory()
+        let view = UIView()
+        let labell = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreenForView(loadingView: view, view: self.view, loadingLabel: labell, spinner: spinner)
         let nombre = DataUserDefaults.getDataNombre()
         let genero = DataUserDefaults.getDataGenero()
         let edad = DataUserDefaults.getDataEdad()
@@ -280,6 +269,7 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
                 if let status = json["status"].bool{
                     if(status){
                         if var message = json["mensaje_plain"].string{
+                            Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
                             let alert = UIAlertController(title: "¡Bien!", message: "Los datos de tu perfil han sido actualizados", preferredStyle: UIAlertControllerStyle.alert)
                             alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: { action in
                                 self.processDataForEditarQueBusco()
@@ -292,7 +282,7 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
                         if var message = json["mensaje_plain"].string{
                             self.showAlerWithMessage(title: "Error!", message: message)
                         }
-                        self.hideActivityIndicator()
+                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
                     }
                     
                 }
@@ -300,6 +290,10 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
         
     }
     func processDataForEditarQueBusco(){
+        let view = UIView()
+        let labell = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreenForView(loadingView: view, view: self.view, loadingLabel: labell, spinner: spinner)
         var estados_busco_array = [String]()
         var que_deseo_array = [String]()
         let busco_genero = DataUserDefaults.getDataBuscoGenero()
@@ -373,33 +367,41 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
                         let photo = DataUserDefaults.getDataFoto()
                         let noFoto = photo.count<=0
                         var buttonTitle = String()
+                        var okMensaje = String()
                         buttonTitle = "Un paso mas"
+                        okMensaje = "Tus preferencias de busqueda han sido actualizadas"
                         if(noFoto){
                             buttonTitle = "Ir a home"
+                            okMensaje = "Listo, ahora responde todos los Tests que puedas, eso mejorará las sugerencias de S1ngulares"
                         }
                         if var message = json["mensaje_plain"].string{
-                            let alert = UIAlertController(title: "¡Bien!", message: "Tus preferencias de busqueda han sido actualizadas", preferredStyle: UIAlertControllerStyle.alert)
+                            Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                            let alert = UIAlertController(title: "¡Bien!", message: okMensaje, preferredStyle: UIAlertControllerStyle.alert)
                             alert.addAction(UIAlertAction(title: buttonTitle, style: UIAlertActionStyle.default, handler: { action in
                                 if(noFoto){
                                     self.performSegue(withIdentifier: "passToMenuSegue", sender: nil)
                                 }else{
                                     self.processDataAgregarFoto()
                                 }
-                                
                             }))
                             self.present(alert, animated: true, completion: nil)
+                            
                         }
                     }else{
                         if var message = json["mensaje_plain"].string{
                             self.showAlerWithMessage(title: "Error!", message: message)
                         }
-                        self.hideActivityIndicator()
+                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
                     }
                 }
         }
     }
     
     func processDataAgregarFoto(){
+        let view = UIView()
+        let labell = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreenForView(loadingView: view, view: self.view, loadingLabel: labell, spinner: spinner)
         var imageName = "image"+Utilerias.getCurrentDateAndTime()+".jpeg"
         var photo = Data()
         photo = DataUserDefaults.getDataFoto()
@@ -416,28 +418,24 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
                         debugPrint(json)
                         if let status = json["status"].bool {
                             if (status){
-                                let alert = UIAlertController(title: "¡Bien!", message: "Has agregado una foto, la usaremos para tu foto de perfil", preferredStyle: UIAlertControllerStyle.alert)
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                                let alert = UIAlertController(title: "¡Bien!", message: "Listo, ahora responde todos los Tests que puedas, eso mejorará las sugerencias de S1ngulares", preferredStyle: UIAlertControllerStyle.alert)
                                 alert.addAction(UIAlertAction(title: "Ir a home", style: UIAlertActionStyle.default, handler: { action in
                                     self.performSegue(withIdentifier: "passToMenuSegue", sender: nil)
                                 }))
                                 self.present(alert, animated: true, completion: nil)
                             }else{
                                 if let message = json["mensaje_plain"].string{
-                                    self.hideActivityIndicator()
+                                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
                                     self.showAlerWithMessage(title:"Error",message: message)
                                 }
-                                self.hideActivityIndicator()
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
                             }
-                        }else{
-                            self.hideActivityIndicator()
                         }
-                        
                     }
-                    
                 case .failure(let encodingError):
-                    self.hideActivityIndicator()
                     print(encodingError)
-                    self.hideActivityIndicator()
+                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
                 }
         }
         )
@@ -452,7 +450,7 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
     }
     
     @IBAction func finalizarTour(_ sender: AnyObject) {
-        let alert = UIAlertController(title: "¿Desea continuar?", message: "Presione continuar para guardar los datos de perfil, preferencias de busqueda y foto de lo contrario presione cancelar para verificar su información", preferredStyle: UIAlertControllerStyle.alert)
+        let alert = UIAlertController(title: "¿Deseas continuar?", message: "Presiona continuar para crear tu perfil", preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: { action in
             self.processDataForEditarPerfil()
         }))

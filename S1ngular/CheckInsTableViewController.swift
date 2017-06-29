@@ -24,6 +24,9 @@ class CheckInsTableViewController: UITableViewController {
         "Authorization": "Bearer "+DataUserDefaults.getUserToken()
     ]
     
+    var checkins : [JSON] = []
+    var otrosCheckins : [JSON] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -36,19 +39,6 @@ class CheckInsTableViewController: UITableViewController {
         tab.botonDerecha!.addTarget(self, action: #selector(self.cambiarSegundoTab), for: UIControlEvents.touchUpInside)
         
         
-        
-        self.listaCercanos = [
-            GeneralTableItem(id: 1, nombre: "Denisse Aristegui", distancia: "15 metros", tiempo: "", lugar: "Starbucks Delta", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "http://www.meganfox.com/wp-content/uploads/2014/01/5.jpg", badge: "42", compartir: false, resaltar: false, restriccion: 50),
-            
-            GeneralTableItem(id: 1, nombre: "Ryan Duncan", distancia: "37 metros", tiempo: "", lugar: "Starbucks Delta", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "http://ell.h-cdn.co/assets/16/07/980x490/landscape-1455813161-elle-henrycavill.jpg", badge: "85", compartir: false, resaltar: false, restriccion: 50),
-            
-            GeneralTableItem(id: 1, nombre: "Cheryl Arvizu", distancia: "220 metros", tiempo: "", lugar: "Starbucks Delta", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "http://caraotadigital.net/site/wp-content/uploads/2016/04/jolie.jpeg", badge: "69", compartir: false, resaltar: false, restriccion: 50),
-            
-            GeneralTableItem(id: 1, nombre: "Emma Retiz", distancia: "593 metros", tiempo: "", lugar: "Starbucks Delta", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "https://i.guim.co.uk/img/static/sys-images/Guardian/Pix/pictures/2015/6/30/1435683314339/Emma-Watson-at-the-HeForS-009.jpg?w=620&q=55&auto=format&usm=12&fit=max&s=4bf38511bf665f44afe480d87fb0d9c9", badge: "91", compartir: false, resaltar: false, restriccion: 50),
-            
-            
-            GeneralTableItem(id: 1, nombre: "Joaquín de Mola", distancia: "103 metros", tiempo: "", lugar: "Starbucks Delta", descripcion: "Está increible, me la paso diario después de  las 7PM búscame para estar en contacto.", avatar: "http://cdn.newsapi.com.au/image/v1/8c092d874974a3e4b9fa060a3b30eb05", badge: "85", compartir: false, resaltar: false, restriccion: 50)
-        ]
         
         
 
@@ -87,23 +77,25 @@ class CheckInsTableViewController: UITableViewController {
     // MARK: - Funciones y Eventos
     
     func cambiarPrimerTab (){
-        self.tableView.reloadData()
+        self.listaCercanos.removeAll()
+        self.obtenerCheckinsOtros()
     }
     
     func cambiarSegundoTab (){
         self.listaMisCheckIns.removeAll()
         self.obtenerMisCheckins()
-        
-        
     }
     
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 3
     }
     
     override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        if indexPath.section == 1{
+            return false
+        }
         return true
     }
     override func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
@@ -135,9 +127,34 @@ class CheckInsTableViewController: UITableViewController {
         }
         
         if self.tab.tabSeleccionada == 0 {
-            return self.listaCercanos.count
+            if self.listaCercanos.isEmpty{
+                if section == 1{
+                    return 1
+                }
+                if section == 2{
+                    return 0
+                }
+            }else{
+                if section == 1{
+                    return 0
+                }
+                return self.listaCercanos.count
+            }
+            
+        }else if self.tab.tabSeleccionada == 1{
+            if self.listaMisCheckIns.isEmpty{
+                if section == 1{
+                    return 1
+                }
+                if section == 2{
+                    return 0
+                }
+            }else{
+                if section == 1{
+                    return 0
+                }
+            }
         }
-        
         return self.listaMisCheckIns.count
     }
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -161,6 +178,11 @@ class CheckInsTableViewController: UITableViewController {
             cell.layer.shadowOffset = CGSize(width: 2, height: 2)
             cell.layer.shadowRadius = 3
             
+            return cell
+        }
+        
+        if indexPath.section == 1{
+            let cell = tableView.dequeueReusableCell(withIdentifier: "celdaInfo", for: indexPath)
             return cell
         }
         
@@ -242,7 +264,7 @@ class CheckInsTableViewController: UITableViewController {
                         
                         if let _imagen = UIImage(data: data!) {
                             
-                            let imagen = self.tab.tabSeleccionada == 0 ? Utilerias.aplicarEfectoDifuminacionImagen(_imagen, intensidad: item!.restriccion) : _imagen
+                            let imagen = Utilerias.aplicarEfectoDifuminacionImagen(_imagen, intensidad: item!.restriccion)
                             
                             self.imagenCache[imagenURL] = imagen;
                             
@@ -280,10 +302,77 @@ class CheckInsTableViewController: UITableViewController {
 
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == 0{
+            DataUserDefaults.setControllsCheckin(type: 1)
+        }
+        if self.tab.tabSeleccionada == 0{
+            if indexPath.section != 0{
+                let jsonCheck:JSON = self.otrosCheckins[indexPath.row]
+                if let id_singular = jsonCheck["id_singular"].int{
+                    DataUserDefaults.setControllsCheckin(type: 3)
+                }
+                DataUserDefaults.setJsonCheckin(json: self.otrosCheckins[indexPath.row].description)
+            }
+        }else{
+            if indexPath.section != 0{
+                let jsonCheck:JSON = self.checkins[indexPath.row]
+                if let id_singular = jsonCheck["id_singular"].int{
+                    DataUserDefaults.setControllsCheckin(type: 3)
+                }else{
+                    DataUserDefaults.setControllsCheckin(type: 2)
+                }
+                DataUserDefaults.setJsonCheckin(json: self.checkins[indexPath.row].description)
+            }
+            
+        }
         self.performSegue(withIdentifier: "MostrarHacerCheckIn", sender: self)
+        
     }
     
-    
+    func obtenerCheckinsOtros(){
+        let loadingView = UIView()
+        let spinner = UIActivityIndicatorView()
+        let loadingLabel = UILabel()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+        Alamofire.request(Constantes.LISTAR_CHECKS_OTROS, headers: self.headers)
+            .responseJSON {
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if(status){
+                        if !json["checkins"].isEmpty{
+                            self.otrosCheckins = json["checkins"].arrayValue
+                            for checkin in self.otrosCheckins{
+                                let id = checkin["id"].int
+                                let id_singular = checkin["id_singular"].int
+                                let nombre = checkin["nombre"].string
+                                let edad = checkin["edad"].int
+                                let imagen = checkin["imagen"].string
+                                let foto_visible = checkin["foto_visible"].floatValue
+                                let fecha = checkin["fecha"].string
+                                let lat = checkin["latitud"].double
+                                let long = checkin["longitud"].double
+                                let distancia = checkin["distancia"].intValue
+                                let titulo = checkin["titulo"].string
+                                let contenido = checkin["contenido"].string
+                                let cal = checkin["calificacion"].int
+                                var urlFoto = Constantes.BASE_URL
+                                urlFoto += imagen!
+                                self.listaCercanos.append(
+                                    GeneralTableItem(id: id!, nombre:nombre!, distancia: "\(distancia) Metros", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: urlFoto, badge: "0", compartir: false, resaltar: false, restriccion: foto_visible)
+                                )
+                            }
+                        }
+                        self.tableView.reloadData()
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                    }else{
+                        self.tableView.reloadData()
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                    }
+                }
+        }
+    }
     func obtenerMisCheckins(){
         let fotoPerfilUrl = DataUserDefaults.getFotoPerfilUrl()
         let loadingView = UIView()
@@ -297,9 +386,9 @@ class CheckInsTableViewController: UITableViewController {
                 debugPrint(json)
                 if let status = json["status"].bool{
                     if(status){
-                        if !json["checkins"].isEmpty{
-                            let checkins : [JSON] = json["checkins"].arrayValue
-                            for checkin in checkins{
+                        if !json["checkins"]["singular"].isEmpty{
+                            self.checkins = json["checkins"]["singular"].arrayValue
+                            for checkin in self.checkins{
                                 let idCheck  = checkin["id"].int
                                 let fecha = checkin["fecha"].string
                                 _ = checkin["latitud"].double
@@ -309,16 +398,54 @@ class CheckInsTableViewController: UITableViewController {
                                 let cal = checkin["calificacion"].int
                                 
                                 self.listaMisCheckIns.append(
-                                    GeneralTableItem(id: idCheck!, nombre: "\(String(describing: cal)) Estrellas", distancia: "", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: fotoPerfilUrl, badge: "42", compartir: false, resaltar: false, restriccion: 0)
+                                    GeneralTableItem(id: idCheck!, nombre:"Yo", distancia: "", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: fotoPerfilUrl, badge: "0", compartir: false, resaltar: false, restriccion: 1.0)
                                 )
                             }
                             self.tableView.reloadData()
                             Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         }
+                        if !json["checkins"]["amigos"].isEmpty{
+                            let checkamigos:[JSON] = json["checkins"]["amigos"].arrayValue
+                            for check in checkamigos{
+                                self.checkins.append(check)
+                                let id = check["id"].int
+                                let id_singular = check["id_singular"].int
+                                let nombre = check["nombre"].string
+                                let edad = check["edad"].int
+                                let image = check["imagen"].string
+                                let foto_visible = check["foto_visible"].floatValue
+                                debugPrint("wtf el blur: \(foto_visible)")
+                                let fecha = check["fecha"].string
+                                let lat = check["latitud"].double
+                                let long = check["longitud"].double
+                                let titulo = check["titulo"].string
+                                let contenido = check["contenido"].string
+                                let calif = check["calificacion"] != JSON.null && !check["calificacion"].isEmpty ? check["calificacion"].int : 0
+                                var urlFoto = Constantes.BASE_URL
+                                urlFoto += image!
+                                self.listaMisCheckIns.append(
+                                    GeneralTableItem(id: id!, nombre:nombre!, distancia: "", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: urlFoto, badge: "0", compartir: false, resaltar: false, restriccion: foto_visible)
+                                )
+                            }
+                        }
+                        self.tableView.reloadData()
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                     }else{
+                        self.tableView.reloadData()
                         Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                     }
                 }
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if self.tab.tabSeleccionada == 0{
+            self.listaCercanos.removeAll()
+            self.obtenerCheckinsOtros()
+        }else{
+            self.listaMisCheckIns.removeAll()
+            self.obtenerMisCheckins()
         }
     }
 

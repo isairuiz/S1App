@@ -9,29 +9,80 @@
 import UIKit
 import CoreData
 import FBSDKLoginKit
+import FirebaseAnalytics
+import FirebaseMessaging
+import FirebaseInstanceID
+import UserNotifications
+
 //import OneSignal
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate,MessagingDelegate {
 
     var window: UIWindow?
-
+    
+    func messaging(_ messaging: Messaging, didRefreshRegistrationToken fcmToken: String) {
+        debugPrint("--->messaging:\(messaging)")
+        debugPrint("--->TOKEN REFRESCADO**********************************************************:\(fcmToken)")
+    }
+    
+    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
+        debugPrint("--->messaging:\(messaging)")
+        debugPrint("--->didReceive Remote Message:\(remoteMessage.appData)")
+        guard let data =
+            try? JSONSerialization.data(withJSONObject: remoteMessage.appData, options: .prettyPrinted),
+            let prettyPrinted = String(data: data, encoding: .utf8) else { return }
+        print("Received direct channel message:\n\(prettyPrinted)")
+    }
+    
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        /*let onesignalInitSettings = [kOSSettingsKeyAutoPrompt: false]
-        OneSignal.initWithLaunchOptions(launchOptions,
-                                        appId: "11111111-2222-3333-4444-0123456789ab",
-                                        handleNotificationAction: nil,
-                                        settings: onesignalInitSettings)
         
-        OneSignal.inFocusDisplayType = OSNotificationDisplayType.notification;
-        OneSignal.promptForPushNotifications(userResponse: { accepted in
-            print("User accepted notifications: \(accepted)")
-        })*/
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+        
+        /*Firebase shit*/
+        FirebaseApp.configure()
+        Messaging.messaging().delegate = self
+        Messaging.messaging().shouldEstablishDirectChannel = true
+        self.initializeFCM(application)
+        let token = InstanceID.instanceID().token()
+        debugPrint("GCM TOKEN = \(String(describing: token))")
+        
         return true 
     }
+    
+    func initializeFCM(_ application: UIApplication){
+        if #available(iOS 10.0, *) // enable new way for notifications on iOS 10
+        {
+            let center = UNUserNotificationCenter.current()
+            center.delegate = self
+            center.requestAuthorization(options: [.badge, .alert , .sound]) { (accepted, error) in
+                if !accepted
+                {
+                    print("Notification access denied.")
+                }
+                else
+                {
+                    print("Notification access accepted.")
+                    application.registerForRemoteNotifications()
+                }
+            }
+        }else
+        {
+            let type: UIUserNotificationType = [UIUserNotificationType.badge, UIUserNotificationType.alert, UIUserNotificationType.sound];
+            let setting = UIUserNotificationSettings(types: type, categories: nil);
+            UIApplication.shared.registerUserNotificationSettings(setting);
+            UIApplication.shared.registerForRemoteNotifications();
+        }
+    }
+    
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        debugPrint("Mensaje ID: \(userInfo["gcm.message_id"]!)")
+        debugPrint("Toda la notificacion:\(userInfo)")
+    }
+    
+    
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

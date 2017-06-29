@@ -129,10 +129,11 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
                 }
             }
             if !(jsonPerfilObject?["fotografias"].isEmpty)!{
+                let foto_visible = jsonPerfilObject?["foto_visible"].floatValue
                 fotoUrl += Constantes.BASE_URL
                 fotitos = jsonPerfilObject?["fotografias"].dictionaryObject as! Dictionary<String, String>
                 fotoUrl += Array(fotitos.values)[0]
-                self.imagePerifl.downloadedFrom(link: fotoUrl,withBlur:true,maxBlur:50)
+                self.imagePerifl.downloadedFrom(link: fotoUrl,withBlur:true,maxBlur:foto_visible!)
                 
             }
             if let nombre = jsonPerfilObject?["nombre"].string{
@@ -141,8 +142,9 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
             if let profesion = jsonPerfilObject?["profesion"].string{
                 self.profesionPersona.text = profesion
             }
-            if let desc = jsonPerfilObject?["descripcion"].string{
-                self.descPersona.text = desc
+            if let desc = jsonPerfilObject?["sobre_mi"].string{
+                self.descPersona.text = "vamos a ver si este texto se ajusta comom debe de ser para ver si la descripcion, bueno mas bien el contenedor adapta su altura dependiendo del tamaño del textview sopas okokok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok okmsdnkandjasda sdasjda dsaksjnda sdnamsnd akjsda sdka sdasd ansdkjas dna ksdjasmdn sak"
+                self.tableView.reloadData()
             }
             Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
         }
@@ -185,6 +187,21 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
         view.layer.insertSublayer(gradientLayer, at: 0)
         
         self.tableView.backgroundView = view
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == 0{
+            return 330
+        }
+        else if indexPath.row == 1{
+            return UITableViewAutomaticDimension
+        }else{
+            return 100
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
     }
     
     func desBlurFoto(sender: UITapGestureRecognizer){
@@ -316,13 +333,13 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
 
     
     @IBAction func aceptarSingular(_ sender: Any) {
-        //self.responderS1(respuesta:1,id: DataUserDefaults.getIdVerPerfil())
-        self.performSegue(withIdentifier: "gotoYeah", sender: nil)
+        self.responderS1(respuesta:1,id: DataUserDefaults.getIdVerPerfil())
+        //self.performSegue(withIdentifier: "gotoYeah", sender: nil)
     }
     
     @IBAction func rechazarSingular(_ sender: Any) {
-        //self.responderS1(respuesta:0,id: DataUserDefaults.getIdVerPerfil())
-        _ = self.navigationController?.popViewController(animated: true)
+        self.responderS1(respuesta:0,id: DataUserDefaults.getIdVerPerfil())
+        //_ = self.navigationController?.popViewController(animated: true)
         
     }
     

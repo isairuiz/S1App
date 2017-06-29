@@ -9,6 +9,8 @@
 import UIKit
 import MapKit
 import CoreLocation
+import Alamofire
+import SwiftyJSON
 
 class HacerCheckInTableViewController: UITableViewController,  CLLocationManagerDelegate, MKMapViewDelegate, UITextFieldDelegate {
     
@@ -29,10 +31,21 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
     @IBOutlet weak var mapTableViewCell: UITableViewCell!
     @IBOutlet weak var dondeEstasTableViewCell: UITableViewCell!
     @IBOutlet weak var queHacesTableViewCell: UITableViewCell!
+    @IBOutlet weak var verMiCheckinCell: UITableViewCell!
+    @IBOutlet weak var verOtroCheckinCell: UITableViewCell!
     
     @IBOutlet weak var dondeEstasTextField: UITextField!
     @IBOutlet weak var queHacesTextField: UITextField!
     
+    
+    @IBOutlet weak var verCheckinLugar: UILabel!
+    @IBOutlet weak var verCheckinFecha: UILabel!
+    @IBOutlet weak var verCheckingContenido: UILabel!
+    
+    @IBOutlet weak var otroCheckinNombre: UILabel!
+    @IBOutlet weak var otroCheckinFecha: UILabel!
+    @IBOutlet weak var otroCheckinLugar: UILabel!
+    @IBOutlet weak var otroCheckinContenido: UILabel!
     
     var calificacion:Int = 0
     var checkInRealizado:Bool = false
@@ -40,6 +53,15 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
     var locationManager:CLLocationManager = CLLocationManager();
     var ubicacion: CLLocationCoordinate2D!;
     var ubicacionCentrada = false
+    
+    let headers: HTTPHeaders = [
+        "Authorization": "Bearer "+DataUserDefaults.getUserToken()
+    ]
+    
+    var showControllsFor : Int = DataUserDefaults.getControllsCheckin()
+    
+    let jsonCheckinString = DataUserDefaults.getJsonCheckin()
+    var jsonCheckin : JSON?
 
     @IBOutlet weak var mapa: MKMapView!
     
@@ -66,12 +88,9 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
         self.compartirCheckInViewButton.layer.shadowOffset = CGSize(width: 2, height: 2)
         self.compartirCheckInViewButton.layer.shadowRadius = 3
         
-        self.mapa.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization()
-        ubicacion = nil
-        locationManager.startUpdatingLocation()
+        
+        
+        
         
         
         self.dondeEstasTextField.delegate = self
@@ -80,6 +99,57 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
         
         let tapView = UITapGestureRecognizer(target: self, action: #selector(self.finalizarEdicion(_:)))
         self.view.addGestureRecognizer(tapView)
+        
+        if let dataFromString = jsonCheckinString.data(using: .utf8, allowLossyConversion: false){
+            jsonCheckin = JSON(data: dataFromString)
+            debugPrint(jsonCheckin)
+        }
+        
+        if showControllsFor == 1{
+            self.mapa.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.delegate = self
+            locationManager.requestWhenInUseAuthorization()
+            ubicacion = nil
+            locationManager.startUpdatingLocation()
+            
+        }else if showControllsFor == 2{
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "changetitle"), object: nil, userInfo: ["windowType":2])
+            _  = jsonCheckin?["id"].int
+            let fecha = jsonCheckin?["fecha"].string
+            let lat = jsonCheckin?["latitud"].double
+            let long = jsonCheckin?["longitud"].double
+            let titulo = jsonCheckin?["titulo"].string
+            let contenido = jsonCheckin?["contenido"].string
+            let cal = jsonCheckin?["calificacion"].int
+            self.addCalificacion(calificacion:cal!)
+            self.verCheckinLugar.text = titulo
+            self.verCheckinFecha.text = fecha
+            self.verCheckingContenido.text = contenido
+            let center = CLLocationCoordinate2D(latitude: lat!, longitude: long!)
+            let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.002, longitudeDelta: 0.002))
+            self.mapa.setRegion(region, animated: true)
+        }else{
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "changetitle"), object: nil, userInfo: ["windowType":3])
+            let nombre = jsonCheckin?["nombre"].string
+            let edad = jsonCheckin?["edad"].int
+            let fecha = jsonCheckin?["fecha"].string
+            let lat = jsonCheckin?["latitud"].double
+            let long = jsonCheckin?["longitud"].double
+            let titulo = jsonCheckin?["titulo"].string
+            let contenido = jsonCheckin?["contenido"].string
+            let cal = jsonCheckin?["calificacion"] != JSON.null && !(jsonCheckin?["calificacion"].isEmpty)! ? jsonCheckin?["calificacion"].int : 0
+            var nombreEdad : String = nombre!
+            nombreEdad += " - \(edad!) años"
+            self.otroCheckinNombre.text = nombreEdad
+            self.otroCheckinFecha.text = fecha
+            self.otroCheckinLugar.text = titulo
+            self.otroCheckinContenido.text = contenido
+            self.addCalificacion(calificacion:cal!)
+            let center = CLLocationCoordinate2D(latitude: lat!, longitude: long!)
+            let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.002, longitudeDelta: 0.002))
+            self.mapa.setRegion(region, animated: true)
+        }
         
     }
 
@@ -136,20 +206,106 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
         
     }
     
-    func hacerCheckIn(){
-        self.checkInRealizado = true
+    func addCalificacion(calificacion:Int){
         
-        self.mapTableViewCell.isUserInteractionEnabled = false
-        self.dondeEstasTableViewCell.isUserInteractionEnabled = false
-        self.queHacesTableViewCell.isUserInteractionEnabled = false
-        
-        self.tableView.reloadData()
-        
+        if calificacion == 1{
+            self.calificacion = 1
+            self.star1.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star2.setImage(UIImage(named: "Star"), for: UIControlState.normal)
+            self.star3.setImage(UIImage(named: "Star"), for: UIControlState.normal)
+            self.star4.setImage(UIImage(named: "Star"), for: UIControlState.normal)
+            self.star5.setImage(UIImage(named: "Star"), for: UIControlState.normal)
+        }else if calificacion == 2{
+            self.calificacion = 2
+            self.star1.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star2.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star3.setImage(UIImage(named: "Star"), for: UIControlState.normal)
+            self.star4.setImage(UIImage(named: "Star"), for: UIControlState.normal)
+            self.star5.setImage(UIImage(named: "Star"), for: UIControlState.normal)
+        }else if calificacion == 3{
+            self.calificacion = 3
+            self.star1.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star2.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star3.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star4.setImage(UIImage(named: "Star"), for: UIControlState.normal)
+            self.star5.setImage(UIImage(named: "Star"), for: UIControlState.normal)
+        }else if calificacion == 4{
+            self.calificacion = 4
+            self.star1.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star2.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star3.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star4.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star5.setImage(UIImage(named: "Star"), for: UIControlState.normal)
+        }else if calificacion == 5{
+            self.calificacion = 5
+            self.star1.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star2.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star3.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star4.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+            self.star5.setImage(UIImage(named: "StarFilled"), for: UIControlState.normal)
+        }
     }
+    
+    func hacerCheckIn(){
+        let loadingView = UIView()
+        let loadinLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        
+        let titulo:String = self.dondeEstasTextField.text!
+        let contenido:String = self.queHacesTextField.text!
+        
+        if titulo.isEmpty || contenido.isEmpty{
+            self.showAlertWithMessage(title: "Error", message: "Escribe el lugar donde te encuentras y que haces, para que tus S1ngulares lo sepan.")
+        }else{
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadinLabel, spinner: spinner)
+            let parameters: Parameters = [
+                "latitud": self.ubicacion.latitude,
+                "longitud": self.ubicacion.longitude,
+                "titulo": titulo,
+                "contenido": contenido,
+                "calificacion": self.calificacion
+            ]
+            
+            Alamofire.request(Constantes.AGREGAR_CHECKIN, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    let json = JSON(response.result.value)
+                    debugPrint(json)
+                    if let status = json["status"].bool{
+                        if status{
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadinLabel, spinner: spinner)
+                            self.checkInRealizado = true
+                            if let mensaje = json["mensaje_plain"].string{
+                                self.showAlertWithMessage(title: "Muy bien!", message: mensaje)
+                            }
+                            self.dondeEstasTextField.text = ""
+                            self.queHacesTextField.text = ""
+                        }else{
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadinLabel, spinner: spinner)
+                            if let mensaje = json["mensaje_plain"].string{
+                                self.showAlertWithMessage(title: "Error!", message: mensaje)
+                            }
+                        }
+                    }
+            }
+            
+            self.tableView.reloadData()
+        }
+    }
+    
     func compartirCheckIn(){
         
         print("compartir")
         
+    }
+    
+    func showAlertWithMessage(title:String,message:String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: {
+            action in
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "goback"), object: nil)
+        }))
+        self.present(alert, animated: true, completion: nil)
     }
     
     // MARK: -  Table
@@ -170,142 +326,80 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
         
+        
         // Logo
         if indexPath.row == 0 {
             return 200
         }
         // Slogan y delimitador "o"
-        if indexPath.row == 1 || indexPath.row == 2 {
-            return 66
-        }
         
-        if !self.checkInRealizado && indexPath.row == 3 {
-            return 78
-        }
         
-        if self.checkInRealizado && indexPath.row == 4 {
-            return 78
+        
+        // Mostrar controles para hacer checkin
+        if self.showControllsFor == 1{
+            if indexPath.row == 1 || indexPath.row == 2 {
+                return 66
+            }
+            if indexPath.row == 3 || indexPath.row == 4{
+                return 0
+            }
+            if !self.checkInRealizado && indexPath.row == 5 {
+                return 78
+            }
+            
+            if self.checkInRealizado && indexPath.row == 6 {
+                return 78
+            }
+        // Mostrar controles para ver mi checkin
+        }else if self.showControllsFor == 2{
+            if indexPath.row == 3{
+                return 150
+            }
+            if indexPath.row == 1 || indexPath.row == 2 || indexPath.row == 4 || indexPath.row == 5{
+                return 0
+            }
+            if indexPath.row == 6 {
+                return 78
+            }
+        // Mostrar controles para ver otro checkin
+        }else if self.showControllsFor == 3{
+            if indexPath.row == 4{
+                return 150
+            }
+            if indexPath.row == 1 || indexPath.row == 2 || indexPath.row == 3 || indexPath.row == 5 || indexPath.row == 6{
+                return 0
+            }
+            
         }
         
         return 0
         
     }
 
-   
-
-    /*
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
-        return cell
-    }
-    */
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
     
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-        /*
-        UIView.animateWithDuration(0.2, animations: {
-            self.pasajeroLocationIcon.center.y += 10.0
-            
-            
-            let sombraWidth = self.sombraPasajeroLocationIcon.frame.size.width
-            let sombraHeight = self.sombraPasajeroLocationIcon.frame.size.height
-            
-            
-            self.sombraPasajeroLocationIcon.frame.size.width = sombraWidth / 1.2
-            self.sombraPasajeroLocationIcon.frame.size.height = sombraHeight / 1.2
-            
-            self.sombraPasajeroLocationIcon.center.x += (sombraWidth - self.sombraPasajeroLocationIcon.frame.size.width ) / 2
-            self.sombraPasajeroLocationIcon.center.y += (sombraHeight - self.sombraPasajeroLocationIcon.frame.size.height) / 2
-            
-            
-            
-        }, completion: nil)*/
+        self.ubicacion = mapView.centerCoordinate
+        debugPrint("Ubicacion actual: \(self.ubicacion)")
     }
     func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
-        
-        /*
-        UIView.animateWithDuration(0.3, animations: {
-            self.pasajeroLocationIcon.center.y -= 10.0
-            
-            let sombraWidth = self.sombraPasajeroLocationIcon.frame.size.width
-            let sombraHeight = self.sombraPasajeroLocationIcon.frame.size.height
-            
-            
-            
-            self.sombraPasajeroLocationIcon.frame.size.width *= 1.2
-            self.sombraPasajeroLocationIcon.frame.size.height *= 1.2
-            
-            self.sombraPasajeroLocationIcon.center.x -= (self.sombraPasajeroLocationIcon.frame.size.width - sombraWidth) / 2
-            self.sombraPasajeroLocationIcon.center.y -= (self.sombraPasajeroLocationIcon.frame.size.height - sombraHeight) / 2
-            
-            
-            
-        }, completion: nil)*/
+
     }
     
     func locationManager(_ manager: CLLocationManager,
                          didUpdateLocations locations: [CLLocation]){
-        
-        self.ubicacion = manager.location!.coordinate
-        
-        //let location = locations.last! as CLLocation
-        
-        
-        
-        if !ubicacionCentrada {
-            let center = CLLocationCoordinate2D(latitude: self.ubicacion.latitude, longitude: self.ubicacion.longitude)
-            let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.002, longitudeDelta: 0.002))
+        if self.showControllsFor == 1{
+            self.ubicacion = manager.location!.coordinate
+            if !ubicacionCentrada {
+                let center = CLLocationCoordinate2D(latitude: self.ubicacion.latitude, longitude: self.ubicacion.longitude)
+                let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.002, longitudeDelta: 0.002))
+                
+                self.mapa.setRegion(region, animated: true)
+                ubicacionCentrada = true
+            }
+        }else{
             
-            self.mapa.setRegion(region, animated: true)
-            ubicacionCentrada = true
         }
+        
         
     }
     

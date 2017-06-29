@@ -11,6 +11,7 @@ import UIKit
 class HacerCheckInViewController: UIViewController {
 
     @IBOutlet weak var subtituloView: UIView!
+    var showControllsFor : Int = DataUserDefaults.getControllsCheckin()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +26,13 @@ class HacerCheckInViewController: UIViewController {
         self.subtituloView.layer.shadowOpacity = 0.5
         self.subtituloView.layer.shadowOffset = CGSize(width: 0, height: 2)
         self.subtituloView.layer.shadowRadius = 3
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(gobackk), name: NSNotification.Name(rawValue: "goback"), object: nil)
+        if showControllsFor == 2{
+            changeTitleName(title:"MI CHECK IN")
+        }else if showControllsFor == 3{
+            changeTitleName(title:"VISTA CHECK IN")
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -45,6 +53,14 @@ class HacerCheckInViewController: UIViewController {
         view.layer.insertSublayer(gradientLayer, at: 0)
         
         self.view.insertSubview(view, at: 0)
+    }
+    
+    func changeTitleName(title:String){
+        self.title = title
+    }
+    
+    func gobackk(){
+        _ = self.navigationController?.popViewController(animated: true)
     }
     // MARK: - Actions y Eventos
     

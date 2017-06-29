@@ -30,6 +30,14 @@ class TuSingleChildTableViewController: UITableViewController {
         return jsonAfinidades.count
     }
     
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell:AfinidadTableViewCell = tableView.dequeueReusableCell(withIdentifier: "afinidadCell", for: indexPath) as! AfinidadTableViewCell
         

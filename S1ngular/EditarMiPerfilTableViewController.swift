@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
 
 class EditarMiPerfilTableViewController: UITableViewController {
 
@@ -19,6 +21,11 @@ class EditarMiPerfilTableViewController: UITableViewController {
     @IBOutlet weak var info: UILabel!
     
     var tapViewImage = UIGestureRecognizer()
+    let headers: HTTPHeaders = [
+        "Authorization": "Bearer "+DataUserDefaults.getUserToken()
+    ]
+    
+    var fotitos = Dictionary<String, String>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +38,7 @@ class EditarMiPerfilTableViewController: UITableViewController {
         fotoPerfil.addGestureRecognizer(tapViewImage)
         
         
-        self.fillWindow()
+        
         
     }
     
@@ -40,26 +47,75 @@ class EditarMiPerfilTableViewController: UITableViewController {
     }
     
     func fillWindow(){
-        let nombre = DataUserDefaults.getDataNombre()
-        let profess = DataUserDefaults.getDataProfesion()
-        let fotoPerfilUrl = DataUserDefaults.getFotoPerfilUrl()
-        if nombre != ""{
-            self.nombreUsuario.text = nombre
-        }else{
-            self.nombreUsuario.text = "Configura tu nombre de usuario"
-        }
-        if profess != ""{
-            self.profesion.text = profess
-        }else{
-            self.profesion.text = "Configura tu profesion"
-        }
-        if fotoPerfilUrl != ""{
-            self.fotoPerfil.downloadedFrom(link: fotoPerfilUrl,withBlur:false,maxBlur:0)
-        }else{
-            self.info.isHidden = false
+        
+        
+        let loadingView = UIView()
+        let spinner = UIActivityIndicatorView()
+        let loadingLabel = UILabel()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+        
+        Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
+            .responseJSON {
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if(status){
+                        if let nombre = json["perfil"]["nombre"].string{
+                            if nombre != ""{
+                                DataUserDefaults.saveDataNombre(nombre: nombre)
+                                self.nombreUsuario.text = nombre
+                            }else{
+                                self.nombreUsuario.text = "Configura tu nombre de usuario"
+                            }
+                            
+                        }
+                        if let prof = json["perfil"]["profesion"].string{
+                            if prof != ""{
+                                self.profesion.text = prof
+                                DataUserDefaults.saveDataProfesion(profesion: prof)
+                            }else{
+                                self.profesion.text = "Configura tu profesion"
+                            }
+                            
+                        }
+                        if let idFoto = json["perfil"]["id_fotografia_perfil"].int{
+                            if idFoto > 0{
+                                DataUserDefaults.saveIdFotoPerfil(id: idFoto)
+                                if !json["perfil"]["fotografias"].isEmpty{
+                                    self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
+                                    let fotoo:String = self.getUrlPerfilFoto(idFotoPerfil: idFoto)
+                                    self.fotoPerfil.downloadedFrom(link: fotoo,withBlur:false,maxBlur:1.0)
+                                }else{
+                                    DataUserDefaults.setFotoPerfilUrl(url: "")
+                                }
+                            }else{
+                                self.info.isHidden = false
+                            }
+                            
+                        }
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                    }else{
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                    }
+                }
         }
     }
     
+    func getUrlPerfilFoto(idFotoPerfil:Int) -> String{
+        for (key,value):(String, String) in self.fotitos {
+            if(key == String(idFotoPerfil)){
+                var urlImage = Constantes.BASE_URL
+                urlImage += value
+                return urlImage
+            }
+        }
+        return ""
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        self.fotitos.removeAll()
+        self.fillWindow()
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

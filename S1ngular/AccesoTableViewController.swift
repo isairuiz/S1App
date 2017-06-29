@@ -34,6 +34,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var aceptarTableViewCell: UITableViewCell!
     @IBOutlet weak var terminosCondicionesTableViewCell: UITableViewCell!
     @IBOutlet weak var recuperContraseñaCell: UITableViewCell!
+    @IBOutlet weak var buttonRecPass: UIButton!
     
 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -74,14 +75,15 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
         let tapView = UITapGestureRecognizer(target: self, action: #selector(self.finalizarEdicion(_:)))
         self.view.addGestureRecognizer(tapView) 
         
+        let tapFacebook = UITapGestureRecognizer(target: self, action: #selector(self.facebookButtonTap(_:)))
+        self.facebookTableViewCell.addGestureRecognizer(tapFacebook   )
+        
         let tapAceptar = UITapGestureRecognizer(target: self, action: #selector(self.aceptarButtonTap(_:)))
         self.aceptarTableViewCell.addGestureRecognizer(tapAceptar   )
         
-        let tapFacebook = UITapGestureRecognizer(target: self, action: #selector(self.facebookButtonTap(_:)))
-        self.facebookTableViewCell.addGestureRecognizer(tapFacebook   )
-        let tapViewRecuperar = UITapGestureRecognizer(target: self, action: #selector(self.recuperarPassword(_:)))
         
-        recuperContraseñaCell.addGestureRecognizer(tapViewRecuperar)
+        let tapViewRecPass = UITapGestureRecognizer(target: self, action:#selector(self.recuperarPassword(_:)))
+        self.buttonRecPass.addGestureRecognizer(tapViewRecPass)
         
         self.tableView.layoutIfNeeded()
         
@@ -140,27 +142,28 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     }
     
     func recuperarPassword(_ sender: UITapGestureRecognizer){
-        let alertController = UIAlertController(title: "Recuperar Contraseña", message: "Ingresa tu correo por favor:", preferredStyle: .alert)
+        debugPrint("Dandole a recuperar")
+        //1. Create the alert controller.
+        let alert = UIAlertController(title: "Recuperación de contraseña", message: "Ingrese su correo para recuperar su contraseña.", preferredStyle: .alert)
         
-        let confirmAction = UIAlertAction(title: "Recuperar", style: .default) { (_) in
-            if let field = alertController.textFields?[0] {
-                // store your data
-                
-            } else {
-                // user did not fill field
-            }
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancelar", style: .cancel) { (_) in }
-        
-        alertController.addTextField { (textField) in
+        alert.addTextField { (textField) in
             textField.placeholder = "Correo"
         }
         
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
+        alert.addAction(UIAlertAction(title: "Recuperar", style: .default, handler: { [weak alert] (_) in
+            let textField = alert?.textFields![0]
+            let mail:String = (textField?.text)!
+            if !(mail.isEmpty){
+                self.RecuperarPassword(correo: mail)
+            }else{
+                self.showAlerWithMessage(title: "Error", message: "Ingresa tu corre por favor.")
+            }
+            
+        }))
         
-        self.present(alertController, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "Cancelar", style: .default, handler: nil))
+        
+        self.present(alert, animated: true, completion: nil)
     
     }
     
@@ -239,7 +242,6 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     
     func clearFields(){
         self.passwordTextField.text = ""
-        self.emailTextField.text = ""
         self.confirmarPasswordTextfield.text = ""
     }
     
@@ -294,6 +296,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                                                 self.showAlerWithMessage(title:"Bien",message: message)
                                                 self.clearFields()
                                                 self.hideActivityIndicator()
+                                                self.tab.botonIzquierda?.sendActions(for: .touchUpInside)
                                             }
                                         }else{
                                             if let message = json["mensaje_plain"].string{
@@ -478,6 +481,34 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                 }
         }
         )
+    
+    }
+    
+    func RecuperarPassword(correo:String){
+        let lView = UIView()
+        let lLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+        let parameters: Parameters = ["mail": correo]
+        Alamofire.request(Constantes.RECUPERAR_PASS, method: .post, parameters: parameters, encoding: URLEncoding.default)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if status{
+                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                        if let mensaje = json["mensaje_plain"].string{
+                            self.showAlerWithMessage(title: "Bien!", message: mensaje)
+                        }
+                    }else{
+                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                        if let mensaje = json["mensaje_plain"].string{
+                            self.showAlerWithMessage(title: "Bien!", message: mensaje)
+                        }
+                    }
+                }
+        }
     }
     
     

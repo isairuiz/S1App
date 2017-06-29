@@ -24,9 +24,16 @@ class MIsFotosViewController: UIViewController {
         self.subtituloView.layer.shadowOpacity = 0.5
         self.subtituloView.layer.shadowOffset = CGSize(width: 0, height: 2)
         self.subtituloView.layer.shadowRadius = 3
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(gotoSubirFoto), name: NSNotification.Name(rawValue: "gotoSubirFoto"), object: nil)
 
         // Do any additional setup after loading the view.
     }
+    
+    func gotoSubirFoto(){
+        self.performSegue(withIdentifier: "subirFotoSegue", sender: nil)
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let gradientLayer = CAGradientLayer()

@@ -1,26 +1,17 @@
 //
-//  BienvenidaPaso3ViewController.swift
+//  AgregarFotoViewController.swift
 //  S1ngular
 //
-//  Created by Akira Redwolf on 21/10/16.
-//  Copyright © 2016 Akira Redwolf. All rights reserved.
+//  Created by Ruiz Aguila on 28/06/17.
+//  Copyright © 2017 Akira Redwolf. All rights reserved.
 //
 
 import UIKit
-import Alamofire
-import SwiftyJSON
 
-class BienvenidaPaso3ViewController: UIViewController {
-
+class AgregarFotoViewController: UIViewController {
+    
     @IBOutlet weak var subtituloView: UIView!
-    var childController: BienvenidaPaso3TableViewController!
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let vc = segue.destination as? BienvenidaPaso3TableViewController, segue.identifier == "bienvenidaSegue3"{
-            self.childController = vc
-        }
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -34,10 +25,11 @@ class BienvenidaPaso3ViewController: UIViewController {
         self.subtituloView.layer.shadowOpacity = 0.5
         self.subtituloView.layer.shadowOffset = CGSize(width: 0, height: 2)
         self.subtituloView.layer.shadowRadius = 3
-        
-        
+
+        // Do any additional setup after loading the view.
     }
     
+
     override func viewWillAppear(_ animated: Bool) {
         
         //self.clearsSelectionOnViewWillAppear = self.splitViewController!.isCollapsed
@@ -51,27 +43,9 @@ class BienvenidaPaso3ViewController: UIViewController {
         self.view.insertSubview(imageView, at: 0)
         
     }
-    // MARK: - Actions y Eventos
     
     @IBAction func regresar(_ sender: AnyObject) {
         _ = self.navigationController?.popViewController(animated: true)
-    }
-    
-    
-    func processData(){
-        self.childController.validateAndContinue()
-    }
-    
-    
-    func sendRequestEditarQueBusco(){
-        
-    }
-    func sendRequestAgregarFoto(){
-        
-    }
-    @IBAction func gotoMinitour(_ sender: Any) {
-        processData()
-        self.performSegue(withIdentifier: "gotoMinitour", sender: nil)
     }
 
 

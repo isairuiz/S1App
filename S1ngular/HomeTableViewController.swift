@@ -9,13 +9,12 @@
 import UIKit
 import Alamofire
 import SwiftyJSON
+import CoreLocation
 
-class HomeTableViewController: UITableViewController {
+class HomeTableViewController: UITableViewController,CLLocationManagerDelegate {
     @IBOutlet weak var creditsButton: UIView!
     
-    let loadingView = UIView()
-    let spinner = UIActivityIndicatorView()
-    let loadingLabel = UILabel()
+    
     
     var fotitos = Dictionary<String, String>()
     
@@ -37,6 +36,11 @@ class HomeTableViewController: UITableViewController {
         "Authorization": "Bearer "+DataUserDefaults.getUserToken()
     ]
     
+    var locationManager:CLLocationManager = CLLocationManager();
+    var ubicacion: CLLocationCoordinate2D!;
+    
+    var locationHasSet:Bool = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -47,8 +51,7 @@ class HomeTableViewController: UITableViewController {
         self.creditsButton.layer.shadowOffset = CGSize(width: 2, height: 2)
         self.creditsButton.layer.shadowRadius = 3
         DataUserDefaults.setDefaultData()
-        self.getUserData()
-        self.visitarHome()
+
         
         let tapViewS1 = UITapGestureRecognizer(target: self, action: #selector(self.gotoS1(sender:)))
         let tapViewMensajes = UITapGestureRecognizer(target: self, action: #selector(self.gotoMensajes(sender:)))
@@ -85,6 +88,9 @@ class HomeTableViewController: UITableViewController {
     }
     
     func getUserData(){
+        let loadingView = UIView()
+        let spinner = UIActivityIndicatorView()
+        let loadingLabel = UILabel()
         Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
         
         Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
@@ -221,9 +227,9 @@ class HomeTableViewController: UITableViewController {
                     DataUserDefaults.setCurrentId(id: 17)
                     /******************//******************//******************/
                     
-                    Utilerias.removeCustomLoadingScreen(loadingView: self.loadingView, loadingLabel: self.loadingLabel, spinner: self.spinner)
+                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                 }else{
-                    Utilerias.removeCustomLoadingScreen(loadingView: self.loadingView, loadingLabel: self.loadingLabel, spinner: self.spinner)
+                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                 }
             }
             
@@ -231,6 +237,9 @@ class HomeTableViewController: UITableViewController {
     }
     
     func visitarHome(){
+        let loadingView = UIView()
+        let spinner = UIActivityIndicatorView()
+        let loadingLabel = UILabel()
         Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
         Alamofire.request(Constantes.VISITAR_HOME_URL, headers: self.headers)
             .responseJSON {
@@ -241,10 +250,20 @@ class HomeTableViewController: UITableViewController {
                 if let status = json["status"].bool{
                     if(status){
                         if let s1Nuevos = json["home"]["singulares_nuevos"].int{
-                            self.nuevosSingulares.text = "¡\(s1Nuevos) NUEVOS s1!"
+                            if s1Nuevos>1{
+                                self.nuevosSingulares.text = "¡\(s1Nuevos) NUEVOS S1!"
+                            }else{
+                                self.nuevosSingulares.text = "¡\(s1Nuevos) NUEVO S1!"
+                            }
+                            
                         }
                         if let mensajesNuevos = json["home"]["mensajes_nuevos"].int{
-                            self.nuevosMensajes.text = "¡\(mensajesNuevos) MENSAJES NUEVOS!"
+                            if mensajesNuevos>1{
+                                self.nuevosMensajes.text = "¡\(mensajesNuevos) MENSAJES NUEVOS!"
+                            }else{
+                                self.nuevosMensajes.text = "¡\(mensajesNuevos) MENSAJE NUEVO!"
+                            }
+                            
                         }
                         if let testsNuevos = json["home"]["nuevos_test"].int{
                             self.nuevosTests.text = "¡\(testsNuevos) NUEVOS TESTS!"
@@ -252,9 +271,28 @@ class HomeTableViewController: UITableViewController {
                         if let checkinsNuevos = json["home"]["chekins_cercanos"].int{
                             self.nuevosCheckins.text = "¡\(checkinsNuevos) S1NGULARES A TU ALREDEDOR!"
                         }
-                        Utilerias.removeCustomLoadingScreen(loadingView: self.loadingView, loadingLabel: self.loadingLabel, spinner: self.spinner)
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                     }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: self.loadingView, loadingLabel: self.loadingLabel, spinner: self.spinner)
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                    }
+                }
+        }
+    }
+    
+    func actualizarPosicion(latitud:Double,longitud:Double){
+        let parameters: Parameters = ["latitud": latitud,"longitud":longitud]
+        Alamofire.request(Constantes.ACTUALIZAR_POSICION, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if status{
+                        
+                    }else{
+                        if let errorMessage = json["mensaje_plain"].string{
+                            self.showAlertWithMessage(title: "Error", message: errorMessage)
+                        }
                     }
                 }
         }
@@ -291,6 +329,17 @@ class HomeTableViewController: UITableViewController {
         self.tableView.backgroundView = view        
         
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.getUserData()
+        self.visitarHome()
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        ubicacion = nil
+        locationManager.startUpdatingLocation()
+    }
    
 
     // MARK: - Table view data source
@@ -312,16 +361,30 @@ class HomeTableViewController: UITableViewController {
         tableView.cellForRow(at: indexPath)?.alpha = 1
     }
     
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    func locationManager(_ manager: CLLocationManager,
+                         didUpdateLocations locations: [CLLocation]){
+        if !self.locationHasSet{
+            debugPrint("ubicacion obtenida =)")
+            self.ubicacion = manager.location!.coordinate
+            self.actualizarPosicion(latitud: self.ubicacion.latitude, longitud: self.ubicacion.longitude)
+            self.locationHasSet = true
+        }
     }
-    */
+    
+    
+    func locationManager(_ manager: CLLocationManager,
+                         didFailWithError error: Error) {
+        debugPrint("ubicacion no pudo ser obtenida =(")
+        self.showAlertWithMessage(title:"Error",message: "No se pudo obtener tu ubicación")
+        self.ubicacion = nil;
+    }
+    
+    
+    func showAlertWithMessage(title:String,message:String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
 
 }

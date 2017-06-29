@@ -12,40 +12,52 @@ import SwiftyJSON
 
 class MisFotosChildTableViewController: UITableViewController,UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
-    var listaFotos:[String] = []
     let reuseIdentifier = "fotoCell"
     var fotitos = Dictionary<String, String>()
     var idFotoPerfil = Int()
     var baseUrl = String()
-    
-    let loadingView = UIView()
-    let spinner = UIActivityIndicatorView()
-    let loadingLabel = UILabel()
+
 
     @IBOutlet weak var collectionFotosCell: UITableViewCell!
     @IBOutlet weak var fotoPerfil: UIImageView!
     @IBOutlet weak var myCollection: UICollectionView!
     @IBOutlet weak var inforMessage: UILabel!
+    @IBOutlet weak var subirFotoCell: UITableViewCell!
+    @IBOutlet weak var subirFotoButton: UIView!
     
     let headers: HTTPHeaders = [
         "Authorization": "Bearer "+DataUserDefaults.getUserToken()
     ]
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.myCollection.delegate = self
         self.myCollection.dataSource = self
-        self.setLoadingScreen()
-        self.getUserData()
+        
         self.idFotoPerfil = DataUserDefaults.getidFotoPerfil()
         self.baseUrl = Constantes.BASE_URL
         
         
+        subirFotoButton.layer.shadowColor = UIColor.black.cgColor
+        subirFotoButton.layer.shadowOpacity = 0.5
+        subirFotoButton.layer.shadowOffset = CGSize(width: 2, height: 2)
+        subirFotoButton.layer.shadowRadius = 3
+        
+        let tapView = UITapGestureRecognizer(target: self, action: #selector(self.subirFotoTap(_:)))
+        self.subirFotoCell.addGestureRecognizer(tapView)
+        
     }
     
+    func subirFotoTap(_ sender: UITapGestureRecognizer){
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "gotoSubirFoto"), object: nil)
+    }
+    
+    
     func getUserData(){
-        
+        let view = UIView()
+        let label = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spinner)
         
         Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
             .validate(contentType: ["application/json"])
@@ -62,18 +74,18 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
                             if !self.fotitos.isEmpty{
                                 self.setPerfilFoto()
                                 self.myCollection.reloadData()
+                                self.tableView.reloadData()
                             }
+                            
                         }else{
                             self.inforMessage.isHidden = false
                             debugPrint("No hay fotos...")
                         }
-                        
-                        
+                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
                     }else{
-                        
+                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
                     }
                 }
-                self.removeLoadingScreen()
                 
         }
     }
@@ -89,7 +101,10 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
     }
     
     func cambiarIdFotoPerfil(idFoto: String){
-        self.setLoadingScreen()
+        let view = UIView()
+        let label = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spinner)
         let params: Parameters = [
             "id_fotografia": idFoto,
         ]
@@ -103,7 +118,9 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
                         if var message = json["mensaje_plain"].string{
                             self.getUserData()
                         }
+                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
                     }else{
+                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
                         if var message = json["mensaje_plain"].string{
                             self.showAlerWithMessage(title: "¡Error!",message: message )
                         }
@@ -120,45 +137,10 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
         self.present(alert, animated: true, completion: nil)
     }
     
-    
-    private func setLoadingScreen() {
-        UIApplication.shared.beginIgnoringInteractionEvents()
-        // Sets the view which contains the loading text and the spinner
-        let width: CGFloat = 140
-        let height: CGFloat = 50
-        let x = (self.tableView.frame.width / 2) - (width / 2)
-        let y = (self.tableView.frame.height / 2) - (height / 2)
-        loadingView.frame = CGRect(x:x, y:y, width:width, height:height)
-        loadingView.clipsToBounds = true
-        loadingView.backgroundColor = Colores.BGPink
-        
-        // Sets loading text
-        self.loadingLabel.textColor = Colores.BGWhite
-        self.loadingLabel.textAlignment = NSTextAlignment.center
-        self.loadingLabel.text = "Cargando..."
-        self.loadingLabel.frame = CGRect(x:0+15, y:0+5, width:150, height:30)
-        
-        // Sets spinner
-        self.spinner.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge
-        self.spinner.frame = CGRect(x:0, y:0, width:50, height:50)
-        self.spinner.startAnimating()
-        
-        // Adds text and spinner to the view
-        loadingView.addSubview(self.spinner)
-        loadingView.addSubview(self.loadingLabel)
-        
-        self.tableView.addSubview(loadingView)
-        
-    }
-    
-    // Remove the activity indicator from the main view
-    private func removeLoadingScreen() {
-        UIApplication.shared.endIgnoringInteractionEvents()
-        // Hides and stops the text and the spinner
-        self.spinner.stopAnimating()
-        self.loadingLabel.isHidden = true
-        self.loadingView.isHidden = true
-        
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.fotitos.removeAll()
+        self.getUserData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -188,13 +170,21 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
         return self.fotitos.keys.count
         
     }
-    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 3
+    }
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
+    }
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if (indexPath.section == 0){
+        
+            if indexPath.row == 0{
+                return 78
+            }
+            if indexPath.row == 2{
+                return 350
+            }
             return 260.0
-        }else{
-            return 360.0
-        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -230,6 +220,7 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
         }
         
     }
+    
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         

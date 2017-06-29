@@ -28,10 +28,6 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
     @IBOutlet weak var unionSwitch: UISwitch!
     @IBOutlet weak var viudoSwitch: UISwitch!
     
-    let loadingView = UIView()
-    let spinner = UIActivityIndicatorView()
-    let loadingLabel = UILabel()
-    
     var nombreUsuario = String()
     var miedad = Int()
     var migenero = Int()
@@ -198,14 +194,17 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
     }
     
     func uploadChanges(){
-        self.setLoadingScreen()
+        let loadingView = UIView()
+        let spinner = UIActivityIndicatorView()
+        let loadingLabel = UILabel()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
         Alamofire.request(Constantes.EDITAR_PERFIL_URL, method: .put, parameters:PerfilParametros, encoding: URLEncoding.httpBody,headers:self.headers)
             .responseJSON{response in
                 let json = JSON(response.result.value)
                 debugPrint(json)
                 if let status = json["status"].bool{
                     if(status){
-                        self.removeLoadingScreen()
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         let alert = UIAlertController(title: "¡Bien!", message: "Tu perfil ha sido correctamente actualizado", preferredStyle: UIAlertControllerStyle.alert)
                         alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: { action in
                             
@@ -216,7 +215,7 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
                         self.present(alert, animated: true, completion: nil)
                         
                     }else{
-                        self.removeLoadingScreen()
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         if var message = json["mensaje_plain"].string{
                             debugPrint(message)
                         }
@@ -227,7 +226,10 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
     }
     
     func getUserData(){
-        self.setLoadingScreen()
+        let loadingView = UIView()
+        let spinner = UIActivityIndicatorView()
+        let loadingLabel = UILabel()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
         Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: headers)
             .responseJSON {
                 response in
@@ -345,7 +347,7 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
                                 
                             }
                         }
-                        self.removeLoadingScreen()
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "notifFinishEditPerfil"), object: nil)
                     }else{
                         
@@ -355,46 +357,6 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
         }
     }
 
-    
-    private func setLoadingScreen() {
-        UIApplication.shared.beginIgnoringInteractionEvents()
-        // Sets the view which contains the loading text and the spinner
-        let width: CGFloat = 140
-        let height: CGFloat = 50
-        let x = (self.tableView.frame.width / 2) - (width / 2)
-        let y = (self.tableView.frame.height / 2) - (height / 2)
-        loadingView.frame = CGRect(x:x, y:y, width:width, height:height)
-        loadingView.clipsToBounds = true
-        loadingView.backgroundColor = Colores.BGPink
-        
-        // Sets loading text
-        self.loadingLabel.textColor = Colores.BGWhite
-        self.loadingLabel.textAlignment = NSTextAlignment.center
-        self.loadingLabel.text = "Cargando..."
-        self.loadingLabel.frame = CGRect(x:0+15, y:0+5, width:150, height:30)
-        
-        // Sets spinner
-        self.spinner.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge
-        self.spinner.frame = CGRect(x:0, y:0, width:50, height:50)
-        self.spinner.startAnimating()
-        
-        // Adds text and spinner to the view
-        loadingView.addSubview(self.spinner)
-        loadingView.addSubview(self.loadingLabel)
-        
-        self.tableView.addSubview(loadingView)
-        
-    }
-    
-    // Remove the activity indicator from the main view
-    private func removeLoadingScreen() {
-        UIApplication.shared.endIgnoringInteractionEvents()
-        // Hides and stops the text and the spinner
-        self.spinner.stopAnimating()
-        self.loadingLabel.isHidden = true
-        self.loadingView.isHidden = true
-        
-    }
     
     @IBAction func seleccionarMujer(_ sender: AnyObject) {
         if self.mujerSwitch.isOn {

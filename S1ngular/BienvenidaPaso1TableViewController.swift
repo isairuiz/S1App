@@ -73,7 +73,19 @@ class BienvenidaPaso1TableViewController: UITableViewController, UITextFieldDele
     }
 
     func validateAndContinue(){
-        DataUserDefaults.saveDataEdad(edad: self.edadTextField.text!)
+        var edadInt:Int = 0
+        let edadString:String = self.edadTextField.text!
+        if edadString.isEmpty{
+            self.showAlerWithMessage(title: "Error", message: "Debes ingresar tu edad")
+           return
+        }else{
+            edadInt = Int(edadString)!
+            if edadInt < 18{
+                self.showAlerWithMessage(title: "Error", message: "Debes tener 18 años o mas")
+                return
+            }
+        }
+        DataUserDefaults.saveDataEdad(edad: edadString)
         DataUserDefaults.saveDataNombre(nombre: self.nombreUsuarioTextField.text!)
         if(self.mujerSwitch.isOn){
             DataUserDefaults.saveDataGenero(genero: 1)
@@ -103,6 +115,12 @@ class BienvenidaPaso1TableViewController: UITableViewController, UITextFieldDele
         if self.viudoSwitch.isOn{
             DataUserDefaults.saveDataEstado(estado: 6)
         }
+    }
+    
+    func showAlerWithMessage(title:String,message:String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     @IBAction func seleccionarMujer(_ sender: AnyObject) {

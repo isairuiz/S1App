@@ -11,7 +11,32 @@ import UIKit
 
 class Utilerias {
     static func aplicarEfectoDifuminacionImagen(_ image: UIImage, intensidad: Float) -> UIImage {
-        
+        debugPrint("Blur proveniente: \(intensidad)")
+        var restric:Float = 0
+        if intensidad == 0.0{
+            restric = 50
+        }else if intensidad == 0.1{
+            restric = 45
+        }else if intensidad == 0.2{
+            restric = 40
+        }else if intensidad == 0.3{
+            restric = 35
+        }else if intensidad == 0.4{
+            restric = 30
+        }else if intensidad == 0.5{
+            restric = 25
+        }else if intensidad == 0.6{
+            restric = 20
+        }else if intensidad == 0.7{
+            restric = 15
+        }else if intensidad == 0.8{
+            restric = 10
+        }else if intensidad == 0.9{
+            restric = 5
+        }else if intensidad == 1.0{
+            restric = 0
+        }
+        debugPrint("Blur nuevo: \(restric)")
         let ciContext = CIContext(options: nil)
         
         let ciImage = CIImage(image: image)
@@ -20,7 +45,7 @@ class Utilerias {
         
         ciFilter!.setValue(ciImage, forKey: kCIInputImageKey)
         
-        ciFilter!.setValue(intensidad, forKey: "inputRadius")
+        ciFilter!.setValue(restric, forKey: "inputRadius")
         
         let cgImage = ciContext.createCGImage(ciFilter!.outputImage!, from: ciImage!.extent)
         
@@ -29,7 +54,7 @@ class Utilerias {
     
     static func getCurrentDateAndTime()->String{
         let date = NSDate()
-        var calendar = NSCalendar.current
+        let calendar = NSCalendar.current
         let current = String(describing:calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date as Date))
         return current
     }

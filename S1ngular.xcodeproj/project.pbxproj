@@ -17,8 +17,11 @@
 		7D3A24B61EE764EA00EB2A49 /* BancoIAPTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3A24B51EE764EA00EB2A49 /* BancoIAPTableViewCell.swift */; };
 		7D3A24B81EE7BA4000EB2A49 /* CreditsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3A24B71EE7BA4000EB2A49 /* CreditsTableViewCell.swift */; };
 		7D3A24BA1EE7BA5700EB2A49 /* CuponTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3A24B91EE7BA5700EB2A49 /* CuponTableViewCell.swift */; };
+		7D433F3A1F048442006231E6 /* AgregarFotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D433F391F048440006231E6 /* AgregarFotoViewController.swift */; };
+		7D433F3C1F04846F006231E6 /* AgregarFotoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D433F3B1F04846F006231E6 /* AgregarFotoTableViewController.swift */; };
 		7D50FECB1EB39084002E1C80 /* DataUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50FECA1EB39084002E1C80 /* DataUserDefaults.swift */; };
 		7D50FECD1EB3B6FC002E1C80 /* Constantes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50FECC1EB3B6FC002E1C80 /* Constantes.swift */; };
+		7D5391CF1EFCB0A20094FA4F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D5391CE1EFCB0A20094FA4F /* GoogleService-Info.plist */; };
 		7D5B068F1ED16F9F0084AA3C /* YeahTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D5B068E1ED16F9F0084AA3C /* YeahTableViewController.swift */; };
 		7D78CAB11EE701460097BD53 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D78CAB01EE701460097BD53 /* StoreKit.framework */; };
 		7D8DDA181ED96EC0001896E8 /* YeahCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8DDA171ED96EC0001896E8 /* YeahCollectionViewCell.swift */; };
@@ -147,8 +150,11 @@
 		7D3A24B51EE764EA00EB2A49 /* BancoIAPTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BancoIAPTableViewCell.swift; sourceTree = "<group>"; };
 		7D3A24B71EE7BA4000EB2A49 /* CreditsTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreditsTableViewCell.swift; sourceTree = "<group>"; };
 		7D3A24B91EE7BA5700EB2A49 /* CuponTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CuponTableViewCell.swift; sourceTree = "<group>"; };
+		7D433F391F048440006231E6 /* AgregarFotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgregarFotoViewController.swift; sourceTree = "<group>"; };
+		7D433F3B1F04846F006231E6 /* AgregarFotoTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgregarFotoTableViewController.swift; sourceTree = "<group>"; };
 		7D50FECA1EB39084002E1C80 /* DataUserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataUserDefaults.swift; sourceTree = "<group>"; };
 		7D50FECC1EB3B6FC002E1C80 /* Constantes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constantes.swift; sourceTree = "<group>"; };
+		7D5391CE1EFCB0A20094FA4F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7D5B068E1ED16F9F0084AA3C /* YeahTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YeahTableViewController.swift; sourceTree = "<group>"; };
 		7D78CAB01EE701460097BD53 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		7D8DDA171ED96EC0001896E8 /* YeahCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YeahCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -301,6 +307,8 @@
 				7D382CB71EC4C87E00E07267 /* NotificacionesTableViewController.swift */,
 				7DB70C431EC62A8700B80125 /* FotosCollectionViewCell.swift */,
 				7DA24D2F1ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift */,
+				7D433F391F048440006231E6 /* AgregarFotoViewController.swift */,
+				7D433F3B1F04846F006231E6 /* AgregarFotoTableViewController.swift */,
 			);
 			name = Configuracion;
 			sourceTree = "<group>";
@@ -374,6 +382,7 @@
 				AB2465991DB83DC60010A814 /* Assets.xcassets */,
 				AB24659B1DB83DC60010A814 /* LaunchScreen.storyboard */,
 				AB24659E1DB83DC60010A814 /* Info.plist */,
+				7D5391CE1EFCB0A20094FA4F /* GoogleService-Info.plist */,
 				AB2465961DB83DC60010A814 /* S1ngular.xcdatamodeld */,
 			);
 			path = S1ngular;
@@ -677,6 +686,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AB2465D11DB9CFDA0010A814 /* Brandon_bld.otf in Resources */,
+				7D5391CF1EFCB0A20094FA4F /* GoogleService-Info.plist in Resources */,
 				AB2465D21DB9CFDA0010A814 /* Brandon_blk.otf in Resources */,
 				AB2465D31DB9CFDA0010A814 /* Brandon_light.otf in Resources */,
 				AB2465D41DB9CFDA0010A814 /* Brandon_med.otf in Resources */,
@@ -861,6 +871,7 @@
 				7DEBBFA41EDF6AE900D23E27 /* ChatTableViewCell.swift in Sources */,
 				7DEEF0991EBAA1E900DD624F /* ConfMenuViewController.swift in Sources */,
 				AB15CFE91DBA0E0E002ED6D1 /* BienvenidaPaso1ViewController.swift in Sources */,
+				7D433F3A1F048442006231E6 /* AgregarFotoViewController.swift in Sources */,
 				7D147DBC1EE4E9D0005ED8D9 /* ResultadoTableViewController.swift in Sources */,
 				AB2465901DB83DC60010A814 /* AppDelegate.swift in Sources */,
 				AB2465D01DB9B60D0010A814 /* Colores.swift in Sources */,
@@ -913,6 +924,7 @@
 				7D8DDA181ED96EC0001896E8 /* YeahCollectionViewCell.swift in Sources */,
 				7DA24D301ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift in Sources */,
 				7D3A24B61EE764EA00EB2A49 /* BancoIAPTableViewCell.swift in Sources */,
+				7D433F3C1F04846F006231E6 /* AgregarFotoTableViewController.swift in Sources */,
 				AB0201851E9F1EE900EA505E /* BancoTableViewController.swift in Sources */,
 				AB15CFF11DBA29FD002ED6D1 /* BienvenidaPaso1TableViewController.swift in Sources */,
 				7D5B068F1ED16F9F0084AA3C /* YeahTableViewController.swift in Sources */,

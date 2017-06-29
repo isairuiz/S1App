@@ -44,6 +44,7 @@ class ResultadoTableViewController: UITableViewController {
         let idTest = DataUserDefaults.getIdComprarTest()
         self.verMiResultado(idTest: String(describing: idTest))
         
+        
     }
     
     func compartirCheckIn(){
@@ -75,6 +76,10 @@ class ResultadoTableViewController: UITableViewController {
     }
     
     func verMiResultado(idTest:String){
+        let view = UIView()
+        let label = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spinner)
         var urlFinal = Constantes.VER_RESULTADO_TEST
         urlFinal += idTest
         Alamofire.request(urlFinal, headers: self.headers)
@@ -96,18 +101,36 @@ class ResultadoTableViewController: UITableViewController {
                         if let puntaje = json["resultado"]["puntaje"].int{
                             
                         }
+                        if let ambito = json["resultado"]["ambito"].string{
+                            self.categoriaTest.text = ambito
+                        }
                         if let resultadoNombre = json["resultado"]["resultado"].string{
                             self.tituloResultadoTest.text = resultadoNombre
                         }
                         if let contenido = json["resultado"]["contenido"].string{
                             self.descripcionResultadoTEst.text = contenido
                         }
-                        
+                        self.tableView.reloadData()
+                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
                     }else{
-                        
+                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
                     }
                 }
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == 0{
+            return 300
+        }else if indexPath.row == 1{
+            return UITableViewAutomaticDimension
+        }else {
+            return 78
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
     }
 
     @IBAction func close(_ sender: Any) {

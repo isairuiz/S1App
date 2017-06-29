@@ -10,9 +10,11 @@ target 'S1ngular' do
   pod 'SwiftyJSON', '~> 3.1'
   pod 'MZFormSheetPresentationController', '~> 2.4'
   pod 'Alamofire', '~> 4.4’
-  pod 'FacebookCore'
-  pod 'FacebookLogin'
-  pod 'FacebookShare'
+  pod 'FacebookCore’
+  pod 'FacebookLogin’
+  #pod 'FacebookShare’,:git => ‘https://github.com/facebook/facebook-sdk-swift’
+  pod ‘Firebase'
+  pod 'Firebase/Messaging'
   #pod 'OneSignal', '>= 2.5.2', '< 3.0'
 
   #target 'OneSignalNotificationServiceExtension2’ do
