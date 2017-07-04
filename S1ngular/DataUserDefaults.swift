@@ -61,6 +61,7 @@ class DataUserDefaults{
         "jsonPerfilPersona", //Index 45
         "jsonCheckin",  //Index 46
         "controllsCheckin" //Index 47
+        
     ]
     static func setDefaultData(){
         for i in 13 ..< 21{

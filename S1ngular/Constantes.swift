@@ -30,9 +30,10 @@ class Constantes{
     static let MIS_CHECKINS = "http://40.84.231.88/singular/singular/listarmischeckins"
     static let LISTAR_CHECKS_OTROS = "http://40.84.231.88/singular/singular/listarcheckins"
     static let LISTAR_PROSPECTOS = "http://40.84.231.88/singular/singular/listarprospectos"
-    static let LISTAR_CHATS = ""
+    static let LISTAR_MIS_CHATS = "http://40.84.231.88/singular/singular/listars1chat"
     static let RESPONDER_S1 = "http://40.84.231.88/singular/singular/responders1"
     static let AGREGAR_CHECKIN = "http://40.84.231.88/singular/singular/agregarcheckin"
     static let ACTUALIZAR_POSICION = "http://40.84.231.88/singular/singular/actualizarposicion"
-    
+    static let ENVIAR_MENSAJE = "http://40.84.231.88/singular/singular/enviarmensaje"
+    static let LISTAR_MENSAJES_CHAT = "http://40.84.231.88/singular/singular/listarmensajeschat?" //id='X'&paginado='X'
 }

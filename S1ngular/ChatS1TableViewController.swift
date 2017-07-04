@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
 
 class ChatS1TableViewController: UITableViewController {
     
@@ -14,40 +16,18 @@ class ChatS1TableViewController: UITableViewController {
     var currentIdUsuario = Int()
     var idPersona = Int()
     var scrollView = UIScrollView()
+    
+    let headers: HTTPHeaders = [
+        "Authorization": "Bearer "+DataUserDefaults.getUserToken()
+    ]
+    
+    var mensajesChat : [JSON] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         currentIdUsuario = DataUserDefaults.getCurrentId()
         idPersona = 19
         scrollView.delegate = self
-        listaMessages = [
-            MessageItem(text: "hey!", image: nil, date: NSDate(), id: 17),
-            MessageItem(text: "what no puedo creerlo xdxdxdxdxdxdxdx!!!", image: nil, date: NSDate(), id: 17),
-            MessageItem(text: "no quiero !!!", image: nil, date: NSDate(), id: 17),
-            MessageItem(text: "este puede ser un texto muy grande pero vamos a ver como queda y si hace el resize y sino ni modos mejor hacemos otra cosa y nos vmos a dormir y mañana tendremos junta okokokokokokokokokokokokokoko!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "heyd,askjdlkajlskdjalkdjlakjlkdajls!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "ñoo dasldkaldkjaldkajldjalkdlaksjdlkasjdlkjaslkdjasldjaslkdjlaksjdklasjdlaksjdlas!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "hey!", image: nil, date: NSDate(), id:17),
-            MessageItem(text: "what no puedo creerlo xdxdxdxdxdxdxdx!!!", image: nil, date: NSDate(),id: 17),
-            MessageItem(text: "no quiero !!!", image: nil, date: NSDate(), id: 17),
-            MessageItem(text: "este puede ser un texto muy grande pero vamos a ver como queda y si hace el resize y sino ni modos mejor hacemos otra cosa y nos vmos a dormir y mañana tendremos junta okokokokokokokokokokokokokoko!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "heyd,askjdlkajlskdjalkdjlakjlkdajls!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "heyd,askjdlkajlskdjalkdjlakjlkdajls!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "ñoo dasldkaldkjaldkajldjalkdlaksjdlkasjdlkjaslkdjasldjaslkdjlaksjdklasjdlaksjdlas!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "hey!", image: nil, date: NSDate(), id:17),
-            MessageItem(text: "what no puedo creerlo xdxdxdxdxdxdxdx!!!", image: nil, date: NSDate(),id: 17),
-            MessageItem(text: "no quiero !!!", image: nil, date: NSDate(), id: 17),
-            MessageItem(text: "este puede ser un texto muy grande pero vamos a ver como queda y si hace el resize y sino ni modos mejor hacemos otra cosa y nos vmos a dormir y mañana tendremos junta okokokokokokokokokokokokokoko!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "heyd,askjdlkajlskdjalkdjlakjlkdajls!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "heyd,askjdlkajlskdjalkdjlakjlkdajls!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "ñoo dasldkaldkjaldkajldjalkdlaksjdlkasjdlkjaslkdjasldjaslkdjlaksjdklasjdlaksjdlas!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "hey!", image: nil, date: NSDate(), id:17),
-            MessageItem(text: "what no puedo creerlo xdxdxdxdxdxdxdx!!!", image: nil, date: NSDate(),id: 17),
-            MessageItem(text: "no quiero !!!", image: nil, date: NSDate(), id: 17),
-            MessageItem(text: "este puede ser un texto muy grande pero vamos a ver como queda y si hace el resize y sino ni modos mejor hacemos otra cosa y nos vmos a dormir y mañana tendremos junta okokokokokokokokokokokokokoko!!!", image: nil, date: NSDate(), id: 19),
-            MessageItem(text: "heyd,askjdlkajlskdjalkdjlakjlkdajls!!!", image: nil, date: NSDate(), id: 19)
-            
-        ]
-        
         
     }
     
@@ -107,18 +87,89 @@ class ChatS1TableViewController: UITableViewController {
         self.tableViewScrollToBottom(animated: false)
     }
     
-    func enviarMensaje(mensaje:String){
-        pintarMensajeEnviado(mensaje:mensaje)
+    func ListarMensajesChat(paginado:Int){
+        let loadingView = UIView()
+        let spinner = UIActivityIndicatorView()
+        let loadingLabel = UILabel()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+        var url:String = Constantes.LISTAR_MENSAJES_CHAT
+        url += "id=\(DataUserDefaults.getIdVerPerfil())"
+        url += "&paginado=\(paginado)"
+        debugPrint(url)
+        Alamofire.request(url, headers: self.headers)
+            .responseJSON {
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if(status){
+                        if !json["mensajes"].isEmpty{
+                            self.mensajesChat = json["mensajes"].arrayValue
+                            self.mensajesChat = self.mensajesChat.reversed()
+                            for mensaje in self.mensajesChat{
+                                //let id = mensaje["id"].int
+                                //let fecha = mensaje["fecha"].string
+                                let idEmisor = mensaje["singular1"].int
+                                let idReceptor = mensaje["singular2"].int
+                                let contenido = mensaje["contenido"].string
+                                //let _ = mensaje["leido"].bool
+                                self.listaMessages.append(
+                                    MessageItem(text: contenido!, image: nil, date: NSDate(), id: idReceptor!)
+                                )
+                            }
+                            self.tableView.reloadData()
+                            self.tableViewScrollToBottom(animated: false)
+                        }
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                    }else{
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        if let mensaje = json["mensaje_plain"].string{
+                            self.showAlertWithMessage(title: "Error", message: mensaje)
+                        }
+                        
+                    }
+                }
+        }
     }
     
-    func pintarMensajeEnviado(mensaje:String){
-        self.listaMessages.append(MessageItem(text: mensaje, image: nil, date: NSDate(), id: 17))
+    func enviarMensaje(mensaje:String,receptor:Int){
+        
+        let parameters: Parameters = ["id_singular": receptor,
+                                      "contenido": mensaje]
+        Alamofire.request(Constantes.ENVIAR_MENSAJE, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if status{
+                        let id = json["id"].int
+                        self.pintarMensajeEnviado(mensaje:mensaje,id: receptor)
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
+                    }else{
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
+                        if let mensaje = json["mensaje_plain"].string{
+                            self.showAlertWithMessage(title: "Error", message: mensaje)
+                        }
+                    }
+                }
+        }
+    }
+    
+    func pintarMensajeEnviado(mensaje:String, id:Int){
+        self.listaMessages.append(MessageItem(text: mensaje, image: nil, date: NSDate(), id: id))
         
         self.tableView.beginUpdates()
         self.tableView.insertRows(at: [IndexPath(row: self.listaMessages.count-1, section: 0)], with: .automatic)
         self.tableView.endUpdates()
         self.tableViewScrollToBottom(animated: false)
 
+    }
+    
+    func showAlertWithMessage(title:String,message:String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     
@@ -144,6 +195,15 @@ class ChatS1TableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.mensajesChat.removeAll()
+        self.listaMessages.removeAll()
+        self.ListarMensajesChat(paginado: 1)
+    }
+    
+    
     
     func tableViewScrollToBottom(animated: Bool) {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {

@@ -39,6 +39,8 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
     
     let jsonPerfilString = DataUserDefaults.getJsonPerfilPersona()
     var jsonPerfilObject : JSON?
+    
+    var idReceptor = Int()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,6 +65,7 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         imageTes.contentMode = .scaleAspectFit
         imageTes.layer.cornerRadius = imageTes.frame.size.width / 2;
         
+        self.idReceptor = DataUserDefaults.getIdVerPerfil()
         
         if let dataFromString = jsonPerfilString.data(using: .utf8, allowLossyConversion: false){
             var fotitos = Dictionary<String, String>()
@@ -71,14 +74,27 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
             if let nombre = jsonPerfilObject?["nombre"].string{
                 subtituloTexto.text = nombre
             }
-            if !(jsonPerfilObject?["fotografias"].isEmpty)!{
-                fotoUrl += Constantes.BASE_URL
-                fotitos = jsonPerfilObject?["fotografias"].dictionaryObject as! Dictionary<String, String>
-                fotoUrl += Array(fotitos.values)[0]
-                imageTes.downloadedFrom(link: fotoUrl,withBlur:false,maxBlur:0)
+            let foto_visible = jsonPerfilObject?["foto_visible"].floatValue
+            if DataUserDefaults.getFromTabS1Nuevos(){
+                if !(jsonPerfilObject?["fotografias"].isEmpty)!{
+                    fotoUrl += Constantes.BASE_URL
+                    fotitos = jsonPerfilObject?["fotografias"].dictionaryObject as! Dictionary<String, String>
+                    fotoUrl += Array(fotitos.values)[0]
+                    imageTes.downloadedFrom(link: fotoUrl,withBlur:true,maxBlur:foto_visible!)
+                }else{
+                    imageTes.image = UIImage(named: "UsuarioIcon")
+                }
             }else{
-                imageTes.image = UIImage(named: "UsuarioIcon")
+                let imagen = jsonPerfilObject?["imagen"].string
+                var fotoUrl = String()
+                
+                if !(imagen?.isEmpty)!{
+                    fotoUrl = Constantes.BASE_URL
+                    fotoUrl += imagen!
+                    imageTes.downloadedFrom(link: fotoUrl,withBlur:true,maxBlur:foto_visible!)
+                }
             }
+            
         }
         
         
@@ -113,6 +129,8 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         
         NotificationCenter.default.addObserver(self, selector: #selector(tryCloseKeyboard), name: NSNotification.Name(rawValue: "closeKeyboardNotif"), object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(habilitarTextField), name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
+        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -124,6 +142,10 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
     
     func tryCloseKeyboard(notification:NSNotification){
         self.view.endEditing(true)
+    }
+    
+    func habilitarTextField(notification:NSNotification){
+        self.mensajeTextField.isEnabled = true
     }
     
     func keyboardWillShow(notification:NSNotification) {
@@ -265,7 +287,8 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         if textField == self.mensajeTextField {
             
             if !(self.mensajeTextField.text?.isEmpty)!{
-                self.childViewController.enviarMensaje(mensaje: self.mensajeTextField.text!)
+                self.mensajeTextField.isEnabled = false
+                self.childViewController.enviarMensaje(mensaje: self.mensajeTextField.text!,receptor:self.idReceptor)
                 self.mensajeTextField.text = ""
             }
             

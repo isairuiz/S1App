@@ -22,6 +22,7 @@ class S1ngularesTableViewController: UITableViewController {
         "Authorization": "Bearer "+DataUserDefaults.getUserToken()
     ]
     var prospectos : [JSON] = []
+    var mischats : [JSON] = []
     
     
     
@@ -30,9 +31,6 @@ class S1ngularesTableViewController: UITableViewController {
 
         self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
         
-        /*if DataUserDefaults.getFromTabS1Nuevos(){
-            tab.tabSeleccionada = 1
-        }*/
         
         tab = TabView(frame: CGRect(x:0,y:0, width: self.view.frame.size.width, height: 66))
         
@@ -40,31 +38,6 @@ class S1ngularesTableViewController: UITableViewController {
         tab.botonIzquierda!.addTarget(self, action: #selector(self.cambiarPrimerTab), for: UIControlEvents.touchUpInside)
         tab.botonDerecha!.addTarget(self, action: #selector(self.cambiarSegundoTab), for: UIControlEvents.touchUpInside)
         
-        
-        
-        /*listaNuevos = [
-            GeneralTableItem(id: 18, nombre: "TEST luna", distancia: "", tiempo: "", lugar: "", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua.", avatar: "http://www.meganfox.com/wp-content/uploads/2014/01/5.jpg", badge: "", compartir: false, resaltar: false, restriccion: 50),
-            
-            GeneralTableItem(id: 19, nombre: "TEST sam", distancia: "", tiempo: "", lugar: "", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua", avatar: "http://ell.h-cdn.co/assets/16/07/980x490/landscape-1455813161-elle-henrycavill.jpg", badge: "", compartir: false, resaltar: false, restriccion: 50)
-        ]*/
-        
-        
-        listaChat = [
-            
-            
-            GeneralTableItem(id: 18, nombre: "TEST Luna", distancia: "37 metros", tiempo: "2:30 hrs", lugar: "", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua", avatar: "http://www.stereomar94fm.com.ve/wp-content/uploads/2016/05/ladygaga-500x375.jpg", badge: "2", compartir: false, resaltar: false, restriccion: 10),
-            
-            GeneralTableItem(id: 17, nombre: "TEST Angel Ruiz", distancia: "626 metros", tiempo: "7:16 hrs", lugar: "De Barbas", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua", avatar: "http://pixel.nymag.com/imgs/daily/vulture/2016/01/19/19-zac-efron-tweet-mlk.w529.h529.jpg", badge: "4", compartir: false, resaltar: false, restriccion: 0),
-            
-            GeneralTableItem(id: 19, nombre: "TEST Sam", distancia: "2 metros", tiempo: "8:58 hrs", lugar: "", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua", avatar: "http://segnorasque.com/wp-content/uploads/2016/06/jolie.jpeg", badge: "", compartir: false, resaltar: false, restriccion: 20),
-            
-            GeneralTableItem(id: 1, nombre: "Pharrell Williams", distancia: "3 km", tiempo: "1 día", lugar: "Chuti de terán", descripcion: "Primeros caracteres de la conversacion. De exceder el espacio, continuará con esto se puede hacer muchas cosas y entonces lalala porque bla bla bla y asi nos vamos al mundo mundial jua jua jua", avatar: "http://media.dlccdn.com/artistas/p/pharrell-williams/pharrell-williams_o.jpg", badge: "85", compartir: false, resaltar: true, restriccion: 30)
-            
-        
-            
-        ]
-        
-        //self.listarNuevosProspectos()
 
     }
 
@@ -318,18 +291,65 @@ class S1ngularesTableViewController: UITableViewController {
             item = self.listaNuevos[(indexPath! as NSIndexPath).row]
             DataUserDefaults.setIdVerPerfil(id: (item?.id)!)
             DataUserDefaults.setJsonPerfilPersona(json: prospectos[(indexPath! as NSIndexPath).row].description)
+            DataUserDefaults.setFromTabS1Nuevos(isit: true)
             performSegue(withIdentifier: "gotoVerPerfil", sender: nil)
         }else{
             let indexPath = tableView.indexPathForSelectedRow
             var item: GeneralTableItem?
             item = self.listaChat[(indexPath! as NSIndexPath).row]
             DataUserDefaults.setIdVerPerfil(id: (item?.id)!)
+            DataUserDefaults.setJsonPerfilPersona(json: mischats[(indexPath! as NSIndexPath).row].description)
+            DataUserDefaults.setFromTabS1Nuevos(isit: false)
             performSegue(withIdentifier: "gotoMesajesChat", sender: nil)
         }
     }
     
     func listarChats(){
-        
+        let loadingView = UIView()
+        let spinner = UIActivityIndicatorView()
+        let loadingLabel = UILabel()
+        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+        Alamofire.request(Constantes.LISTAR_MIS_CHATS, headers: self.headers)
+            .responseJSON {
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if(status){
+                        if !json["s1"].isEmpty{
+                            self.mischats = json["s1"].arrayValue
+                            for michat in self.mischats{
+                                
+                                let id  = michat["id"].int
+                                let nombre = michat["nombre"].string
+                                let imagen = michat["imagen"].string
+                                let foto_visible = michat["foto_visible"].floatValue
+                                let hora_ultimo = michat["hora_ultimo_mensaje"].string
+                                let ultimo_mensaje = michat["ultimo_mensaje"].string
+                                let sin_leer = michat["mensajes_sin_leer"].int
+                                let es_primer_contacto = michat["es_primer_contacto"].int
+                                var fotoUrl = String()
+                                
+                                if !(imagen?.isEmpty)!{
+                                    fotoUrl = Constantes.BASE_URL
+                                    fotoUrl += imagen!
+                                }
+                                
+                                self.listaChat.append(
+                                    GeneralTableItem(id: id!, nombre: nombre!, distancia: "", tiempo: hora_ultimo!, lugar: "", descripcion: ultimo_mensaje!, avatar: fotoUrl, badge: String(sin_leer!), compartir: false, resaltar: false, restriccion: foto_visible)
+                                )
+                            }
+                            self.tableView.reloadData()
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        }else{
+                            self.tableView.reloadData()
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        }
+                    }else{
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                    }
+                }
+        }
     }
     
     func listarNuevosProspectos(){
@@ -374,10 +394,21 @@ class S1ngularesTableViewController: UITableViewController {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if tab.tabSeleccionada == 0{
+            self.cambiarPrimerTab()
+        }else{
+            self.cambiarSegundoTab()
+        }
+    }
+    
     // MARK: - Acciones y eventos
     
     func cambiarPrimerTab (){
-        self.tableView.reloadData()
+        self.listaChat.removeAll()
+        self.mischats.removeAll()
+        listarChats()
     }
     
     func cambiarSegundoTab (){
