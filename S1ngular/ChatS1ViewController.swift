@@ -25,6 +25,8 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
     
     var recorder: AVAudioRecorder!
     var player:AVAudioPlayer!
+    var meterTimer:Timer!
+    var soundFileURL:URL!
     
     
     let imageTestUrl = "http://2.bp.blogspot.com/-lnt7x6S-QDE/VXB4iM3jktI/AAAAAAAAEZc/Evr1d3aQJ5M/s1600/kiss.jpg"
@@ -105,8 +107,10 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         
         
         //Audio tap button
-        audioTapView = UITapGestureRecognizer(target: self, action: #selector(self.startStopRecording(sender:)))
-        audioButton.addGestureRecognizer(audioTapView)
+        //audioTapView = UITapGestureRecognizer(target: self, action: #selector(self.startStopRecording(sender:)))
+        //audioButton.addGestureRecognizer(audioTapView)
+        
+        //setSessionPlayback()
         
         
         //Poniendo el boton de bloquear en el navigation bar
@@ -187,13 +191,32 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         self.performSegue(withIdentifier: "gotoPerfilPersona", sender: nil)
     }
     
+    
+    
     func startStopRecording(sender: UITapGestureRecognizer){
-        /*if recorder == nil {
+        if recorder == nil {
             print("recording. recorder nil")
-            recordButton.setTitle("Pause", for:UIControlState())
-            //recordWithPermission(true)
+            self.infoRecord.isHidden = false
+            recordWithPermission(true)
             return
-        }*/
+        }else{
+            print("stop")
+            
+            recorder?.stop()
+            player?.stop()
+            
+            meterTimer.invalidate()
+            
+            let session = AVAudioSession.sharedInstance()
+            do {
+                try session.setActive(false)
+                self.infoRecord.isHidden = true
+            } catch let error as NSError {
+                print("could not make session inactive")
+                print(error.localizedDescription)
+            }
+            recorder = nil
+        }
         
     }
     
@@ -211,7 +234,44 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         }
     }
     
-    /*func recordWithPermission(_ setup:Bool) {
+    func setupRecorder() {
+        let format = DateFormatter()
+        format.dateFormat="yyyy-MM-dd-HH-mm-ss"
+        let currentFileName = "recording-\(format.string(from: Date())).m4a"
+        print(currentFileName)
+        
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        self.soundFileURL = documentsDirectory.appendingPathComponent(currentFileName)
+        print("writing to soundfile url: '\(soundFileURL!)'")
+        
+        if FileManager.default.fileExists(atPath: soundFileURL.absoluteString) {
+            // probably won't happen. want to do something about it?
+            print("soundfile \(soundFileURL.absoluteString) exists")
+        }
+        
+        
+        let recordSettings:[String : AnyObject] = [
+            AVFormatIDKey:             NSNumber(value: kAudioFormatAppleLossless),
+            AVEncoderAudioQualityKey : NSNumber(value:AVAudioQuality.max.rawValue),
+            AVEncoderBitRateKey :      NSNumber(value:320000),
+            AVNumberOfChannelsKey:     NSNumber(value:2),
+            AVSampleRateKey :          NSNumber(value:44100.0)
+        ]
+        
+        
+        do {
+            recorder = try AVAudioRecorder(url: soundFileURL, settings: recordSettings)
+            recorder.delegate = self as! AVAudioRecorderDelegate
+            recorder.isMeteringEnabled = true
+            recorder.prepareToRecord() // creates/overwrites the file at soundFileURL
+        } catch let error as NSError {
+            recorder = nil
+            print(error.localizedDescription)
+        }
+        
+    }
+    
+    func recordWithPermission(_ setup:Bool) {
         let session:AVAudioSession = AVAudioSession.sharedInstance()
         // ios 8 and later
         if (session.responds(to: #selector(AVAudioSession.requestRecordPermission(_:)))) {
@@ -235,7 +295,24 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         } else {
             print("requestRecordPermission unrecognized")
         }
-    }*/
+    }
+    
+    func setSessionPlayback() {
+        let session:AVAudioSession = AVAudioSession.sharedInstance()
+        
+        do {
+            try session.setCategory(AVAudioSessionCategoryPlayback)
+        } catch let error as NSError {
+            print("could not set session category")
+            print(error.localizedDescription)
+        }
+        do {
+            try session.setActive(true)
+        } catch let error as NSError {
+            print("could not make session active")
+            print(error.localizedDescription)
+        }
+    }
     
     func setSessionPlayAndRecord() {
         let session = AVAudioSession.sharedInstance()

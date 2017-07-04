@@ -13,6 +13,7 @@ class SpeechBubble: UIView {
     var labelChatText: UILabel?
     var data: ChatBubbleData?
     let padding: CGFloat = 10.0
+    var playbutton : UIButton?
     
     
     override init(frame: CGRect) {
@@ -27,41 +28,60 @@ class SpeechBubble: UIView {
     required convenience init(withData data: ChatBubbleData) {
         self.init(frame: SpeechBubble.framePrimary(type: data.type))
         self.data = data
+        
         if data.type == .Mine{
             color = ColoresTexto.TXTMain
         }else{
             color = ColoresTexto.TXTSecondary
         }
         
+        let paddingFactor: CGFloat = 0.02
+        let sidePadding = UIScreen.main.bounds.width * paddingFactor
         let startX = padding
         let startY:CGFloat = 0.0
         
-        labelChatText = UILabel(frame: CGRect(x: startX, y: startY, width: self.frame.width - 2 * startX, height: 5))
-        labelChatText?.textAlignment = data.type == .Mine ? .right : .left
-        labelChatText?.font = UIFont(name: "BrandonGrotesque-Medium", size: 16)
-        labelChatText?.textColor = data.type == .Mine ? ColoresTexto.TXTSecondary : ColoresTexto.TXTMain
-        labelChatText?.numberOfLines = 0
-        labelChatText?.lineBreakMode = NSLineBreakMode.byTruncatingTail
-        labelChatText?.text = data.text
-        labelChatText?.sizeToFit()
+        if !(data.soundUrlString?.isEmpty)!{
+            //Cuando data trae multimedia
+            let maxWidth = UIScreen.main.bounds.width * 0.65 // We are cosidering 65% of the screen width as the Maximum with of a single bubble
+            let xWithSound: CGFloat = data.type == .Mine ? UIScreen.main.bounds.width * (CGFloat(1.0) - paddingFactor) - maxWidth : sidePadding
+            
+            playbutton = UIButton(type: .custom)
+            playbutton?.frame = CGRect(x: startX, y: startY, width: self.frame.width - 2 * startX, height: 5)
+            playbutton?.isUserInteractionEnabled = true
+            //playbutton?.actions(forTarget: Selector(), forControlEvent: UIControlEvents.touchUpInside)
         
-        self.addSubview(labelChatText!)
+            playbutton?.setImage(UIImage(named: ""), for: .normal)
+            
+            
+            self.frame = CGRect(x: xWithSound, y: 10, width: maxWidth, height: 40)
+        }else{
+            //Cuando es un simple mensaje sin multimedia
+            
+            labelChatText = UILabel(frame: CGRect(x: startX, y: startY, width: self.frame.width - 2 * startX, height: 5))
+            labelChatText?.textAlignment = data.type == .Mine ? .right : .left
+            labelChatText?.font = UIFont(name: "BrandonGrotesque-Medium", size: 16)
+            labelChatText?.textColor = data.type == .Mine ? ColoresTexto.TXTSecondary : ColoresTexto.TXTMain
+            labelChatText?.numberOfLines = 0
+            labelChatText?.lineBreakMode = NSLineBreakMode.byTruncatingTail
+            labelChatText?.text = data.text
+            labelChatText?.sizeToFit()
+            
+            self.addSubview(labelChatText!)
+            
+            var viewHeight: CGFloat = 0.0
+            var viewWidth: CGFloat = 0.0
+            
+            viewHeight = (labelChatText?.frame.maxY)! + padding
+            viewWidth = (labelChatText?.frame.width)! + ((labelChatText?.frame.minX)! + padding)
+            
+            
+            
+            
+            let NewStartX: CGFloat = data.type == .Mine ? UIScreen.main.bounds.width * (CGFloat(1.0) - paddingFactor) - viewWidth : sidePadding
+            
+            self.frame = CGRect(x: NewStartX, y: 10, width: viewWidth, height: viewHeight+15)
+        }
         
-        var viewHeight: CGFloat = 0.0
-        var viewWidth: CGFloat = 0.0
-        
-        viewHeight = (labelChatText?.frame.maxY)! + padding
-        viewWidth = (labelChatText?.frame.width)! + ((labelChatText?.frame.minX)! + padding)
-        
-        
-        let paddingFactor: CGFloat = 0.02
-        let sidePadding = UIScreen.main.bounds.width * paddingFactor
-        let maxWidth = UIScreen.main.bounds.width * 0.65 // We are cosidering 65% of the screen width as the Maximum with of a single bubble
-        
-        
-        let NewStartX: CGFloat = data.type == .Mine ? UIScreen.main.bounds.width * (CGFloat(1.0) - paddingFactor) - viewWidth : sidePadding
-        
-        self.frame = CGRect(x: NewStartX, y: 10, width: viewWidth, height: viewHeight+15)
         
         
     }

@@ -23,6 +23,9 @@ class ChatS1TableViewController: UITableViewController {
     
     var mensajesChat : [JSON] = []
     
+    var isPaginando : Bool = false
+    var numPaginado : Int = 1
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         currentIdUsuario = DataUserDefaults.getCurrentId()
@@ -62,7 +65,7 @@ class ChatS1TableViewController: UITableViewController {
             view.removeFromSuperview()
         }
         let messageType = item.id == currentIdUsuario ? BubbleDataType.Mine : BubbleDataType.Opponent
-        let chatBubbleData = ChatBubbleData(text: item.text, image: item.image, date: item.date, type: messageType)
+        let chatBubbleData = ChatBubbleData(text: item.text, image: item.image, date: item.date, type: messageType, soundUrlString: "")
         let chatBubbleMessage = SpeechBubble(withData: chatBubbleData)
         cell.messageBubble.addSubview(chatBubbleMessage)
         
@@ -104,8 +107,10 @@ class ChatS1TableViewController: UITableViewController {
                 if let status = json["status"].bool{
                     if(status){
                         if !json["mensajes"].isEmpty{
-                            self.mensajesChat = json["mensajes"].arrayValue
                             self.mensajesChat = self.mensajesChat.reversed()
+                            self.mensajesChat += json["mensajes"].arrayValue
+                            self.mensajesChat = self.mensajesChat.reversed()
+                            self.listaMessages.removeAll()
                             for mensaje in self.mensajesChat{
                                 //let id = mensaje["id"].int
                                 //let fecha = mensaje["fecha"].string
@@ -117,9 +122,19 @@ class ChatS1TableViewController: UITableViewController {
                                     MessageItem(text: contenido!, image: nil, date: NSDate(), id: idReceptor!)
                                 )
                             }
+                            self.isPaginando = false
                             self.tableView.reloadData()
-                            self.tableViewScrollToBottom(animated: false)
+                            if self.numPaginado >= 2{
+                                
+                            }else{
+                                self.tableViewScrollToBottom(animated: false)
+                            }
+                            
+                        }else{
+                            self.numPaginado -= 1
                         }
+                        self.isPaginando = false
+                        self.tableView.reloadData()
                         Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                     }else{
                         Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
@@ -176,7 +191,18 @@ class ChatS1TableViewController: UITableViewController {
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let isScrolledTop = scrollView.isScrolledToEdge(edge: .Top)
         if isScrolledTop{
-            debugPrint("estoy en top!!!")
+            debugPrint("Numero de mensajes: \(self.listaMessages.count)")
+            if self.listaMessages.count >= 14{
+                if !self.isPaginando{
+                    self.isPaginando = true
+                    self.numPaginado += 1
+                    self.ListarMensajesChat(paginado: self.numPaginado)
+                    debugPrint("Puedo paginar!!!")
+                }
+            }else{
+                debugPrint("No Puedo paginar aun!")
+            }
+            
         }
     }
     
