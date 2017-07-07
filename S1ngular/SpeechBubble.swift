@@ -6,26 +6,33 @@
 //  Copyright © 2017 Akira Redwolf. All rights reserved.
 //
 import UIKit
+import AVFoundation
 
-class SpeechBubble: UIView {
+class SpeechBubble: UIView, AVAudioPlayerDelegate {
     
     var color:UIColor = UIColor.gray
     var labelChatText: UILabel?
     var data: ChatBubbleData?
     let padding: CGFloat = 10.0
+    var player:AVAudioPlayer!
+    var urlCorrect = NSURL()
+    var isPlaying : Bool = false
     var playbutton : UIButton?
+    var audioProgress:UISlider?
+    var timer:Timer?
     
     
     override init(frame: CGRect) {
         
-        super.init(frame: frame)
+        super.init(frame: SpeechBubble.framePrimary(type: .Mine))
         
         self.backgroundColor = UIColor.clear
+        self.isUserInteractionEnabled = true
     }
     
     
     
-    required convenience init(withData data: ChatBubbleData) {
+    required convenience init(withData data: ChatBubbleData, eventTarget: AnyObject) {
         self.init(frame: SpeechBubble.framePrimary(type: data.type))
         self.data = data
         
@@ -39,21 +46,33 @@ class SpeechBubble: UIView {
         let sidePadding = UIScreen.main.bounds.width * paddingFactor
         let startX = padding
         let startY:CGFloat = 0.0
-        
         if !(data.soundUrlString?.isEmpty)!{
             //Cuando data trae multimedia
             let maxWidth = UIScreen.main.bounds.width * 0.65 // We are cosidering 65% of the screen width as the Maximum with of a single bubble
             let xWithSound: CGFloat = data.type == .Mine ? UIScreen.main.bounds.width * (CGFloat(1.0) - paddingFactor) - maxWidth : sidePadding
             
-            playbutton = UIButton(type: .custom)
-            playbutton?.frame = CGRect(x: startX, y: startY, width: self.frame.width - 2 * startX, height: 5)
+            var baseUrl = Constantes.BASE_URL
+            if data.fromNetwork{
+                baseUrl += data.soundUrlString!
+                urlCorrect = NSURL(string: baseUrl)!
+            }else{
+                urlCorrect = NSURL(string: data.soundUrlString!)!
+            }
+            debugPrint("Url de audio: \(urlCorrect)")
+            
+            playbutton = UIButton(frame: CGRect(x: startX, y: 1, width: 34, height: 34))
+            playbutton?.setImage(UIImage(named: "play_audio"), for: .normal)
             playbutton?.isUserInteractionEnabled = true
-            //playbutton?.actions(forTarget: Selector(), forControlEvent: UIControlEvents.touchUpInside)
-        
-            playbutton?.setImage(UIImage(named: ""), for: .normal)
+            self.playbutton?.addTarget(self, action: #selector(self.downloadFileFromURL), for: UIControlEvents.touchUpInside)
             
+            self.addSubview(playbutton!)
             
-            self.frame = CGRect(x: xWithSound, y: 10, width: maxWidth, height: 40)
+            audioProgress = UISlider(frame: CGRect(x: (playbutton?.frame.width)!+5, y: 10, width: self.frame.width - (playbutton?.frame.width)!, height: 15))
+            audioProgress?.minimumValue = 0
+            audioProgress?.maximumValue = 100
+            self.addSubview(audioProgress!)
+            self.frame = CGRect(x: xWithSound, y: 5, width: maxWidth, height: 55)
+            
         }else{
             //Cuando es un simple mensaje sin multimedia
             
@@ -75,13 +94,10 @@ class SpeechBubble: UIView {
             viewWidth = (labelChatText?.frame.width)! + ((labelChatText?.frame.minX)! + padding)
             
             
-            
-            
             let NewStartX: CGFloat = data.type == .Mine ? UIScreen.main.bounds.width * (CGFloat(1.0) - paddingFactor) - viewWidth : sidePadding
             
             self.frame = CGRect(x: NewStartX, y: 10, width: viewWidth, height: viewHeight+15)
         }
-        
         
         
     }
@@ -89,6 +105,93 @@ class SpeechBubble: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func downloadFileFromURL(){
+        if (self.data?.fromNetwork)!{
+            var downloadTask:URLSessionDownloadTask
+            downloadTask = URLSession.shared.downloadTask(with: urlCorrect as URL, completionHandler: { [weak self](URL, response, error) -> Void in
+                self?.play(URL!)
+            })
+            
+            downloadTask.resume()
+        }else{
+            self.play(self.urlCorrect as URL)
+        }
+        
+        
+    }
+    
+    func trackAudio() {
+        var normalizedTime = Float(player.currentTime * 100.0 / player.duration)
+        audioProgress?.value = normalizedTime
+    }
+    
+    func play(_ url:URL) {
+        
+        print("playing \(url)")
+        if !isPlaying{
+            isPlaying = true;
+            timer = Timer(timeInterval: 1.0, target: self, selector: #selector(trackAudio), userInfo: nil, repeats: true)
+            do {
+                DispatchQueue.main.async() { () -> Void in
+                    self.playbutton?.setImage(UIImage(named: "pause_audio"), for: .normal)
+                }
+                self.player = try AVAudioPlayer(contentsOf: url)
+                player.prepareToPlay()
+                player.volume = 1.0
+                player.delegate = self
+                RunLoop.main.add(self.timer!, forMode: .commonModes)
+                player.play()
+                
+            } catch let error as NSError {
+                DispatchQueue.main.async() { () -> Void in
+                    self.timer?.invalidate()
+                    self.playbutton?.setImage(UIImage(named: "play_audio"), for: .normal)
+                    self.audioProgress?.value = 0
+                    self.audioProgress?.minimumValue = 0
+                    self.audioProgress?.maximumValue = 100
+                }
+                self.player = nil
+                print(error.localizedDescription)
+            } catch {
+                print("AVAudioPlayer init failed")
+            }
+        }else{
+            DispatchQueue.main.async() { () -> Void in
+                self.playbutton?.setImage(UIImage(named: "play_audio"), for: .normal)
+                self.timer?.invalidate()
+                self.audioProgress?.value = 0
+                self.audioProgress?.minimumValue = 0
+                self.audioProgress?.maximumValue = 100
+            }
+            isPlaying = false;
+            print("stop playing")
+            player.stop()
+            let session = AVAudioSession.sharedInstance()
+            do {
+                try session.setActive(false)
+            } catch let error as NSError {
+                print("could not make session inactive")
+                print(error.localizedDescription)
+            }
+        }
+    }
+    
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        if flag{
+            debugPrint("Termine de sonar!")
+            isPlaying = false;
+            
+            DispatchQueue.main.async() { () -> Void in
+                self.timer?.invalidate()
+                self.audioProgress?.value = 0
+                self.audioProgress?.minimumValue = 0
+                self.audioProgress?.maximumValue = 100
+                self.playbutton?.setImage(UIImage(named: "play_audio"), for: .normal)
+            }
+        }
+    }
+
     
     override func draw(_ rect: CGRect) {
         
@@ -138,9 +241,6 @@ class SpeechBubble: UIView {
             context?.fillPath();
             
         }
-        
-        
-        
     }
     
     

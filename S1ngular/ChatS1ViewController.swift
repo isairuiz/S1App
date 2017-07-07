@@ -11,7 +11,7 @@ import AVFoundation
 import SwiftyJSON
 import Alamofire
 
-class ChatS1ViewController: UIViewController,UITextFieldDelegate{
+class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorderDelegate{
     @IBOutlet weak var subtituloView: UIView!
     @IBOutlet weak var subtituloTexto: UILabel!
     @IBOutlet weak var profilePersona: UIBarButtonItem!
@@ -107,10 +107,10 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         
         
         //Audio tap button
-        //audioTapView = UITapGestureRecognizer(target: self, action: #selector(self.startStopRecording(sender:)))
-        //audioButton.addGestureRecognizer(audioTapView)
+        audioTapView = UITapGestureRecognizer(target: self, action: #selector(self.startStopRecording(sender:)))
+        audioButton.addGestureRecognizer(audioTapView)
         
-        //setSessionPlayback()
+        setSessionPlayback()
         
         
         //Poniendo el boton de bloquear en el navigation bar
@@ -211,11 +211,15 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
             do {
                 try session.setActive(false)
                 self.infoRecord.isHidden = true
+                self.infoRecord.text = "00:00"
             } catch let error as NSError {
                 print("could not make session inactive")
                 print(error.localizedDescription)
             }
             recorder = nil
+            
+            self.mensajeTextField.isEnabled = false
+            self.childViewController.enviarMensajeMultimedia(audioUrl: self.soundFileURL, receptor: self.idReceptor)
         }
         
     }
@@ -261,7 +265,7 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate{
         
         do {
             recorder = try AVAudioRecorder(url: soundFileURL, settings: recordSettings)
-            recorder.delegate = self as! AVAudioRecorderDelegate
+            recorder.delegate = self
             recorder.isMeteringEnabled = true
             recorder.prepareToRecord() // creates/overwrites the file at soundFileURL
         } catch let error as NSError {

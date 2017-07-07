@@ -33,14 +33,6 @@ class ChatS1TableViewController: UITableViewController {
         scrollView.delegate = self
         
     }
-    
-    func keyboardWillHide() {
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "closeKeyboardNotif"), object: nil)
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        keyboardWillHide()
-    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -59,16 +51,17 @@ class ChatS1TableViewController: UITableViewController {
         
         var item: MessageItem
         item = self.listaMessages[(indexPath as NSIndexPath).row]
-        
+        cell.itemData = item
+        cell.theBubbleView = UIView()
         /*Clear view on refresh*/
         for view in cell.messageBubble.subviews {
             view.removeFromSuperview()
         }
         let messageType = item.id == currentIdUsuario ? BubbleDataType.Mine : BubbleDataType.Opponent
-        let chatBubbleData = ChatBubbleData(text: item.text, image: item.image, date: item.date, type: messageType, soundUrlString: "")
-        let chatBubbleMessage = SpeechBubble(withData: chatBubbleData)
+        let chatBubbleData = ChatBubbleData(text: item.text, image: item.image, date: item.date, soundUrlString: item.audioUrl, type: messageType, fromNetwork: item.fromNetwork)
+        let chatBubbleMessage = SpeechBubble(withData: chatBubbleData, eventTarget: self)
         cell.messageBubble.addSubview(chatBubbleMessage)
-        
+        cell.theBubbleView = chatBubbleMessage
         let horizontalConstraint = NSLayoutConstraint(item: chatBubbleMessage, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: cell.messageBubble, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0)
         
         let verticalConstraint = NSLayoutConstraint(item: chatBubbleMessage, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: cell.messageBubble, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0)
@@ -116,10 +109,17 @@ class ChatS1TableViewController: UITableViewController {
                                 //let fecha = mensaje["fecha"].string
                                 let idEmisor = mensaje["singular1"].int
                                 let idReceptor = mensaje["singular2"].int
-                                let contenido = mensaje["contenido"].string
+                                var contenido : String = ""
+                                var soundUrl : String = ""
+                                if let cont = mensaje["contenido"].string{
+                                    contenido = cont
+                                }
+                                if let audio = mensaje["multimedia"].string{
+                                    soundUrl = audio
+                                }
                                 //let _ = mensaje["leido"].bool
                                 self.listaMessages.append(
-                                    MessageItem(text: contenido!, image: nil, date: NSDate(), id: idReceptor!)
+                                    MessageItem(text: contenido, image: nil, date: NSDate(), id: idReceptor!, audioUrl: soundUrl, fromNetwork:true)
                                 )
                             }
                             self.isPaginando = false
@@ -146,6 +146,54 @@ class ChatS1TableViewController: UITableViewController {
                 }
         }
     }
+    /*FALTA EXTRAR DATA DEL URL DEL AUDIO*/
+    func enviarMensajeMultimedia(audioUrl:URL,receptor:Int){
+        let idString:String = String(receptor)
+        let view = UIView()
+        let labell = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreenForView(loadingView: view, view: self.view, loadingLabel: labell, spinner: spinner)
+        let audioName = "audio"+Utilerias.getCurrentDateAndTime()+".m4a"
+        var audioData = Data()
+        do{
+            audioData = try Data(contentsOf: audioUrl)
+        }catch{
+            debugPrint(error)
+        }
+        
+        Alamofire.upload(
+            multipartFormData: { multipartFormData in
+                multipartFormData.append(("necesita contenido".data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "contenido")
+                multipartFormData.append((idString.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "id_singular")
+                multipartFormData.append(audioData, withName: "multimedia", fileName: audioName, mimeType: "audio/x-m4a")
+        },
+            to: Constantes.ENVIAR_MENSAJE, headers:self.headers,
+            encodingCompletion: { encodingResult in
+                switch encodingResult {
+                case .success(let upload, _, _):
+                    upload.responseJSON { response in
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool {
+                            if (status){
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                                self.pintarMensajeEnviado(mensaje:"",id: receptor, audioUrl: audioUrl.description)
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                                if let message = json["mensaje_plain"].string{
+                                    self.showAlertWithMessage(title: "Error", message: message)
+                                }
+                            }
+                        }
+                    }
+                case .failure(let encodingError):
+                    print(encodingError)
+                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                }
+        }
+        )
+    }
     
     func enviarMensaje(mensaje:String,receptor:Int){
         
@@ -159,7 +207,7 @@ class ChatS1TableViewController: UITableViewController {
                 if let status = json["status"].bool{
                     if status{
                         let id = json["id"].int
-                        self.pintarMensajeEnviado(mensaje:mensaje,id: receptor)
+                        self.pintarMensajeEnviado(mensaje:mensaje,id: receptor, audioUrl: "")
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
                     }else{
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
@@ -171,8 +219,8 @@ class ChatS1TableViewController: UITableViewController {
         }
     }
     
-    func pintarMensajeEnviado(mensaje:String, id:Int){
-        self.listaMessages.append(MessageItem(text: mensaje, image: nil, date: NSDate(), id: id))
+    func pintarMensajeEnviado(mensaje:String, id:Int, audioUrl:String){
+        self.listaMessages.append(MessageItem(text: mensaje, image: nil, date: NSDate(), id: id, audioUrl:audioUrl, fromNetwork:false))
         
         self.tableView.beginUpdates()
         self.tableView.insertRows(at: [IndexPath(row: self.listaMessages.count-1, section: 0)], with: .automatic)
@@ -208,9 +256,7 @@ class ChatS1TableViewController: UITableViewController {
     
     
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        keyboardWillHide()
-    }
+    
     
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
