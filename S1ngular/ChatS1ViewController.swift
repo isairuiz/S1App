@@ -135,6 +135,8 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
         
         NotificationCenter.default.addObserver(self, selector: #selector(habilitarTextField), name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
         
+        NotificationCenter.default.addObserver(self,selector:#selector(routeChange(_:)),name:NSNotification.Name.AVAudioSessionRouteChange,                                 object:nil)
+        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -191,10 +193,60 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
         self.performSegue(withIdentifier: "gotoPerfilPersona", sender: nil)
     }
     
+    func routeChange(_ notification:Notification) {
+        print("routeChange \((notification as NSNotification).userInfo)")
+        
+        if let userInfo = (notification as NSNotification).userInfo {
+            //print("userInfo \(userInfo)")
+            if let reason = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt {
+                //print("reason \(reason)")
+                switch AVAudioSessionRouteChangeReason(rawValue: reason)! {
+                case AVAudioSessionRouteChangeReason.newDeviceAvailable:
+                    print("NewDeviceAvailable")
+                    print("did you plug in headphones?")
+                    checkHeadphones()
+                case AVAudioSessionRouteChangeReason.oldDeviceUnavailable:
+                    print("OldDeviceUnavailable")
+                    print("did you unplug headphones?")
+                    checkHeadphones()
+                case AVAudioSessionRouteChangeReason.categoryChange:
+                    print("CategoryChange")
+                case AVAudioSessionRouteChangeReason.override:
+                    print("Override")
+                case AVAudioSessionRouteChangeReason.wakeFromSleep:
+                    print("WakeFromSleep")
+                case AVAudioSessionRouteChangeReason.unknown:
+                    print("Unknown")
+                case AVAudioSessionRouteChangeReason.noSuitableRouteForCategory:
+                    print("NoSuitableRouteForCategory")
+                case AVAudioSessionRouteChangeReason.routeConfigurationChange:
+                    print("RouteConfigurationChange")
+                    
+                }
+            }
+        }
+    }
     
+    func checkHeadphones() {
+        // check NewDeviceAvailable and OldDeviceUnavailable for them being plugged in/unplugged
+        let currentRoute = AVAudioSession.sharedInstance().currentRoute
+        if currentRoute.outputs.count > 0 {
+            for description in currentRoute.outputs {
+                if description.portType == AVAudioSessionPortHeadphones {
+                    print("headphones are plugged in")
+                    break
+                } else {
+                    print("headphones are unplugged")
+                }
+            }
+        } else {
+            print("checking headphones requires a connection to a device")
+        }
+    }
     
     func startStopRecording(sender: UITapGestureRecognizer){
         if recorder == nil {
+            checkHeadphones()
             print("recording. recorder nil")
             self.infoRecord.isHidden = false
             recordWithPermission(true)

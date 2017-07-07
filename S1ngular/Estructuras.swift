@@ -17,14 +17,16 @@ struct MessageItem{
     let id: Int
     let audioUrl: String
     let fromNetwork: Bool
+    let loadingCell: Bool
     
-    init(text:String,image:UIImage?,date:NSDate,id:Int, audioUrl:String, fromNetwork:Bool){
+    init(text:String,image:UIImage?,date:NSDate,id:Int, audioUrl:String, fromNetwork:Bool, loadingCell:Bool){
         self.text = text
         self.image = image
         self.date = date
         self.id = id
         self.audioUrl = audioUrl
         self.fromNetwork = fromNetwork
+        self.loadingCell = loadingCell
     }
 }
 struct GeneralTableItem {

@@ -67,7 +67,7 @@ class SpeechBubble: UIView, AVAudioPlayerDelegate {
             
             self.addSubview(playbutton!)
             
-            audioProgress = UISlider(frame: CGRect(x: (playbutton?.frame.width)!+5, y: 10, width: self.frame.width - (playbutton?.frame.width)!, height: 15))
+            audioProgress = UISlider(frame: CGRect(x: (playbutton?.frame.width)!+5, y: 10, width: self.frame.width - (playbutton?.frame.width)!-5, height: 15))
             audioProgress?.minimumValue = 0
             audioProgress?.maximumValue = 100
             self.addSubview(audioProgress!)
@@ -140,8 +140,8 @@ class SpeechBubble: UIView, AVAudioPlayerDelegate {
                 player.prepareToPlay()
                 player.volume = 1.0
                 player.delegate = self
-                RunLoop.main.add(self.timer!, forMode: .commonModes)
                 player.play()
+                RunLoop.main.add(self.timer!, forMode: .commonModes)
                 
             } catch let error as NSError {
                 DispatchQueue.main.async() { () -> Void in

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7D145F211F0FF1CE001122FC /* LoadingCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D145F201F0FF1CE001122FC /* LoadingCellTableViewCell.swift */; };
 		7D147DBC1EE4E9D0005ED8D9 /* ResultadoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D147DBB1EE4E9D0005ED8D9 /* ResultadoTableViewController.swift */; };
 		7D2399DE1EC2A44800996179 /* EditarMiPerfil2ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2399DD1EC2A44800996179 /* EditarMiPerfil2ViewController.swift */; };
 		7D2399E01EC2A46C00996179 /* EditarMiPerfil2TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2399DF1EC2A46C00996179 /* EditarMiPerfil2TableViewController.swift */; };
@@ -140,6 +141,7 @@
 		174530A7C08428C7587908AF /* Pods-S1ngularTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-S1ngularTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-S1ngularTests/Pods-S1ngularTests.debug.xcconfig"; sourceTree = "<group>"; };
 		2D6C0693D0880FABA2256DB5 /* Pods_S1ngular.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_S1ngular.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FA4CF1689701624E2EF57E5 /* Pods_S1ngular_OneSignalNotificationServiceExtension2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_S1ngular_OneSignalNotificationServiceExtension2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7D145F201F0FF1CE001122FC /* LoadingCellTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingCellTableViewCell.swift; sourceTree = "<group>"; };
 		7D147DBB1EE4E9D0005ED8D9 /* ResultadoTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultadoTableViewController.swift; sourceTree = "<group>"; };
 		7D2399DD1EC2A44800996179 /* EditarMiPerfil2ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditarMiPerfil2ViewController.swift; sourceTree = "<group>"; };
 		7D2399DF1EC2A46C00996179 /* EditarMiPerfil2TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditarMiPerfil2TableViewController.swift; sourceTree = "<group>"; };
@@ -493,6 +495,7 @@
 				7DE899441EE082A400A07B68 /* ChatBubbleData.swift */,
 				7DA0544F1EEB9C42009668D0 /* TuSingleChildTableViewController.swift */,
 				7DA054511EEB9CA4009668D0 /* AfinidadTableViewCell.swift */,
+				7D145F201F0FF1CE001122FC /* LoadingCellTableViewCell.swift */,
 			);
 			name = S1ngulares;
 			sourceTree = "<group>";
@@ -913,6 +916,7 @@
 				ABE536821DDE8A9600F7B2C6 /* TestsTableViewController.swift in Sources */,
 				7DDD16F91EDE14D3004347DB /* BloquearS1TableViewController.swift in Sources */,
 				AB400C9F1DCD926D0083342A /* Estructuras.swift in Sources */,
+				7D145F211F0FF1CE001122FC /* LoadingCellTableViewCell.swift in Sources */,
 				AB15CFEF1DBA29AF002ED6D1 /* BienvenidaPaso2TableViewController.swift in Sources */,
 				7D943DA31EBB065700B66629 /* EditarMiPerfilViewController.swift in Sources */,
 				7DDD16F31EDBC0A6004347DB /* TuS1ngleTableViewController.swift in Sources */,
