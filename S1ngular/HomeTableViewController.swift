@@ -10,8 +10,12 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 import CoreLocation
+import FirebaseAnalytics
+import FirebaseMessaging
+import FirebaseInstanceID
+import UserNotifications
 
-class HomeTableViewController: UITableViewController,CLLocationManagerDelegate {
+class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,UNUserNotificationCenterDelegate {
     @IBOutlet weak var creditsButton: UIView!
     
     
@@ -64,6 +68,18 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate {
         self.gotoMisResultadosCell.addGestureRecognizer(tapViewResultados)
         self.gotoNuevosTestsCell.addGestureRecognizer(tapViewNuevosTests)
         self.gotoCheckinsCell.addGestureRecognizer(tapViewCheckins)
+        
+        let app = UIApplication.shared
+        
+        self.initializeFCM(app)
+        let token = InstanceID.instanceID().token()
+        if !(token?.isEmpty)!{
+            debugPrint("GCM TOKEN FIREBASE= \(token!)")
+            self.registrarFirebaseToken(token:token!)
+        }else{
+            debugPrint("Token vacion =(")
+        }
+        
     }
     
     func gotoS1(sender: UITapGestureRecognizer){
@@ -222,10 +238,7 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate {
                             
                         }
                     }
-                    /******************//******************//******************/
-                    /*Cambiar esto por el codigo que obtendra el ID de usuario*/
-                    DataUserDefaults.setCurrentId(id: 17)
-                    /******************//******************//******************/
+                    
                     
                     Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                 }else{
@@ -279,6 +292,8 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate {
         }
     }
     
+    
+    
     func actualizarPosicion(latitud:Double,longitud:Double){
         let parameters: Parameters = ["latitud": latitud,"longitud":longitud]
         Alamofire.request(Constantes.ACTUALIZAR_POSICION, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
@@ -292,6 +307,55 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate {
                     }else{
                         if let errorMessage = json["mensaje_plain"].string{
                             self.showAlertWithMessage(title: "Error", message: errorMessage)
+                        }
+                    }
+                }
+        }
+    }
+    
+    func initializeFCM(_ application: UIApplication){
+        if #available(iOS 10.0, *) // enable new way for notifications on iOS 10
+        {
+            let center = UNUserNotificationCenter.current()
+            center.delegate = self
+            center.requestAuthorization(options: [.badge, .alert , .sound]) { (accepted, error) in
+                if !accepted
+                {
+                    print("Notification access denied.")
+                }
+                else
+                {
+                    print("Notification access accepted.")
+                    application.registerForRemoteNotifications()
+                }
+            }
+        }else
+        {
+            let type: UIUserNotificationType = [UIUserNotificationType.badge, UIUserNotificationType.alert, UIUserNotificationType.sound];
+            let setting = UIUserNotificationSettings(types: type, categories: nil);
+            UIApplication.shared.registerUserNotificationSettings(setting);
+            UIApplication.shared.registerForRemoteNotifications();
+        }
+    }
+    
+    func registrarFirebaseToken(token:String){
+        let lView = UIView()
+        let lLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+        let parameters: Parameters = ["idfirebase": token]
+        Alamofire.request(Constantes.REG_FIREBASE_TOKEN, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if status{
+                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                    }else{
+                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                        if let errorMessage = json["mensaje_plain"].string{
+                            self.showAlertWithMessage(title: "¡Algo va mal!", message: errorMessage)
                         }
                     }
                 }

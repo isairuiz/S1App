@@ -36,4 +36,6 @@ class Constantes{
     static let ACTUALIZAR_POSICION = "http://40.84.231.88/singular/singular/actualizarposicion"
     static let ENVIAR_MENSAJE = "http://40.84.231.88/singular/singular/enviarmensaje"
     static let LISTAR_MENSAJES_CHAT = "http://40.84.231.88/singular/singular/listarmensajeschat?" //id='X'&paginado='X'
+    static let REG_FIREBASE_TOKEN = "http://40.84.231.88/singular/singular/agregaridfirebase"
+    static let BLOQUEAR_PERFIL = "http://40.84.231.88/singular/singular/bloquearperfil"
 }

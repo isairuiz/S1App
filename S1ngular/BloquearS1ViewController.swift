@@ -11,6 +11,7 @@ import UIKit
 class BloquearS1ViewController: UIViewController {
 
     @IBOutlet weak var subtituloView: UIView!
+    @IBOutlet weak var subtituloTexto: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +27,7 @@ class BloquearS1ViewController: UIViewController {
         self.subtituloView.layer.shadowOpacity = 0.5
         self.subtituloView.layer.shadowOffset = CGSize(width: 0, height: 2)
         self.subtituloView.layer.shadowRadius = 3
+        self.subtituloTexto.text = DataUserDefaults.getNombrePersona()
 
 
         // Do any additional setup after loading the view.

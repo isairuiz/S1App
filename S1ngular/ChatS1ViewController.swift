@@ -75,6 +75,7 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
             var fotoUrl = String()
             if let nombre = jsonPerfilObject?["nombre"].string{
                 subtituloTexto.text = nombre
+                DataUserDefaults.setNombrePersona(nombre: nombre)
             }
             let foto_visible = jsonPerfilObject?["foto_visible"].floatValue
             if DataUserDefaults.getFromTabS1Nuevos(){

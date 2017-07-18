@@ -9,8 +9,11 @@
 import UIKit
 import SwiftyJSON
 import Alamofire
+import FacebookShare
+import FacebookCore
 
-class ResultadoTableViewController: UITableViewController {
+
+class ResultadoTableViewController: UITableViewController{
     
     @IBOutlet weak var nombreTest: UILabel!
     @IBOutlet weak var compartirCheckInTableViewCell: UITableViewCell!
@@ -18,6 +21,9 @@ class ResultadoTableViewController: UITableViewController {
     @IBOutlet weak var categoriaTest: UILabel!
     @IBOutlet weak var descripcionResultadoTEst: UITextView!
     @IBOutlet weak var imagenTest: UIImageView!
+    var urlImagenResultadoTest = String()
+    
+    var shareButton = ShareButton<LinkShareContent>()
     
     
     @IBOutlet weak var compartirCheckInViewButton: UIView!
@@ -32,24 +38,56 @@ class ResultadoTableViewController: UITableViewController {
         
         self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
         
-        let compartirCheckInTap = UITapGestureRecognizer(target: self, action: #selector(self.compartirCheckIn))
+        let compartirTestTap = UITapGestureRecognizer(target: self, action: #selector(self.compartirCheckIn))
         
-        self.compartirCheckInTableViewCell.addGestureRecognizer(compartirCheckInTap)
+        self.compartirCheckInTableViewCell.addGestureRecognizer(compartirTestTap)
 
+        
+        /*shareButton.layer.shadowColor = UIColor.black.cgColor
+        shareButton.layer.shadowOpacity = 0.5
+        shareButton.layer.shadowOffset = CGSize(width: 2, height: 2)
+        shareButton.layer.shadowRadius = 3*/
         self.compartirCheckInViewButton.layer.shadowColor = UIColor.black.cgColor
         self.compartirCheckInViewButton.layer.shadowOpacity = 0.5
         self.compartirCheckInViewButton.layer.shadowOffset = CGSize(width: 2, height: 2)
         self.compartirCheckInViewButton.layer.shadowRadius = 3
         
+
         let idTest = DataUserDefaults.getIdComprarTest()
         self.verMiResultado(idTest: String(describing: idTest))
         
         
     }
-    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        /*shareButton = ShareButton(frame: CGRect(x: 0, y: 0, width: self.compartirCheckInTableViewCell.frame.maxX - 10, height: self.compartirCheckInTableViewCell.frame.maxY - 10), content: content)
+        shareButton.center = self.compartirCheckInTableViewCell.center
+        self.compartirCheckInTableViewCell.addSubview(shareButton)*/
+    }
     func compartirCheckIn(){
         
         print("compartir")
+        
+        
+        var content = LinkShareContent(url: URL(string: "http://s1ngular.com/")! )
+        var desc:String = "Finalice con exito un test en S1ngular: "
+        desc += self.nombreTest.text!
+        content.quote = desc
+        
+        
+        
+        let shareDialog = ShareDialog(content: content)
+        shareDialog.mode = .native
+        shareDialog.failsOnInvalidData = true
+        shareDialog.completion = { result in
+            debugPrint(result)
+        }
+        do{
+            try shareDialog.show()
+        }catch{
+            debugPrint(error)
+        }
+        
         
     }
     
@@ -96,6 +134,7 @@ class ResultadoTableViewController: UITableViewController {
                         if let imagen = json["resultado"]["imagenresultado"].string{
                             var url = Constantes.BASE_URL
                             url += imagen
+                            self.urlImagenResultadoTest = url
                             self.imagenTest.downloadedFrom(link: url,withBlur:false,maxBlur:0)
                         }
                         if let puntaje = json["resultado"]["puntaje"].int{

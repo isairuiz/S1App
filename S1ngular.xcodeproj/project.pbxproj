@@ -25,6 +25,7 @@
 		7D5391CF1EFCB0A20094FA4F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D5391CE1EFCB0A20094FA4F /* GoogleService-Info.plist */; };
 		7D5B068F1ED16F9F0084AA3C /* YeahTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D5B068E1ED16F9F0084AA3C /* YeahTableViewController.swift */; };
 		7D78CAB11EE701460097BD53 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D78CAB01EE701460097BD53 /* StoreKit.framework */; };
+		7D860E751F1866B200BC02D5 /* SocialMediaShareable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D860E741F1866B200BC02D5 /* SocialMediaShareable.swift */; };
 		7D8DDA181ED96EC0001896E8 /* YeahCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8DDA171ED96EC0001896E8 /* YeahCollectionViewCell.swift */; };
 		7D943DA31EBB065700B66629 /* EditarMiPerfilViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D943DA21EBB065600B66629 /* EditarMiPerfilViewController.swift */; };
 		7D943DA51EBB068700B66629 /* EditarMiPerfilTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D943DA41EBB068700B66629 /* EditarMiPerfilTableViewController.swift */; };
@@ -159,6 +160,7 @@
 		7D5391CE1EFCB0A20094FA4F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7D5B068E1ED16F9F0084AA3C /* YeahTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YeahTableViewController.swift; sourceTree = "<group>"; };
 		7D78CAB01EE701460097BD53 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		7D860E741F1866B200BC02D5 /* SocialMediaShareable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialMediaShareable.swift; sourceTree = "<group>"; };
 		7D8DDA171ED96EC0001896E8 /* YeahCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YeahCollectionViewCell.swift; sourceTree = "<group>"; };
 		7D943DA21EBB065600B66629 /* EditarMiPerfilViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditarMiPerfilViewController.swift; sourceTree = "<group>"; };
 		7D943DA41EBB068700B66629 /* EditarMiPerfilTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditarMiPerfilTableViewController.swift; sourceTree = "<group>"; };
@@ -447,6 +449,7 @@
 				7D50FECC1EB3B6FC002E1C80 /* Constantes.swift */,
 				7D99D3D41EEA40CB00C9D62D /* test.m */,
 				7D99D3D31EEA40CA00C9D62D /* S1ngular-Bridging-Header.h */,
+				7D860E741F1866B200BC02D5 /* SocialMediaShareable.swift */,
 			);
 			name = Common;
 			sourceTree = "<group>";
@@ -935,6 +938,7 @@
 				AB09AED31DBAF6A30050F882 /* BienvenidaPaso2ViewController.swift in Sources */,
 				7D2399E01EC2A46C00996179 /* EditarMiPerfil2TableViewController.swift in Sources */,
 				7DDD16F51EDBDC60004347DB /* FotosS1ViewController.swift in Sources */,
+				7D860E751F1866B200BC02D5 /* SocialMediaShareable.swift in Sources */,
 				AB3878C31DF0F77100C814F9 /* MostrarTestViewController.swift in Sources */,
 				7D949A141EB1B7AC008213C5 /* CustomAlert.swift in Sources */,
 				7DDD16F71EDE14AE004347DB /* BloquearS1ViewController.swift in Sources */,

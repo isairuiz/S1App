@@ -33,15 +33,18 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var facebookTableViewCell: UITableViewCell!
     @IBOutlet weak var aceptarTableViewCell: UITableViewCell!
     @IBOutlet weak var terminosCondicionesTableViewCell: UITableViewCell!
+    
     @IBOutlet weak var recuperContraseñaCell: UITableViewCell!
     @IBOutlet weak var buttonRecPass: UIButton!
     
+    @IBOutlet weak var terminosSwitch: UISwitch!
+    @IBOutlet weak var verTerminosPoliticas: UILabel!
 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var actIndicatorFB: UIActivityIndicatorView!
     
     var dict : [String : AnyObject]!
-    
+    var terminosAceptados:Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,6 +59,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
         aceptarButton.layer.shadowOffset = CGSize(width: 2, height: 2)
         aceptarButton.layer.shadowRadius = 3
         
+        self.terminosCondicionesTableViewCell.isHidden = true
         
         tab = TabView(frame: CGRect(x:0,y:0, width: self.view.frame.size.width, height: 66))
         
@@ -73,7 +77,10 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
         
         
         let tapView = UITapGestureRecognizer(target: self, action: #selector(self.finalizarEdicion(_:)))
-        self.view.addGestureRecognizer(tapView) 
+        self.view.addGestureRecognizer(tapView)
+        
+        let tpVerCondiciones = UITapGestureRecognizer(target: self, action: #selector(self.modalTerminosPoliticas(_:)))
+        self.verTerminosPoliticas.addGestureRecognizer(tpVerCondiciones)
         
         let tapFacebook = UITapGestureRecognizer(target: self, action: #selector(self.facebookButtonTap(_:)))
         self.facebookTableViewCell.addGestureRecognizer(tapFacebook   )
@@ -140,6 +147,31 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     func finalizarEdicion(_ sender: UITapGestureRecognizer){
         self.view.endEditing(true)
     }
+    func modalTerminosPoliticas(_ sender: UITapGestureRecognizer){
+        let refreshAlert = UIAlertController(title: "Refresh", message: "All data will be lost.", preferredStyle: UIAlertControllerStyle.actionSheet)
+        
+        refreshAlert.addAction(UIAlertAction(title: "Ver Politicas de Privacidad", style: .default, handler: { (action: UIAlertAction!) in
+            
+            let url = URL(string: "http://40.84.231.88/singular/admin/privacidad")!
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+            
+        }))
+        
+        refreshAlert.addAction(UIAlertAction(title: "Ver Términos y Condiciones", style: .default, handler: { (action: UIAlertAction!) in
+            let url = URL(string: "http://40.84.231.88/singular/admin/terminos")!
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }))
+        
+        refreshAlert.addAction(UIAlertAction(title: "Cancelar", style: .cancel, handler: { (action: UIAlertAction!) in
+            refreshAlert.dismiss(animated: true, completion: nil)
+        }))
+        
+        present(refreshAlert, animated: true, completion: nil)
+    }
     
     func recuperarPassword(_ sender: UITapGestureRecognizer){
         debugPrint("Dandole a recuperar")
@@ -169,7 +201,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     
     func cambiarPrimerTab (){
         
-        
+        self.terminosCondicionesTableViewCell.isHidden = true
         self.tableView.beginUpdates()
         self.tableView.endUpdates()
         
@@ -188,7 +220,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     }
     
     func cambiarSegundoTab (){
-        
+        self.terminosCondicionesTableViewCell.isHidden = false
         self.tableView.beginUpdates()
         self.tableView.endUpdates()
         
@@ -272,6 +304,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                 showAlerWithMessage(title: "Error", message: "Todos los campos son requeridos")
             }else{
                 if(equalPass){
+                    if self.terminosAceptados{
                     self.showActivityIndicatory()
                     Alamofire.upload(
                         multipartFormData: { multipartFormData in
@@ -314,6 +347,9 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                             }
                     }
                     )
+                    }else{
+                        showAlerWithMessage(title:"Error",message: "Debes estar de acuerdo con las Politicas de Privacidad y con los Terminos y Condiciones para poder continuar.")
+                    }
                 }else{
                     showAlerWithMessage(title:"Error",message: "Las contraseñas no coinciden")
                 }
@@ -385,17 +421,17 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                         debugPrint(json)
                         if let status = json["status"].bool {
                             if (status){
+                                if let idSingular = json["id"].int{
+                                    DataUserDefaults.setCurrentId(id: idSingular)
+                                }
                                 if let authtoken = json["token"].string{
-                                    debugPrint(authtoken)
                                     DataUserDefaults.setUserToken(token: authtoken)
                                     DataUserDefaults.setUserData(email: mail, user: "", password: password)
                                     DataUserDefaults.setIsLogged(logged: true)
                                     
                                 }
-                                
                                 /*Descomntar para produccion*/
                                 if let primerLogin = json["primerlogin"].bool{
-                                    debugPrint(primerLogin)
                                     if(primerLogin){
                                         self.performSegue(withIdentifier: "MostrarBienvenida", sender: self)
                                     }else{
@@ -444,6 +480,10 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                         if let status = json["status"].bool {
                             debugPrint(status)
                             if (status){
+                                
+                                if let idSingular = json["id"].int{
+                                    DataUserDefaults.setCurrentId(id: idSingular)
+                                }
                                 if let authtoken = json["token"].string{
                                     debugPrint(authtoken)
                                     DataUserDefaults.setUserToken(token: authtoken)
@@ -587,6 +627,13 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     }
     
 
+    @IBAction func switchTerminosChange(_ sender: Any) {
+        if self.terminosSwitch.isOn{
+            self.terminosAceptados = true
+        }else{
+            self.terminosAceptados = false
+        }
+    }
     
     
     /*

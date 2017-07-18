@@ -20,6 +20,7 @@ class SpeechBubble: UIView, AVAudioPlayerDelegate {
     var playbutton : UIButton?
     var audioProgress:UISlider?
     var timer:Timer?
+    var audioSession = AVAudioSession.sharedInstance()
     
     
     override init(frame: CGRect) {
@@ -99,7 +100,11 @@ class SpeechBubble: UIView, AVAudioPlayerDelegate {
             self.frame = CGRect(x: NewStartX, y: 10, width: viewWidth, height: viewHeight+15)
         }
         
-        
+        do {
+            try audioSession.overrideOutputAudioPort(AVAudioSessionPortOverride.speaker)
+        } catch let error as NSError {
+            print("audioSession error: \(error.localizedDescription)")
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -115,6 +120,7 @@ class SpeechBubble: UIView, AVAudioPlayerDelegate {
             
             downloadTask.resume()
         }else{
+            
             self.play(self.urlCorrect as URL)
         }
         

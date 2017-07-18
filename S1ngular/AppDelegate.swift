@@ -44,44 +44,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         FirebaseApp.configure()
         Messaging.messaging().delegate = self
         Messaging.messaging().shouldEstablishDirectChannel = true
-        self.initializeFCM(application)
-        let token = InstanceID.instanceID().token()
-        debugPrint("GCM TOKEN = \(String(describing: token))")
         
         return true 
     }
     
-    func initializeFCM(_ application: UIApplication){
-        if #available(iOS 10.0, *) // enable new way for notifications on iOS 10
-        {
-            let center = UNUserNotificationCenter.current()
-            center.delegate = self
-            center.requestAuthorization(options: [.badge, .alert , .sound]) { (accepted, error) in
-                if !accepted
-                {
-                    print("Notification access denied.")
-                }
-                else
-                {
-                    print("Notification access accepted.")
-                    application.registerForRemoteNotifications()
-                }
-            }
-        }else
-        {
-            let type: UIUserNotificationType = [UIUserNotificationType.badge, UIUserNotificationType.alert, UIUserNotificationType.sound];
-            let setting = UIUserNotificationSettings(types: type, categories: nil);
-            UIApplication.shared.registerUserNotificationSettings(setting);
-            UIApplication.shared.registerForRemoteNotifications();
-        }
-    }
     
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         debugPrint("Mensaje ID: \(userInfo["gcm.message_id"]!)")
         debugPrint("Toda la notificacion:\(userInfo)")
     }
-    
     
 
     func applicationWillResignActive(_ application: UIApplication) {
