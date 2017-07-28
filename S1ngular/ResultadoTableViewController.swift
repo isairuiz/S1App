@@ -25,6 +25,7 @@ class ResultadoTableViewController: UITableViewController{
     
     var shareButton = ShareButton<LinkShareContent>()
     
+    @IBOutlet weak var responderNuevoCell: UITableViewCell!
     
     @IBOutlet weak var compartirCheckInViewButton: UIView!
     
@@ -32,7 +33,7 @@ class ResultadoTableViewController: UITableViewController{
         "Authorization": "Bearer "+DataUserDefaults.getUserToken()
     ]
     
-
+    var idTest = Int()
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -41,6 +42,9 @@ class ResultadoTableViewController: UITableViewController{
         let compartirTestTap = UITapGestureRecognizer(target: self, action: #selector(self.compartirCheckIn))
         
         self.compartirCheckInTableViewCell.addGestureRecognizer(compartirTestTap)
+        
+        //let responderNuevoTap = UITapGestureRecognizer(target: self, action: #selector(self.responderNuevo))
+        //self.responderNuevoCell.addGestureRecognizer(responderNuevoTap)
 
         
         /*shareButton.layer.shadowColor = UIColor.black.cgColor
@@ -53,7 +57,7 @@ class ResultadoTableViewController: UITableViewController{
         self.compartirCheckInViewButton.layer.shadowRadius = 3
         
 
-        let idTest = DataUserDefaults.getIdComprarTest()
+        self.idTest = DataUserDefaults.getIdComprarTest()
         self.verMiResultado(idTest: String(describing: idTest))
         
         
@@ -64,6 +68,8 @@ class ResultadoTableViewController: UITableViewController{
         shareButton.center = self.compartirCheckInTableViewCell.center
         self.compartirCheckInTableViewCell.addSubview(shareButton)*/
     }
+    
+    
     func compartirCheckIn(){
         
         print("compartir")
@@ -112,6 +118,7 @@ class ResultadoTableViewController: UITableViewController{
         self.tableView.backgroundView = view
         
     }
+    
     
     func verMiResultado(idTest:String){
         let view = UIView()

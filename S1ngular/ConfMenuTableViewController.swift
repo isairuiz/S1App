@@ -14,12 +14,14 @@ class ConfMenuTableViewController: UITableViewController {
     
 
     @IBOutlet weak var editarPerfilButton: UIView!
+    @IBOutlet weak var editarPrefButton: UIView!
+    @IBOutlet weak var editarNotifButton: UIView!
+    @IBOutlet weak var cerrarButton: UIView!
 
     @IBOutlet weak var editarPerfilCell: UITableViewCell!
-    @IBOutlet weak var prefButton: UIButton!
-    @IBOutlet weak var notifButton: UIButton!
-    
-    @IBOutlet var cerrarSesionButton: UIButton!
+    @IBOutlet weak var prefButton: UITableViewCell!
+    @IBOutlet weak var notifButton: UITableViewCell!
+    @IBOutlet var cerrarSesionButton: UITableViewCell!
     
     
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
@@ -33,17 +35,21 @@ class ConfMenuTableViewController: UITableViewController {
         // Add a background view to the table view
         
         
-        editarPerfilButton.layer.shadowColor = UIColor.black.cgColor
-        editarPerfilButton.layer.shadowOpacity = 0.5
-        editarPerfilButton.layer.shadowOffset = CGSize(width: 2, height: 2)
-        editarPerfilButton.layer.shadowRadius = 3
+        self.styleButton(button: editarPerfilButton)
+        self.styleButton(button: editarPrefButton)
+        self.styleButton(button: editarNotifButton)
+        self.styleButton(button: cerrarButton)
         
-        transformButton(button: self.prefButton)
-        transformButton(button: self.notifButton)
-        transformButton(button: self.cerrarSesionButton)
         
-        let tapView = UITapGestureRecognizer(target: self, action: #selector(self.editarPerfilButtonTap(_:)))
-        self.editarPerfilCell.addGestureRecognizer(tapView)
+        let tapView1 = UITapGestureRecognizer(target: self, action: #selector(self.editarPerfilButtonTap(_:)))
+        let tapView2 = UITapGestureRecognizer(target: self, action: #selector(self.gotoEditarPreferencias(_:)))
+        let tapView3 = UITapGestureRecognizer(target: self, action: #selector(self.gotoNotificaciones(_:)))
+        let tapView4 = UITapGestureRecognizer(target: self, action: #selector(self.cerrarSesion(_:)))
+        
+        self.editarPerfilCell.addGestureRecognizer(tapView1)
+        self.prefButton.addGestureRecognizer(tapView2)
+        self.notifButton.addGestureRecognizer(tapView3)
+        self.cerrarSesionButton.addGestureRecognizer(tapView4)
 
     }
 
@@ -58,10 +64,19 @@ class ConfMenuTableViewController: UITableViewController {
     
     func editarPerfilButtonTap(_ sender: UITapGestureRecognizer){
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "myNotification"), object: nil)
-
     }
     
-    func transformButton(button:UIButton){
+    func gotoEditarPreferencias(_ sender: UITapGestureRecognizer) {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "notifEditarPreferencias"), object: nil)
+    }
+    
+    func gotoNotificaciones(_ sender: UITapGestureRecognizer) {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "notifNotificaciones"), object: nil)
+    }
+    func cerrarSesion(_ sender: UITapGestureRecognizer) {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "notifCerrarSesion"), object: nil)
+    }
+    /*func transformButton(button:UIButton){
         button.layer.cornerRadius = button.bounds.size.height / 2
         button.layer.borderWidth = 1
         button.layer.borderColor = ColoresTexto.TXTMain.cgColor
@@ -75,33 +90,17 @@ class ConfMenuTableViewController: UITableViewController {
         button.titleLabel?.lineBreakMode = .byTruncatingTail
         button.contentHorizontalAlignment = .center
         button.titleEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.size.height / 2, bottom: 0, right: button.bounds.size.height / 2)
+    }*/
+    
+    func styleButton(button:UIView){
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.5
+        button.layer.shadowOffset = CGSize(width: 2, height: 2)
+        button.layer.shadowRadius = 3
     }
     
-    func showActivityIndicator() {
-        
-        cerrarSesionButton.isHidden = true
-        activityIndicator.isHidden = false
-        activityIndicator.startAnimating()
-        UIApplication.shared.beginIgnoringInteractionEvents()
-        
-    }
-    
-    func hideActivityIndicator(){
-        cerrarSesionButton.isHidden = false
-        activityIndicator.stopAnimating()
-        UIApplication.shared.endIgnoringInteractionEvents()
+    override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        return true
     }
 
-
-    @IBAction func gotoEditarPreferencias(_ sender: Any) {
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "notifEditarPreferencias"), object: nil)
-    }
-
-    @IBAction func gotoNotificaciones(_ sender: Any) {
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "notifNotificaciones"), object: nil)
-    }
-    @IBAction func cerrarSesion(_ sender: Any) {
-        showActivityIndicator()
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "notifCerrarSesion"), object: nil)
-    }
 }

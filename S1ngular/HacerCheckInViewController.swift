@@ -12,6 +12,7 @@ class HacerCheckInViewController: UIViewController {
 
     @IBOutlet weak var subtituloView: UIView!
     var showControllsFor : Int = DataUserDefaults.getControllsCheckin()
+    @IBOutlet weak var subtituloText: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +33,9 @@ class HacerCheckInViewController: UIViewController {
             changeTitleName(title:"MI CHECK IN")
         }else if showControllsFor == 3{
             changeTitleName(title:"VISTA CHECK IN")
+            subtituloText.text = "¡MIRA DÓNDE ANDAN TUS AMIGOS!"
+        }else if showControllsFor == 4{
+            subtituloText.text = "¡MIRA DóNDE HAY MÁS S1NGULARES!"
         }
     }
 

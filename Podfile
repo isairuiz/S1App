@@ -9,7 +9,7 @@ target 'S1ngular' do
 
   pod 'SwiftyJSON', '~> 3.1'
   pod 'MZFormSheetPresentationController', '~> 2.4'
-  pod 'Alamofire', '~> 4.4’
+  pod 'Alamofire', '~> 4.5’
   pod 'FacebookCore’
   pod 'FacebookLogin’
   pod 'FacebookShare’, :git => 'https://github.com/1amageek/facebook-sdk-swift'

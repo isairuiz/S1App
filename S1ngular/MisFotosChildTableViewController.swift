@@ -114,13 +114,11 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
                 let json = JSON(response.result.value)
                 debugPrint(json)
                 if let status = json["status"].bool{
+                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
                     if(status){
-                        if var message = json["mensaje_plain"].string{
-                            self.getUserData()
-                        }
-                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
+                        self.getUserData()
+                        
                     }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
                         if var message = json["mensaje_plain"].string{
                             self.showAlerWithMessage(title: "¡Error!",message: message )
                         }
@@ -129,6 +127,31 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
                 
         }
 
+    }
+    
+    func eliminarFotografia(idFoto:Int){
+        let lView = UIView()
+        let lLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+        let parameters: Parameters = ["id_fotografia": idFoto]
+        Alamofire.request(Constantes.ELIMINAR_FOTO, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                    if status{
+                        let mensaje = json["mensaje_plain"].string
+                        self.showAlerWithMessage(title: "Bien!", message: mensaje!)
+                    }else{
+                        if let errorMessage = json["mensaje_plain"].string{
+                            self.showAlerWithMessage(title: "Error", message: errorMessage)
+                        }
+                    }
+                }
+        }
     }
     
     func showAlerWithMessage(title:String,message:String){
@@ -209,15 +232,46 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let keyFoto   = Array(self.fotitos.keys)[indexPath.row]
-        let urlFoto = Array(self.fotitos.values)[indexPath.row]
+        _ = Array(self.fotitos.values)[indexPath.row]
         if(keyFoto != String(self.idFotoPerfil)){
+            
+            
+            let alert = UIAlertController(title: "Selecciona una acción", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
+            alert.addAction(UIAlertAction(title: "Usar como foto de perfil", style: UIAlertActionStyle.default, handler: { action in
+                
+                self.confirmAlert(keyFoto: keyFoto,changeFotoPerfil: true)
+            }))
+            alert.addAction(UIAlertAction(title: "Eliminar foto", style: UIAlertActionStyle.default, handler: {action in
+                self.confirmAlert(keyFoto: keyFoto,changeFotoPerfil: false)
+                
+            }))
+            alert.addAction(UIAlertAction(title: "Cancelar", style: UIAlertActionStyle.cancel, handler: {action in
+                alert.dismiss(animated: true, completion: nil)
+            }))
+            self.present(alert, animated: true, completion: nil)
+        }
+        
+    }
+    
+    func confirmAlert(keyFoto:String,changeFotoPerfil:Bool){
+        
+        if changeFotoPerfil{
             let alert = UIAlertController(title: "¿Desea continuar?", message: "Se usara esta foto como foto de perfil.", preferredStyle: UIAlertControllerStyle.alert)
-            alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: { action in
+            alert.addAction(UIAlertAction(title: "Si, cambiar", style: UIAlertActionStyle.default, handler: { action in
                 self.cambiarIdFotoPerfil(idFoto: keyFoto)
             }))
             alert.addAction(UIAlertAction(title: "Cancelar", style: UIAlertActionStyle.cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
+        }else{
+            let alert = UIAlertController(title: "¿Desea continuar?", message: "La foto sera eliminada de s1ngular", preferredStyle: UIAlertControllerStyle.alert)
+            alert.addAction(UIAlertAction(title: "Si, eliminar", style: UIAlertActionStyle.default, handler: { action in
+                
+                self.eliminarFotografia(idFoto: Int(keyFoto)!)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancelar", style: UIAlertActionStyle.cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
+        
         
     }
     

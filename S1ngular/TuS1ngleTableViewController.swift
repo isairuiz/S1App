@@ -202,7 +202,6 @@ class TuS1ngleTableViewController: UITableViewController {
                 self.isShowing = true
             })
         }
-        
     }
     
     func makeLabelRounded(label:UILabel){

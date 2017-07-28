@@ -15,6 +15,7 @@ class Constantes{
     static let EDITAR_PERFIL_URL = "http://40.84.231.88/singular/singular/editarperfil"
     static let EDITAR_QUE_BUSCO_URL = "http://40.84.231.88/singular/singular/editarquebusco"
     static let AGREGAR_FOTO = "http://40.84.231.88/singular/singular/agregarfotografia"
+    static let ELIMINAR_FOTO = "http://40.84.231.88/singular/singular/eliminarfotografia"//Delete
     static let VER_MI_PERFIL_URL = "http://40.84.231.88/singular/singular/vermiperfil"
     static let VER_PERFIL_URL = "http://40.84.231.88/singular/singular/verperfil?id="
     static let DEF_FOTO_PERFIL_URL = "http://40.84.231.88/singular/singular/definirfotografiaperfil"
@@ -38,4 +39,6 @@ class Constantes{
     static let LISTAR_MENSAJES_CHAT = "http://40.84.231.88/singular/singular/listarmensajeschat?" //id='X'&paginado='X'
     static let REG_FIREBASE_TOKEN = "http://40.84.231.88/singular/singular/agregaridfirebase"
     static let BLOQUEAR_PERFIL = "http://40.84.231.88/singular/singular/bloquearperfil"
+    static let RESET_TEST = "http://40.84.231.88/singular/singular/resettest"
+    
 }

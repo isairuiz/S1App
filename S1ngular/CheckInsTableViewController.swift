@@ -309,7 +309,7 @@ class CheckInsTableViewController: UITableViewController {
             if indexPath.section != 0{
                 let jsonCheck:JSON = self.otrosCheckins[indexPath.row]
                 if let id_singular = jsonCheck["id_singular"].int{
-                    DataUserDefaults.setControllsCheckin(type: 3)
+                    DataUserDefaults.setControllsCheckin(type: 4)
                 }
                 DataUserDefaults.setJsonCheckin(json: self.otrosCheckins[indexPath.row].description)
             }

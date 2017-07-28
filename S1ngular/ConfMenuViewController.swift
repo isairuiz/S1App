@@ -56,7 +56,6 @@ class ConfMenuViewController: UIViewController {
     }
     func gotoCerrarSesion(){
         if(DataUserDefaults.clearData()){
-            self.childController.hideActivityIndicator()
             self.view.window!.rootViewController?.dismiss(animated: true, completion: nil)
         }
     }

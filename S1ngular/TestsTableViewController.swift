@@ -221,7 +221,7 @@ class TestsTableViewController: UITableViewController {
             (cell.viewWithTag(2) as? UILabel)?.attributedText = descripcion
             (cell.viewWithTag(2) as? UILabel)?.lineBreakMode = .byTruncatingTail
             
-            (cell.viewWithTag(3) as? UILabel)?.text = "+ \(item!.recompensa) S1NGLE CREDITS"
+            (cell.viewWithTag(3) as? UILabel)?.text = "RECOMPENZA: \(item!.recompensa) S1NGLE CREDITS"
             (cell.viewWithTag(4) as? UILabel)?.text = "-\(item!.costo)"
             
         } else{
@@ -307,7 +307,7 @@ class TestsTableViewController: UITableViewController {
                 item = self.listaNuevos[(indexPath as NSIndexPath).row]
                 self.comprarTest(id: (item?.id)!,costo:(item?.costo)!)
                 DataUserDefaults.setIdComprarTest(idTest: (item?.id)!)
-                //self.performSegue(withIdentifier: "MostrarTest", sender: self)
+                
             }))
             alert.addAction(UIAlertAction(title: "No lo quiero", style: UIAlertActionStyle.cancel, handler: {action in
                 
@@ -315,12 +315,65 @@ class TestsTableViewController: UITableViewController {
             self.present(alert, animated: true, completion: nil)
             
         }else{
-            debugPrint("Tocando resultado...")
             itemRes = self.listaResultados[(indexPath as NSIndexPath).row]
-            DataUserDefaults.setIdComprarTest(idTest: (itemRes?.id)!)
-            self.performSegue(withIdentifier: "MostrarResultadoSegue", sender: nil)
+            let alert = UIAlertController(title: "Selecciona una acción", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
+            alert.addAction(UIAlertAction(title: "Ver resultado", style: UIAlertActionStyle.default, handler: { action in
+                
+                DataUserDefaults.setIdComprarTest(idTest: (itemRes?.id)!)
+                self.performSegue(withIdentifier: "MostrarResultadoSegue", sender: nil)
+            }))
+            alert.addAction(UIAlertAction(title: "Reiniciar Test", style: UIAlertActionStyle.default, handler: {action in
+                DataUserDefaults.setIdComprarTest(idTest: (itemRes?.id)!)
+                self.responderNuevo(idTest: (itemRes?.id)!)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancelar", style: UIAlertActionStyle.cancel, handler: {action in
+                alert.dismiss(animated: true, completion: nil)
+            }))
+            self.present(alert, animated: true, completion: nil)
+            
+            
+            
+            
         }
         
+    }
+    
+    func responderNuevo(idTest:Int){
+        let alert = UIAlertController(title: "¿Deseas responder nuevamente este test?", message: "Contesta de nuevo para encontrar a nuevos s1ngulares. Se descontara nuevamente el costo del test de tus S1 Credits.", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: { action in
+            self.resetearTest(idTest: idTest)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancelar", style: UIAlertActionStyle.cancel, handler: {action in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
+    func resetearTest(idTest:Int){
+        let lView = UIView()
+        let lLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+        let parameters: Parameters = ["id": idTest]
+        Alamofire.request(Constantes.RESET_TEST, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                    if status{
+                        
+                        DataUserDefaults.setJsonTest(json: json.description)
+                        self.performSegue(withIdentifier: "MostrarTest", sender: self)
+                    }else{
+                        if let errorMessage = json["mensaje_plain"].string{
+                            
+                        }
+                    }
+                }
+        }
     }
     
     // MARK: - Acciones y eventos

@@ -129,7 +129,9 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
             let center = CLLocationCoordinate2D(latitude: lat!, longitude: long!)
             let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.002, longitudeDelta: 0.002))
             self.mapa.setRegion(region, animated: true)
-        }else{
+            self.starsContentView.isUserInteractionEnabled = false
+            self.mapa.isUserInteractionEnabled = false
+        }else if showControllsFor == 3 || showControllsFor == 4{
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "changetitle"), object: nil, userInfo: ["windowType":3])
             let nombre = jsonCheckin?["nombre"].string
             let edad = jsonCheckin?["edad"].int
@@ -138,7 +140,8 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
             let long = jsonCheckin?["longitud"].double
             let titulo = jsonCheckin?["titulo"].string
             let contenido = jsonCheckin?["contenido"].string
-            let cal = jsonCheckin?["calificacion"] != JSON.null && !(jsonCheckin?["calificacion"].isEmpty)! ? jsonCheckin?["calificacion"].int : 0
+            //let cal = jsonCheckin?["calificacion"] != JSON.null && !(jsonCheckin?["calificacion"].isEmpty)! ? jsonCheckin?["calificacion"].int : 0
+            let cal = jsonCheckin?["calificacion"].int
             var nombreEdad : String = nombre!
             nombreEdad += " - \(edad!) años"
             self.otroCheckinNombre.text = nombreEdad
@@ -149,7 +152,18 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
             let center = CLLocationCoordinate2D(latitude: lat!, longitude: long!)
             let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.002, longitudeDelta: 0.002))
             self.mapa.setRegion(region, animated: true)
+            self.starsContentView.isUserInteractionEnabled = false
+            self.mapa.isUserInteractionEnabled = false
         }
+        
+    }
+    
+    func disableStars(){
+        /*self.star1.isEnabled = false
+        self.star2.isEnabled = false
+        self.star3.isEnabled = false
+        self.star4.isEnabled = false
+        self.star5.isEnabled = false*/
         
     }
 

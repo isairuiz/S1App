@@ -263,19 +263,11 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
                 if let status = json["status"].bool{
                     if(status){
                         if let s1Nuevos = json["home"]["singulares_nuevos"].int{
-                            if s1Nuevos>1{
-                                self.nuevosSingulares.text = "¡\(s1Nuevos) NUEVOS S1!"
-                            }else{
-                                self.nuevosSingulares.text = "¡\(s1Nuevos) NUEVO S1!"
-                            }
+                            self.nuevosSingulares.text = "¡\(s1Nuevos) NUEVOS S1!"
                             
                         }
                         if let mensajesNuevos = json["home"]["mensajes_nuevos"].int{
-                            if mensajesNuevos>1{
-                                self.nuevosMensajes.text = "¡\(mensajesNuevos) MENSAJES NUEVOS!"
-                            }else{
-                                self.nuevosMensajes.text = "¡\(mensajesNuevos) MENSAJE NUEVO!"
-                            }
+                            self.nuevosMensajes.text = "¡\(mensajesNuevos) MENSAJES NUEVOS!"
                             
                         }
                         if let testsNuevos = json["home"]["nuevos_test"].int{

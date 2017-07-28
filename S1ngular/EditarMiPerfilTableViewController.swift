@@ -19,6 +19,7 @@ class EditarMiPerfilTableViewController: UITableViewController {
     @IBOutlet weak var nombreUsuario: UILabel!
     @IBOutlet weak var profesion: UILabel!
     @IBOutlet weak var info: UILabel!
+    @IBOutlet weak var descripcionUsuario: UITextView!
     
     var tapViewImage = UIGestureRecognizer()
     let headers: HTTPHeaders = [
@@ -40,6 +41,20 @@ class EditarMiPerfilTableViewController: UITableViewController {
         
         
         
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == 0{
+            return 300
+        }else if indexPath.row == 1{
+            return UITableViewAutomaticDimension
+        }else {
+            return 100
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
     }
     
     func gotoMisFotos(sender: UITapGestureRecognizer){
@@ -78,6 +93,14 @@ class EditarMiPerfilTableViewController: UITableViewController {
                                 self.profesion.text = "Configura tu profesion"
                             }
                             
+                        }
+                        if let descripcion = json["perfil"]["sobre_mi"].string{
+                            if !descripcion.isEmpty{
+                                self.descripcionUsuario.text = descripcion
+                                DataUserDefaults.saveDataSobreMi(sobreti: descripcion)
+                            }else{
+                                self.descripcionUsuario.text = "Aún no has escrito sobre ti."
+                            }
                         }
                         if let idFoto = json["perfil"]["id_fotografia_perfil"].int{
                             if idFoto > 0{

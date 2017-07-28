@@ -73,7 +73,7 @@ class MostrarTestViewController: UIViewController {
     // MARK: - Actions y Eventos
     
     @IBAction func regresar(_ sender: AnyObject) {
-        _ = self.navigationController?.popViewController(animated: true)
+        _ = self.navigationController?.popToRootViewController(animated: true)
     }
 
 }

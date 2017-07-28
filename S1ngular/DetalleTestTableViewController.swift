@@ -83,7 +83,10 @@ class DetalleTestTableViewController: UITableViewController {
             let id = jsonTestObject?["test"]["id"].int
             let nombre = jsonTestObject?["test"]["nombre"].string
             var urlImage = Constantes.BASE_URL
-            urlImage += (jsonTestObject?["test"]["url"].string)!
+            if let urlll = jsonTestObject?["test"]["url"].string{
+                urlImage += urlll
+            }
+            
             let ambito = jsonTestObject?["test"]["ambito"].string
             let contestado = jsonTestObject?["test"]["contestado"].bool
             
@@ -122,15 +125,14 @@ class DetalleTestTableViewController: UITableViewController {
                 self.test = testCompleto
             }
         }
-        
-        
+        /*Porque truena aqui?????*/
         self.testLabel.text = test.nombre
         self.testLabel.layoutIfNeeded()
         self.testLabel.sizeToFit()
         
         
         self.heightHeaderLabel.constant = self.testLabel.bounds.height + 41
-        self.tagLabel.text = test.tag
+        self.tagLabel.text = test.ambito
         
         self.preguntaLabel.text = self.test.descripcion
         self.indiceLabel.text = "0 / \(self.test.preguntas.count)"

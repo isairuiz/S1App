@@ -15,5 +15,4 @@ class FotosCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var definirFotoPerfil: UIImageView!
     
     
-    
 }

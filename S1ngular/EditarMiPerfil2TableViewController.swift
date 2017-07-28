@@ -15,6 +15,8 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
     @IBOutlet weak var edadTextField: UITextField!
     @IBOutlet weak var nombreUsuarioTextField: UITextField!
     
+    @IBOutlet weak var profesionTextField: UITextField!
+    @IBOutlet weak var sobreMiTextField: UITextField!
     // Género
     @IBOutlet weak var mujerSwitch: UISwitch!
     @IBOutlet weak var hombreSwitch: UISwitch!
@@ -30,6 +32,8 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
     
     var nombreUsuario = String()
     var miedad = Int()
+    var miprofesion = String()
+    var sobremi = String()
     var migenero = Int()
     var fumo = Bool()
     var estadoCivil = Int()
@@ -37,6 +41,8 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
     
     var ChangenombreUsuario = String()
     var Changemiedad = Int()
+    var Changemiprofesion = String()
+    var Changesobremi = String()
     var ChangemiGenero = Int()
     var ChangeFumo = Bool()
     var ChangeestadoCivil = Int()
@@ -67,11 +73,15 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
     func setInfo(){
         nombreUsuario = DataUserDefaults.getDataNombre()
         miedad = Int(DataUserDefaults.getDataEdad())!
+        miprofesion = DataUserDefaults.getDataProfesion()
+        sobremi = DataUserDefaults.getDataSobreMi()
         migenero = DataUserDefaults.getDataGenero()
         fumo = DataUserDefaults.getDataFumo()
         estadoCivil = DataUserDefaults.getDataEstado()
         self.nombreUsuarioTextField.text = nombreUsuario
         self.edadTextField.text = String(miedad)
+        self.profesionTextField.text = miprofesion
+        self.sobreMiTextField.text = sobremi
         if migenero == 0{
             self.hombreSwitch.isOn = true
         }else{
@@ -130,6 +140,12 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
         if self.edadTextField.text != ""{
             Changemiedad = Int(self.edadTextField.text!)!
         }
+        if self.profesionTextField.text != ""{
+            Changemiprofesion = self.profesionTextField.text!
+        }
+        if self.sobreMiTextField.text != ""{
+            Changesobremi = self.sobreMiTextField.text!
+        }
         if self.mujerSwitch.isOn{
             ChangemiGenero = 1
         }
@@ -172,6 +188,16 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
             hasChanged = true
             changes += "Mi edad,"
             PerfilParametros.updateValue(Changemiedad, forKey: "edad")
+        }
+        if miprofesion != Changemiprofesion{
+            hasChanged = true
+            changes += "Mi profesion,"
+            PerfilParametros.updateValue(Changemiprofesion, forKey: "profesion")
+        }
+        if sobremi != Changesobremi{
+            hasChanged = true
+            changes += "Sobre mi,"
+            PerfilParametros.updateValue(Changesobremi, forKey: "sobre_mi")
         }
         if migenero != ChangemiGenero{
             hasChanged = true
@@ -266,6 +292,10 @@ class EditarMiPerfil2TableViewController: UITableViewController, UITextFieldDele
                             debugPrint("profesion:")
                             debugPrint(prof)
                             DataUserDefaults.saveDataProfesion(profesion: prof)
+                        }
+                        if let sobremii = json["perfil"]["sobre_mi"].string{
+                            debugPrint("sobre mi:")
+                            DataUserDefaults.saveDataSobreMi(sobreti: sobremii)
                         }
                         
                         if let fumo = json["perfil"]["fumo"].bool{
