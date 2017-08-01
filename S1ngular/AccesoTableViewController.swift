@@ -40,8 +40,6 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var terminosSwitch: UISwitch!
     @IBOutlet weak var verTerminosPoliticas: UILabel!
 
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var actIndicatorFB: UIActivityIndicatorView!
     
     var dict : [String : AnyObject]!
     var terminosAceptados:Bool = false
@@ -100,7 +98,6 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
             if((currentEmail.isEmpty) || (currentPass.isEmpty)){
                 debugPrint("No hay cuenta para iniciar sesion")
             }else{
-                self.showActIndicatorFB()
                 self.loginToSingular(mail: currentEmail,password: currentPass)
             }
         }
@@ -236,35 +233,6 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
         self.tableView.cellForRow(at: IndexPath(row: 11, section: 0))?.isHidden =  true
     }
     
-    func showActivityIndicatory() {
-        
-        aceptarButtonLabel.isHidden = true
-        activityIndicator.isHidden = false
-        activityIndicator.startAnimating()
-        UIApplication.shared.beginIgnoringInteractionEvents()
-        
-    }
-    
-    func hideActivityIndicator(){
-        aceptarButtonLabel.isHidden = false
-        activityIndicator.stopAnimating()
-        UIApplication.shared.endIgnoringInteractionEvents()
-    }
-    
-    func showActIndicatorFB(){
-        facebookButtonLabel.isHidden = true
-        fbImage.isHidden = true
-        actIndicatorFB.isHidden = false
-        actIndicatorFB.startAnimating()
-        UIApplication.shared.beginIgnoringInteractionEvents()
-    }
-    
-    func hideActIndicatorFB(){
-        facebookButtonLabel.isHidden = false
-        fbImage.isHidden = false
-        actIndicatorFB.stopAnimating()
-        UIApplication.shared.endIgnoringInteractionEvents()
-    }
     
     func showAlerWithMessage(title:String,message:String){
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
@@ -289,7 +257,6 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
             if((mail?.isEmpty)! || (password?.isEmpty)!){
                 showAlerWithMessage(title: "Error", message: "Todos los campos son requeridos")
             }else{
-                self.showActivityIndicatory()
                 self.loginToSingular(mail: mail!,password: password!)
 
             }
@@ -305,7 +272,10 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
             }else{
                 if(equalPass){
                     if self.terminosAceptados{
-                    self.showActivityIndicatory()
+                        let view = UIView()
+                        let label = UILabel()
+                        let spiner = UIActivityIndicatorView()
+                        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spiner)
                     Alamofire.upload(
                         multipartFormData: { multipartFormData in
                             multipartFormData.append((mail?.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "mail")
@@ -328,12 +298,12 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                                                 message+=" Por favor inicia sesión."
                                                 self.showAlerWithMessage(title:"Bien",message: message)
                                                 self.clearFields()
-                                                self.hideActivityIndicator()
                                                 self.tab.botonIzquierda?.sendActions(for: .touchUpInside)
                                             }
+                                            Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
                                         }else{
+                                            Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
                                             if let message = json["mensaje_plain"].string{
-                                                self.hideActivityIndicator()
                                                 self.showAlerWithMessage(title:"Error",message: message)
                                             }
                                         }
@@ -362,7 +332,6 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     
     
     func facebookButtonTap(_ sender: UITapGestureRecognizer){
-        self.showActIndicatorFB()
         let fbLoginManager : FBSDKLoginManager = FBSDKLoginManager()
         fbLoginManager.logIn(withReadPermissions: ["email"], from: self) { (result, error) in
             if (error == nil){
@@ -407,6 +376,10 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     }
     
     func loginToSingular(mail:String, password:String){
+        let view = UIView()
+        let label = UILabel()
+        let spiner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spiner)
         Alamofire.upload(
             multipartFormData: { multipartFormData in
                 multipartFormData.append((mail.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "mail")
@@ -437,16 +410,11 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                                     }else{
                                         self.performSegue(withIdentifier: "MostrarApp", sender: self)
                                     }
-                                    self.hideActivityIndicator()
-                                    self.hideActIndicatorFB()
-                                    
                                 }
-                                self.hideActivityIndicator()
-                                self.hideActIndicatorFB()
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
                             }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
                                 if let message = json["mensaje_plain"].string{
-                                    self.hideActIndicatorFB()
-                                    self.hideActivityIndicator()
                                     self.showAlerWithMessage(title:"Error",message: message)
                                     
                                 }
@@ -456,8 +424,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                     }
                     
                 case .failure(let encodingError):
-                    self.hideActIndicatorFB()
-                    self.hideActivityIndicator()
+                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
                     print(encodingError)
                 }
         }
@@ -465,6 +432,10 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     }
 
     func FBLoginSingular(fbid:String,email:String){
+        let view = UIView()
+        let label = UILabel()
+        let spiner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spiner)
         Alamofire.upload(
             multipartFormData: { multipartFormData in
                 multipartFormData.append((email.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "mail")
@@ -501,13 +472,11 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                                  }else{
                                  self.performSegue(withIdentifier: "MostrarApp", sender: self)
                                  }
-                                 self.hideActivityIndicator()
-                                 
                                  }
-                                self.hideActIndicatorFB()
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
                             }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
                                 if let message = json["mensaje_plain"].string{
-                                    self.hideActIndicatorFB()
                                     self.showAlerWithMessage(title:"Error",message: message)
                                 }
                             }
@@ -516,7 +485,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                     }
                     
                 case .failure(let encodingError):
-                    self.hideActIndicatorFB()
+                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
                     print(encodingError)
                 }
         }

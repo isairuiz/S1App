@@ -54,15 +54,25 @@ class TestsTableViewController: UITableViewController {
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightButton)
         
-        /*if DataUserDefaults.getFromTabTestResult(){
-            tab.tabSeleccionada = 1
-        }*/
+        
         
         tab = TabView(frame: CGRect(x:0,y:0, width: self.view.frame.size.width, height: 66))
         
         tab.actualizarTextoBotones("NUEVOS", derecha: "RESULTADOS")
         tab.botonIzquierda!.addTarget(self, action: #selector(self.cambiarPrimerTab), for: UIControlEvents.touchUpInside)
         tab.botonDerecha!.addTarget(self, action: #selector(self.cambiarSegundoTab), for: UIControlEvents.touchUpInside)
+        
+        let tabGuardada:Int = 0
+        guard tabGuardada == DataUserDefaults.getTab() else{
+            return
+        }
+        if tabGuardada == 0 || tabGuardada == 1{
+            tab.botonIzquierda?.sendActions(for: .touchUpInside)
+        }else{
+            tab.botonDerecha?.sendActions(for: .touchUpInside)
+        }
+        
+        DataUserDefaults.setTab(tab: 1)
         
     }
 
@@ -332,8 +342,6 @@ class TestsTableViewController: UITableViewController {
             self.present(alert, animated: true, completion: nil)
             
             
-            
-            
         }
         
     }
@@ -483,7 +491,12 @@ class TestsTableViewController: UITableViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if self.tab.tabSeleccionada == 0{
+        
+        var tabGuardada:Int = 0
+        tabGuardada = DataUserDefaults.getTab()
+        debugPrint("Tab guardada: \(tabGuardada)")
+        if tabGuardada == 0 || tabGuardada == 1{
+            tab.botonIzquierda?.sendActions(for: .touchUpInside)
             if DataUserDefaults.isTestPendiente(){
                 let alert = UIAlertController(title: "Un momento", message: "Tienes un test pendiente, debes contestarlo para poder avanzar.", preferredStyle: UIAlertControllerStyle.alert)
                 alert.addAction(UIAlertAction(title: "Terminar test", style: UIAlertActionStyle.default, handler: { action in
@@ -491,12 +504,12 @@ class TestsTableViewController: UITableViewController {
                 }))
                 self.present(alert, animated: true, completion: nil)
             }
-            self.listaNuevos.removeAll()
-            obtenerTestsNuevos()
         }else{
-            self.listaResultados.removeAll()
-            obtenerMisResultados()
+            tab.botonDerecha?.sendActions(for: .touchUpInside)
+            //self.cambiarSegundoTab()
         }
+        
+        
     }
 
     

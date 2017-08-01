@@ -38,6 +38,8 @@ class S1ngularesTableViewController: UITableViewController {
         tab.botonIzquierda!.addTarget(self, action: #selector(self.cambiarPrimerTab), for: UIControlEvents.touchUpInside)
         tab.botonDerecha!.addTarget(self, action: #selector(self.cambiarSegundoTab), for: UIControlEvents.touchUpInside)
         
+        
+        
 
     }
 
@@ -173,111 +175,179 @@ class S1ngularesTableViewController: UITableViewController {
         var item: GeneralTableItem?
         
         if self.tab.tabSeleccionada == 0 {
-            
-            item = self.listaChat[(indexPath as NSIndexPath).row]
-            
-            cell?.badge.alpha = 1
-            cell?.badge.text = item!.badge
-            
-            
-            cell?.distancia.text = item!.ditancia
-            if item!.resaltar {
-                cell?.actualizarTipo(3)
-            } else {
-                if item!.badge == ""  {
-                    cell?.actualizarTipo(2)
+            if !self.listaChat.isEmpty{
+                item = self.listaChat[(indexPath as NSIndexPath).row]
+                
+                cell?.badge.alpha = 1
+                cell?.badge.text = item!.badge
+                
+                
+                cell?.distancia.text = item!.ditancia
+                if item!.resaltar {
+                    cell?.actualizarTipo(3)
                 } else {
-                    cell?.actualizarTipo(1)
+                    if item!.badge == ""  {
+                        cell?.actualizarTipo(2)
+                    } else {
+                        cell?.actualizarTipo(1)
+                    }
+                    
                 }
                 
-            }
-        } else{
-            item = self.listaNuevos[(indexPath as NSIndexPath).row]
-            
-            cell?.badge.alpha = 0
-            cell?.badge.text = "0"
-            cell?.distancia.text = ""
-            
-            cell?.actualizarTipo(2)
-            
-            
-        }
-        
-        imagenURL = item!.avatar
-        
-        cell?.nombre.text = item!.nombre
-        
-        
-        let descripcion = NSMutableAttributedString(string: item!.descripcion, attributes: [NSFontAttributeName :  UIFont(name: "HelveticaNeue", size: 12)!, NSParagraphStyleAttributeName: paragraphStyle ])
-        cell?.texto.attributedText = descripcion
-        cell?.texto.lineBreakMode = .byTruncatingTail
-        
-        
-        
-        
-        
-        let imagen =  self.imagenCache[imagenURL];
-        cell?.foto.image = UIImage(named: "Avatar")
-        
-        if(imagen == nil){
-            // Si la imagen no exite hay que descargarla
-            if item?.avatar != "" {
-                let url:URL = URL(string: "\(item!.avatar)?\( arc4random_uniform(100) )" )!
-                let session = URLSession.shared;
-                let request : NSMutableURLRequest = NSMutableURLRequest()
-                request.url = url;
-                request.httpMethod = "GET"
+                if !(item?.avatar.isEmpty)!{
+                    imagenURL = item!.avatar
+                }
+                
+                cell?.nombre.text = item!.nombre
                 
                 
-                let task = session.dataTask(with: request as URLRequest){data,response, error in
-                   
-                    guard data != nil else {
+                let descripcion = NSMutableAttributedString(string: item!.descripcion, attributes: [NSFontAttributeName :  UIFont(name: "HelveticaNeue", size: 12)!, NSParagraphStyleAttributeName: paragraphStyle ])
+                cell?.texto.attributedText = descripcion
+                cell?.texto.lineBreakMode = .byTruncatingTail
+                
+                let imagen =  self.imagenCache[imagenURL];
+                cell?.foto.image = UIImage(named: "Avatar")
+                
+                if(imagen == nil){
+                    // Si la imagen no exite hay que descargarla
+                    if item?.avatar != "" {
+                        let url:URL = URL(string: "\(item!.avatar)?\( arc4random_uniform(100) )" )!
+                        let session = URLSession.shared;
+                        let request : NSMutableURLRequest = NSMutableURLRequest()
+                        request.url = url;
+                        request.httpMethod = "GET"
+                        
+                        
+                        let task = session.dataTask(with: request as URLRequest){data,response, error in
+                            
+                            guard data != nil else {
+                                cell?.foto.image = UIImage(named: "Avatar")
+                                return
+                                
+                            }
+                            
+                            
+                            
+                            
+                            DispatchQueue.main.async(execute: { () -> Void in
+                                
+                                if let _imagen = UIImage(data: data!) {
+                                    let imagen = Utilerias.aplicarEfectoDifuminacionImagen(_imagen, intensidad: item!.restriccion)
+                                    self.imagenCache[imagenURL] = imagen;
+                                    if let cell = tableView.cellForRow(at: indexPath) as? S1ngularesTableViewCell {
+                                        cell.foto.image = imagen
+                                        
+                                    }
+                                } else {
+                                    if let cell = tableView.cellForRow(at: indexPath) as? S1ngularesTableViewCell {
+                                        cell.foto.image = UIImage(named: "Avatar")
+                                        
+                                    }
+                                }
+                            })
+                        };
+                        task.resume()
+                    } else {
                         cell?.foto.image = UIImage(named: "Avatar")
-                        return
                         
                     }
                     
                     
-                    
-                    
+                }else{
                     DispatchQueue.main.async(execute: { () -> Void in
                         
-                        if let _imagen = UIImage(data: data!) {
-                            let imagen = Utilerias.aplicarEfectoDifuminacionImagen(_imagen, intensidad: item!.restriccion)
-                            self.imagenCache[imagenURL] = imagen;
-                            if let cell = tableView.cellForRow(at: indexPath) as? S1ngularesTableViewCell {
-                                cell.foto.image = imagen
-                                
-                            }
-                        } else {
-                            if let cell = tableView.cellForRow(at: indexPath) as? S1ngularesTableViewCell {
-                                cell.foto.image = UIImage(named: "Avatar")
-                                
-                            }
+                        if let cell = tableView.cellForRow(at: indexPath) as? S1ngularesTableViewCell {
+                            cell.foto.image = imagen
+                            
                         }
+                        
+                        
                     })
-                };
-                task.resume()
-            } else {
-                cell?.foto.image = UIImage(named: "Avatar")
-                
+                }
             }
             
-            
-        }else{
-            DispatchQueue.main.async(execute: { () -> Void in
+        } else{
+            if !self.listaNuevos.isEmpty{
+                item = self.listaNuevos[(indexPath as NSIndexPath).row]
                 
-                if let cell = tableView.cellForRow(at: indexPath) as? S1ngularesTableViewCell {
-                    cell.foto.image = imagen
-                    
+                cell?.badge.alpha = 0
+                cell?.badge.text = "0"
+                cell?.distancia.text = ""
+                
+                cell?.actualizarTipo(2)
+                
+                if !(item?.avatar.isEmpty)!{
+                    imagenURL = item!.avatar
                 }
                 
+                cell?.nombre.text = item!.nombre
                 
-            })
+                
+                let descripcion = NSMutableAttributedString(string: item!.descripcion, attributes: [NSFontAttributeName :  UIFont(name: "HelveticaNeue", size: 12)!, NSParagraphStyleAttributeName: paragraphStyle ])
+                cell?.texto.attributedText = descripcion
+                cell?.texto.lineBreakMode = .byTruncatingTail
+                
+                let imagen =  self.imagenCache[imagenURL];
+                cell?.foto.image = UIImage(named: "Avatar")
+                
+                if(imagen == nil){
+                    // Si la imagen no exite hay que descargarla
+                    if item?.avatar != "" {
+                        let url:URL = URL(string: "\(item!.avatar)?\( arc4random_uniform(100) )" )!
+                        let session = URLSession.shared;
+                        let request : NSMutableURLRequest = NSMutableURLRequest()
+                        request.url = url;
+                        request.httpMethod = "GET"
+                        
+                        
+                        let task = session.dataTask(with: request as URLRequest){data,response, error in
+                            
+                            guard data != nil else {
+                                cell?.foto.image = UIImage(named: "Avatar")
+                                return
+                                
+                            }
+                            
+                            
+                            
+                            
+                            DispatchQueue.main.async(execute: { () -> Void in
+                                
+                                if let _imagen = UIImage(data: data!) {
+                                    let imagen = Utilerias.aplicarEfectoDifuminacionImagen(_imagen, intensidad: item!.restriccion)
+                                    self.imagenCache[imagenURL] = imagen;
+                                    if let cell = tableView.cellForRow(at: indexPath) as? S1ngularesTableViewCell {
+                                        cell.foto.image = imagen
+                                        
+                                    }
+                                } else {
+                                    if let cell = tableView.cellForRow(at: indexPath) as? S1ngularesTableViewCell {
+                                        cell.foto.image = UIImage(named: "Avatar")
+                                        
+                                    }
+                                }
+                            })
+                        };
+                        task.resume()
+                    } else {
+                        cell?.foto.image = UIImage(named: "Avatar")
+                        
+                    }
+                    
+                    
+                }else{
+                    DispatchQueue.main.async(execute: { () -> Void in
+                        
+                        if let cell = tableView.cellForRow(at: indexPath) as? S1ngularesTableViewCell {
+                            cell.foto.image = imagen
+                            
+                        }
+                        
+                        
+                    })
+                }
+            }
         }
-        
-        
-        
         
         
         return cell!
@@ -291,7 +361,7 @@ class S1ngularesTableViewController: UITableViewController {
             item = self.listaNuevos[(indexPath! as NSIndexPath).row]
             DataUserDefaults.setIdVerPerfil(id: (item?.id)!)
             DataUserDefaults.setJsonPerfilPersona(json: prospectos[(indexPath! as NSIndexPath).row].description)
-            DataUserDefaults.setFromTabS1Nuevos(isit: true)
+            DataUserDefaults.setTab(tab: 2)
             performSegue(withIdentifier: "gotoVerPerfil", sender: nil)
         }else{
             let indexPath = tableView.indexPathForSelectedRow
@@ -299,7 +369,7 @@ class S1ngularesTableViewController: UITableViewController {
             item = self.listaChat[(indexPath! as NSIndexPath).row]
             DataUserDefaults.setIdVerPerfil(id: (item?.id)!)
             DataUserDefaults.setJsonPerfilPersona(json: mischats[(indexPath! as NSIndexPath).row].description)
-            DataUserDefaults.setFromTabS1Nuevos(isit: false)
+            DataUserDefaults.setTab(tab: 1)
             performSegue(withIdentifier: "gotoMesajesChat", sender: nil)
         }
     }
@@ -369,8 +439,14 @@ class S1ngularesTableViewController: UITableViewController {
                             for prospecto in self.prospectos{
                                 var fotitos = Dictionary<String, String>()
                                 let id  = prospecto["id"].int
-                                let nombre = prospecto["nombre"].string
-                                let sobre_mi = prospecto["sobre_mi"].string
+                                var nombre:String = "Sin Nombre";
+                                if let nom = prospecto["nombre"].string{
+                                    nombre = nom
+                                }
+                                var sobre_mi:String = "Sin descripcion"
+                                if let sobre = prospecto["sobre_mi"].string{
+                                    sobre_mi = sobre
+                                }
                                 let foto_visible = prospecto["foto_visible"].floatValue
                                 var fotoUrl = String()
                                 if !prospecto["fotografias"].isEmpty{
@@ -379,7 +455,7 @@ class S1ngularesTableViewController: UITableViewController {
                                     fotoUrl += Array(fotitos.values)[0]
                                     
                                 }
-                                self.listaNuevos.append(GeneralTableItem(id: id!, nombre: nombre!, distancia: "", tiempo: "", lugar: "", descripcion: sobre_mi!, avatar: fotoUrl, badge: "", compartir: false, resaltar: false, restriccion: foto_visible))
+                                self.listaNuevos.append(GeneralTableItem(id: id!, nombre: nombre, distancia: "", tiempo: "", lugar: "", descripcion: sobre_mi, avatar: fotoUrl, badge: "", compartir: false, resaltar: false, restriccion: foto_visible))
                             }
                             self.tableView.reloadData()
                             Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
@@ -396,10 +472,15 @@ class S1ngularesTableViewController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if tab.tabSeleccionada == 0{
-            self.cambiarPrimerTab()
+        var tabGuardada:Int = 0
+        tabGuardada = DataUserDefaults.getTab()
+        debugPrint("Tab guardada: \(tabGuardada)")
+        if tabGuardada == 0 || tabGuardada == 1{
+            tab.botonIzquierda?.sendActions(for: .touchUpInside)
+            //self.cambiarPrimerTab()
         }else{
-            self.cambiarSegundoTab()
+            tab.botonDerecha?.sendActions(for: .touchUpInside)
+            //self.cambiarSegundoTab()
         }
     }
     
@@ -408,12 +489,16 @@ class S1ngularesTableViewController: UITableViewController {
     func cambiarPrimerTab (){
         self.listaChat.removeAll()
         self.mischats.removeAll()
+        self.listaNuevos.removeAll()
+        self.prospectos.removeAll()
         listarChats()
     }
     
     func cambiarSegundoTab (){
         self.listaNuevos.removeAll()
         self.prospectos.removeAll()
+        self.listaChat.removeAll()
+        self.mischats.removeAll()
         listarNuevosProspectos()
     }
     

@@ -83,23 +83,23 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
     }
     
     func gotoS1(sender: UITapGestureRecognizer){
-        //DataUserDefaults.setFromTabS1Nuevos(isit: true)
+        DataUserDefaults.setTab(tab: 2)
         tabBarController?.selectedIndex = 1
-        
     }
     func gotoMensajes(sender: UITapGestureRecognizer){
-        //DataUserDefaults.setFromTabS1Nuevos(isit: false)
+        DataUserDefaults.setTab(tab: 1)
         tabBarController?.selectedIndex = 1
     }
     func gotoResultados(sender: UITapGestureRecognizer){
-        //DataUserDefaults.setFromTabTestResult(isit: true)
+        DataUserDefaults.setTab(tab: 2)
         tabBarController?.selectedIndex = 2
     }
     func gotoNuevosTests(sender: UITapGestureRecognizer){
-        //DataUserDefaults.setFromTabTestResult(isit: false)
+        DataUserDefaults.setTab(tab: 1)
         tabBarController?.selectedIndex = 2
     }
     func gotoCheckins(sender: UITapGestureRecognizer){
+        DataUserDefaults.setTab(tab: 1)
         tabBarController?.selectedIndex = 3
     }
     

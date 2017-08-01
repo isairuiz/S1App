@@ -385,17 +385,11 @@ class DataUserDefaults{
         return defaults.integer(forKey: keys[39])
     }
     
-    static func setFromTabS1Nuevos(isit:Bool){
-        defaults.set(isit, forKey: keys[40])
+    static func setTab(tab:Int){
+        defaults.set(tab, forKey: keys[40])
     }
-    static func getFromTabS1Nuevos()->Bool{
-        return defaults.bool(forKey: keys[40])
-    }
-    static func setFromTabTestResult(isit:Bool){
-        defaults.set(isit, forKey: keys[41])
-    }
-    static func getFromTabTestResult()->Bool{
-        return defaults.bool(forKey: keys[41])
+    static func getTab()->Int{
+        return defaults.integer(forKey: keys[40])
     }
     static func setIdComprarTest(idTest:Int){
         defaults.set(idTest, forKey: keys[42])

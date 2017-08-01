@@ -40,5 +40,6 @@ class Constantes{
     static let REG_FIREBASE_TOKEN = "http://40.84.231.88/singular/singular/agregaridfirebase"
     static let BLOQUEAR_PERFIL = "http://40.84.231.88/singular/singular/bloquearperfil"
     static let RESET_TEST = "http://40.84.231.88/singular/singular/resettest"
+    static let COMPRAR_FOTO = "http://40.84.231.88/singular/singular/comprarfotografias"
     
 }

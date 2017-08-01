@@ -26,6 +26,7 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet weak var siButton: UIButton!
     
+    
     let headers: HTTPHeaders = [
         "Authorization": "Bearer "+DataUserDefaults.getUserToken()
     ]
@@ -43,6 +44,9 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
     
     let jsonPerfilString = DataUserDefaults.getJsonPerfilPersona()
     var jsonPerfilObject : JSON?
+    
+    var idPerfil:Int = 0
+    var urlFotoPerfil:String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -133,6 +137,7 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
                 fotoUrl += Constantes.BASE_URL
                 fotitos = jsonPerfilObject?["fotografias"].dictionaryObject as! Dictionary<String, String>
                 fotoUrl += Array(fotitos.values)[0]
+                self.urlFotoPerfil = fotoUrl
                 self.imagePerifl.downloadedFrom(link: fotoUrl,withBlur:true,maxBlur:foto_visible!)
                 
             }
@@ -143,9 +148,12 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
                 self.profesionPersona.text = profesion
             }
             if let desc = jsonPerfilObject?["sobre_mi"].string{
-                self.descPersona.text = "vamos a ver si este texto se ajusta comom debe de ser para ver si la descripcion, bueno mas bien el contenedor adapta su altura dependiendo del tamaño del textview sopas okokok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok okmsdnkandjasda sdasjda dsaksjnda sdnamsnd akjsda sdka sdasd ansdkjas dna ksdjasmdn sak"
-                self.tableView.reloadData()
+                self.descPersona.text = desc
             }
+            if let id = jsonPerfilObject?["id"].int{
+                self.idPerfil = id
+            }
+            self.tableView.reloadData()
             Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
         }
     }
@@ -205,8 +213,53 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
     }
     
     func desBlurFoto(sender: UITapGestureRecognizer){
-        debugPrint("desblurreame esta")
-        //self.scrollView.isScrollEnabled = true
+        /*Comprar fotografia*/
+        
+        let alert = UIAlertController(title: "¿Desbloquear foto?", message: "Desbloquea la foto de este s1ngular con 25 S1 Credits.", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: { action in
+            self.tryDesbloquearFoto()
+        }))
+        alert.addAction(UIAlertAction(title: "Cancelar", style: UIAlertActionStyle.cancel, handler: {action in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        self.present(alert, animated: true, completion: nil)
+        
+        
+        
+    }
+    
+    func tryDesbloquearFoto(){
+        
+        let lView = UIView()
+        let lLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+        let parameters: Parameters = ["id": self.idPerfil]
+        Alamofire.request(Constantes.COMPRAR_FOTO, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    if status{
+                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                        if let isVisible = json["foto_visible"].bool{
+                            if isVisible{
+                                /*quitar el blur de la foto*/
+                                self.imagePerifl.downloadedFrom(link: self.urlFotoPerfil,withBlur:false,maxBlur:0.0)
+                            }
+                            if let mensaje = json["mensaje_plain"].string{
+                                self.showAlertWithMessage(title: "¡Espera!", message: mensaje)
+                            }
+                        }
+                    }else{
+                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                        if let errorMessage = json["mensaje_plain"].string{
+                            self.showAlertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                        }
+                    }
+                }
+        }
     }
     
     

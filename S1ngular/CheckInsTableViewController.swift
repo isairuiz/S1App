@@ -37,11 +37,18 @@ class CheckInsTableViewController: UITableViewController {
         tab.actualizarTextoBotones("CERCANOS", derecha: "MIS CHECK IN")
         tab.botonIzquierda!.addTarget(self, action: #selector(self.cambiarPrimerTab), for: UIControlEvents.touchUpInside)
         tab.botonDerecha!.addTarget(self, action: #selector(self.cambiarSegundoTab), for: UIControlEvents.touchUpInside)
-        
-        
-        
-        
 
+        let tabGuardada:Int = 0
+        guard tabGuardada == DataUserDefaults.getTab() else{
+            return
+        }
+        if tabGuardada == 0 || tabGuardada == 1{
+            tab.botonIzquierda?.sendActions(for: .touchUpInside)
+        }else{
+            tab.botonDerecha?.sendActions(for: .touchUpInside)
+        }
+        
+        DataUserDefaults.setTab(tab: 1)
     }
    
     override func viewWillAppear(_ animated: Bool) {
@@ -440,13 +447,18 @@ class CheckInsTableViewController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if self.tab.tabSeleccionada == 0{
-            self.listaCercanos.removeAll()
-            self.obtenerCheckinsOtros()
+        
+        var tabGuardada:Int = 0
+        tabGuardada = DataUserDefaults.getTab()
+        debugPrint("Tab guardada: \(tabGuardada)")
+        if tabGuardada == 0 || tabGuardada == 1{
+            tab.botonIzquierda?.sendActions(for: .touchUpInside)
+            //self.cambiarPrimerTab()
         }else{
-            self.listaMisCheckIns.removeAll()
-            self.obtenerMisCheckins()
+            tab.botonDerecha?.sendActions(for: .touchUpInside)
+            //self.cambiarSegundoTab()
         }
+        
     }
 
     /*
