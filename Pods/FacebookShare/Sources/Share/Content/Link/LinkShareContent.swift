@@ -29,11 +29,7 @@ public struct LinkShareContent: ContentProtocol {
    The title to display for this link.
 
    This value may be discarded for specially handled links (ex: iTunes URLs).
-   
-   @deprecated `title` is deprecated from Graph API 2.9.
-   For more information, see https://developers.facebook.com/docs/apps/changelog#v2_9_deprecations.
    */
-  @available(*, deprecated, message: "`title` is deprecated from Graph API 2.9")
   public var title: String?
 
   /**
@@ -41,11 +37,7 @@ public struct LinkShareContent: ContentProtocol {
 
    If not specified, this field is automatically populated by information scraped from the contentURL,
    typically the title of the page. This value may be discarded for specially handled links (ex: iTunes URLs).
-   
-   @deprecated `description` is deprecated from Graph API 2.9.
-   For more information, see https://developers.facebook.com/docs/apps/changelog#v2_9_deprecations
    */
-  @available(*, deprecated, message: "`description` is deprecated from Graph API 2.9")
   public var description: String?
 
   /**
@@ -55,13 +47,7 @@ public struct LinkShareContent: ContentProtocol {
    */
   public var quote: String?
 
-  /**
-   The URL of a picture to attach to this content.
-   
-   @deprecated `imageURL` is deprecated from Graph API 2.9.
-   For more information, see https://developers.facebook.com/docs/apps/changelog#v2_9_deprecations
-   */
-  @available(*, deprecated, message: "`imageURL` is deprecated from Graph API 2.9")
+  /// The URL of a picture to attach to this content.
   public var imageURL: URL?
 
   /**
@@ -132,6 +118,9 @@ extension LinkShareContent: Equatable {
 extension LinkShareContent: SDKBridgedContent {
   internal var sdkSharingContentRepresentation: FBSDKSharingContent {
     let content = FBSDKShareLinkContent()
+    /*content.contentDescription = self.description
+    content.contentTitle = self.title
+    content.imageURL = self.imageURL*/
     content.quote = self.quote
     content.contentURL = self.url
     content.hashtag = self.hashtag?.sdkHashtagRepresentation

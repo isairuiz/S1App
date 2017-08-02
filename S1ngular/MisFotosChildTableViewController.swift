@@ -135,7 +135,7 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
         let spinner = UIActivityIndicatorView()
         Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
         let parameters: Parameters = ["id_fotografia": idFoto]
-        Alamofire.request(Constantes.ELIMINAR_FOTO, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+        Alamofire.request(Constantes.ELIMINAR_FOTO, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
             .responseJSON{
                 response in
                 let json = JSON(response.result.value)
@@ -145,6 +145,7 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
                     if status{
                         let mensaje = json["mensaje_plain"].string
                         self.showAlerWithMessage(title: "Bien!", message: mensaje!)
+                        self.getUserData()
                     }else{
                         if let errorMessage = json["mensaje_plain"].string{
                             self.showAlerWithMessage(title: "Error", message: errorMessage)

@@ -11,6 +11,7 @@ import SwiftyJSON
 import Alamofire
 import FacebookShare
 import FacebookCore
+import Social
 
 
 class ResultadoTableViewController: UITableViewController{
@@ -75,13 +76,26 @@ class ResultadoTableViewController: UITableViewController{
         print("compartir")
         
         
-        var content = LinkShareContent(url: URL(string: "http://s1ngular.com/")! )
-        var desc:String = "Finalice con exito un test en S1ngular: "
+        //var content = LinkShareContent(url: URL(string: "http://s1ngular.com/")! )
+        var desc:String = "Finalice con exito un test en S1ngular:"
         desc += self.nombreTest.text!
+        /*content.description = desc
+        content.imageURL = URL(string: self.urlImagenResultadoTest)
         content.quote = desc
+        let shareDialog = ShareDialog(content: content)
+        shareDialog.mode = .native
+        shareDialog.failsOnInvalidData = true
+        shareDialog.completion = { result in
+            debugPrint(result)
+        }
+        do{
+            try shareDialog.show()
+        }catch{
+            debugPrint(error)
+        }*/
         
-        
-        
+        let photo = Photo(image: self.imagenTest.image!, userGenerated: true)
+        var content = PhotoShareContent(photos: [photo])
         let shareDialog = ShareDialog(content: content)
         shareDialog.mode = .native
         shareDialog.failsOnInvalidData = true
@@ -94,8 +108,22 @@ class ResultadoTableViewController: UITableViewController{
             debugPrint(error)
         }
         
+        /*if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeFacebook){
+            var facebookSheet:SLComposeViewController = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
+            facebookSheet.setInitialText("resultado test")
+            
+            facebookSheet.add(self.imagenTest.image)
+            self.present(facebookSheet, animated: true, completion: nil)
+        } else {
+            var alert = UIAlertController(title: "Accounts", message: "Please login to a Facebook account to share.", preferredStyle: UIAlertControllerStyle.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }*/
         
     }
+    
+    
+    
     
     override func viewWillAppear(_ animated: Bool) {
         

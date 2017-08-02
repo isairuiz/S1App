@@ -17,13 +17,13 @@ PODS:
   - FacebookShare (0.2.0):
     - Bolts (~> 1.8)
     - FacebookCore (~> 0.2)
-    - FBSDKCoreKit (~> 4.21)
-    - FBSDKShareKit (~> 4.21)
+    - FBSDKCoreKit (~> 4.15)
+    - FBSDKShareKit (~> 4.15)
   - FBSDKCoreKit (4.24.0):
     - Bolts (~> 1.7)
   - FBSDKLoginKit (4.24.0):
     - FBSDKCoreKit
-  - FBSDKShareKit (4.24.0):
+  - FBSDKShareKit (4.25.0):
     - FBSDKCoreKit
   - Firebase (4.0.4):
     - Firebase/Core (= 4.0.4)
@@ -68,30 +68,21 @@ DEPENDENCIES:
   - Alamofire (~> 4.5)
   - FacebookCore
   - FacebookLogin
-  - FacebookShare (from `https://github.com/1amageek/facebook-sdk-swift`)
+  - FacebookShare
   - Firebase
   - Firebase/Messaging
   - MZFormSheetPresentationController (~> 2.4)
   - SwiftyJSON (~> 3.1)
-
-EXTERNAL SOURCES:
-  FacebookShare:
-    :git: https://github.com/1amageek/facebook-sdk-swift
-
-CHECKOUT OPTIONS:
-  FacebookShare:
-    :commit: 3ac76c770e9849285c380f380309d866911d2e93
-    :git: https://github.com/1amageek/facebook-sdk-swift
 
 SPEC CHECKSUMS:
   Alamofire: f28cdffd29de33a7bfa022cbd63ae95a27fae140
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
   FacebookCore: 2cb3f0fbff218e9d3119cec84bae983b232412de
   FacebookLogin: c9d606504735780a9e3002465a615512e0a691a5
-  FacebookShare: d086f7a4610bbbca9cec5e774de450a9b3e1a20b
+  FacebookShare: 8e9ee8ea06505e6a1d3d719b0cc63e840fb8aaeb
   FBSDKCoreKit: f8c9eb0dd34a9cd277c7b60da4b32226d142502d
   FBSDKLoginKit: 1214c6d5a1c4995b694d8db8a9ba6910c6028acf
-  FBSDKShareKit: a2ed9d7781a4eda9ac20d7404305e795b10251ac
+  FBSDKShareKit: aea699d3cac749af08e360f4e949b82ffa8813f5
   Firebase: 1492bf04e1b73a7353b4fb2cf5a20bac9692f341
   FirebaseAnalytics: ad41720e3e67fc63fbe3d2948d3e26932a8de311
   FirebaseCore: cfc042628ef9f20debe09c0eb683135fcd404cb4
@@ -100,10 +91,10 @@ SPEC CHECKSUMS:
   GoogleToolboxForMac: 8e329f1b599f2512c6b10676d45736bcc2cbbeb0
   MZAppearance: 0c06d3fa9cc55142f1da14bc8631fbe8fd6e19d5
   MZFormSheetPresentationController: c1dc3bce639d2393b3cc416fcb6e050eb5bca062
-  nanopb: 22bc080fa3955e2116b6ff3ee6c2cb3c15ab97cb
+  nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   Protobuf: d582fecf68201eac3d79ed61369ef45734394b9c
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
 
-PODFILE CHECKSUM: fa878fade0f7c7d0ad2fee368f2b019437b1164b
+PODFILE CHECKSUM: e7b7721141641af42edfd99e65a85e1d6183ad18
 
 COCOAPODS: 1.2.1

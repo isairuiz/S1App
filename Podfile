@@ -12,7 +12,8 @@ target 'S1ngular' do
   pod 'Alamofire', '~> 4.5’
   pod 'FacebookCore’
   pod 'FacebookLogin’
-  pod 'FacebookShare’, :git => 'https://github.com/1amageek/facebook-sdk-swift'
+  pod 'FacebookShare’
+  #pod 'FacebookShare’, :git => 'https://github.com/1amageek/facebook-sdk-swift'
   pod ‘Firebase'
   pod 'Firebase/Messaging'
   #pod 'OneSignal', '>= 2.5.2', '< 3.0'
