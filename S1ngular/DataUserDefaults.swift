@@ -61,7 +61,9 @@ class DataUserDefaults{
         "jsonPerfilPersona", //Index 45
         "jsonCheckin",  //Index 46
         "controllsCheckin", //Index 47
-        "nombrePersona" //Index 48
+        "nombrePersona", //Index 48
+        "isCurrentlyLogged", //INDEX 49
+        "pushType", //index 50
         
     ]
     static func setDefaultData(){
@@ -432,5 +434,20 @@ class DataUserDefaults{
     }
     static func getNombrePersona()->String{
         return defaults.string(forKey: keys[48])!
+    }
+    static func setCurrentlyLogged(flag:Bool){
+        defaults.set(flag, forKey: keys[49])
+    }
+    static func isCurrentlyLogged()->Bool{
+        return defaults.bool(forKey: keys[49])
+    }
+    static func keyExists()->Bool{
+        return defaults.object(forKey: keys[49]) != nil
+    }
+    static func setPushType(type:String){
+        defaults.set(type, forKey: keys[50])
+    }
+    static func getPushType()->String{
+        return defaults.string(forKey: keys[50])!
     }
 }

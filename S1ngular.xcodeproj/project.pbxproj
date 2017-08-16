@@ -36,6 +36,7 @@
 		7DA054521EEB9CA4009668D0 /* AfinidadTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA054511EEB9CA4009668D0 /* AfinidadTableViewCell.swift */; };
 		7DA24D301ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA24D2F1ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift */; };
 		7DB70C441EC62A8700B80125 /* FotosCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DB70C431EC62A8700B80125 /* FotosCollectionViewCell.swift */; };
+		7DC6123C1F3AC42500C4C48E /* NotificationAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DC6123B1F3AC42500C4C48E /* NotificationAlert.swift */; };
 		7DD609901EC12014004EB837 /* MIsFotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DD6098F1EC12014004EB837 /* MIsFotosViewController.swift */; };
 		7DDD16EF1EDB5C10004347DB /* ChatS1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DDD16EE1EDB5C10004347DB /* ChatS1ViewController.swift */; };
 		7DDD16F11EDB5C37004347DB /* ChatS1TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DDD16F01EDB5C37004347DB /* ChatS1TableViewController.swift */; };
@@ -173,6 +174,7 @@
 		7DA24D2F1ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MisFotosChildTableViewController.swift; sourceTree = "<group>"; };
 		7DB70C431EC62A8700B80125 /* FotosCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FotosCollectionViewCell.swift; sourceTree = "<group>"; };
 		7DC49F20ED494B8614B12151 /* Pods-S1ngularTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-S1ngularTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-S1ngularTests/Pods-S1ngularTests.release.xcconfig"; sourceTree = "<group>"; };
+		7DC6123B1F3AC42500C4C48E /* NotificationAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationAlert.swift; sourceTree = "<group>"; };
 		7DD6098F1EC12014004EB837 /* MIsFotosViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIsFotosViewController.swift; sourceTree = "<group>"; };
 		7DDD16EE1EDB5C10004347DB /* ChatS1ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatS1ViewController.swift; sourceTree = "<group>"; };
 		7DDD16F01EDB5C37004347DB /* ChatS1TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatS1TableViewController.swift; sourceTree = "<group>"; };
@@ -450,6 +452,7 @@
 				7D99D3D41EEA40CB00C9D62D /* test.m */,
 				7D99D3D31EEA40CA00C9D62D /* S1ngular-Bridging-Header.h */,
 				7D860E741F1866B200BC02D5 /* SocialMediaShareable.swift */,
+				7DC6123B1F3AC42500C4C48E /* NotificationAlert.swift */,
 			);
 			name = Common;
 			sourceTree = "<group>";
@@ -918,6 +921,7 @@
 				AB40D0121E0A143E0084EE91 /* HacerCheckInTableViewController.swift in Sources */,
 				ABE536821DDE8A9600F7B2C6 /* TestsTableViewController.swift in Sources */,
 				7DDD16F91EDE14D3004347DB /* BloquearS1TableViewController.swift in Sources */,
+				7DC6123C1F3AC42500C4C48E /* NotificationAlert.swift in Sources */,
 				AB400C9F1DCD926D0083342A /* Estructuras.swift in Sources */,
 				7D145F211F0FF1CE001122FC /* LoadingCellTableViewCell.swift in Sources */,
 				AB15CFEF1DBA29AF002ED6D1 /* BienvenidaPaso2TableViewController.swift in Sources */,

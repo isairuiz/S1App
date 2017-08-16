@@ -394,6 +394,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                         debugPrint(json)
                         if let status = json["status"].bool {
                             if (status){
+                                DataUserDefaults.setCurrentlyLogged(flag: true)
                                 if let idSingular = json["id"].int{
                                     DataUserDefaults.setCurrentId(id: idSingular)
                                 }
@@ -451,7 +452,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                         if let status = json["status"].bool {
                             debugPrint(status)
                             if (status){
-                                
+                                DataUserDefaults.setCurrentlyLogged(flag: true)
                                 if let idSingular = json["id"].int{
                                     DataUserDefaults.setCurrentId(id: idSingular)
                                 }

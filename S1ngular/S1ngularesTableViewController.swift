@@ -39,14 +39,19 @@ class S1ngularesTableViewController: UITableViewController {
         tab.botonDerecha!.addTarget(self, action: #selector(self.cambiarSegundoTab), for: UIControlEvents.touchUpInside)
         
         
+        //NotificationCenter.default.addObserver(self, selector: #selector(pushS1ViewController), name: NSNotification.Name(rawValue: "gotoNuevoS1"), object: nil)
         
 
+    }
+    
+    func pushS1ViewController(){
+        self.performSegue(withIdentifier: "gotoYeah", sender: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         
         super.viewWillAppear(animated)
-        
+         
         let gradientLayer = CAGradientLayer()
         
         self.view.layoutIfNeeded()
@@ -481,6 +486,12 @@ class S1ngularesTableViewController: UITableViewController {
         }else{
             tab.botonDerecha?.sendActions(for: .touchUpInside)
             //self.cambiarSegundoTab()
+        }
+        let pushType = DataUserDefaults.getPushType()
+        if pushType == "2"{
+            pushS1ViewController()
+        }else if pushType == "3"{
+            self.performSegue(withIdentifier: "gotoMesajesChat", sender: nil)
         }
     }
     

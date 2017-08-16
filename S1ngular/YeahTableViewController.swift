@@ -25,6 +25,7 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
     
     
     var tapMicro = UIGestureRecognizer()
+    var tapDespues = UIGestureRecognizer()
     
     let jsonPerfilString = DataUserDefaults.getJsonPerfilPersona()
     var jsonPerfilObject : JSON?
@@ -50,26 +51,34 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
         self.escribeDespuesButton.layer.cornerRadius = self.escribeDespuesButton.bounds.size.height / 2
         
         tapMicro = UITapGestureRecognizer(target: self, action: #selector(self.gotoChat(sender:)))
-        tapMicro.cancelsTouchesInView = false
-        self.microfonoButton.addGestureRecognizer(tapMicro)
+        tapDespues = UITapGestureRecognizer(target: self, action: #selector(self.despues(sender:)))
         
+        self.microfonoButton.addGestureRecognizer(tapMicro)
+        self.escribeDespuesButton.addGestureRecognizer(tapDespues)
         if let dataFromString = jsonPerfilString.data(using: .utf8, allowLossyConversion: false){
-            var fotitos = Dictionary<String, String>()
             jsonPerfilObject = JSON(data: dataFromString)
-            var fotoUrl = String()
-            if !(jsonPerfilObject?["fotografias"].isEmpty)!{
-                fotoUrl += Constantes.BASE_URL
-                fotitos = jsonPerfilObject?["fotografias"].dictionaryObject as! Dictionary<String, String>
-                let foto_visible = jsonPerfilObject?["foto_visible"].floatValue
-                self.foto_blur = foto_visible!
-                fotoUrl += Array(fotitos.values)[0]
+            
+            
+            let foto_visible = jsonPerfilObject?["foto_visible"].floatValue
+            self.foto_blur = foto_visible!
+            
+            if let Urlimage = jsonPerfilObject?["imagen"].string{
+                var fotoUrl:String = Constantes.BASE_URL
+                fotoUrl += Urlimage
                 self.fotosPersonas.append(fotoUrl)
             }
+            
         }
     }
     
     func gotoChat(sender: UITapGestureRecognizer){
+        DataUserDefaults.setPushType(type: "0")
         self.performSegue(withIdentifier: "gotoChat", sender: nil)
+    }
+    func despues(sender: UITapGestureRecognizer){
+        DataUserDefaults.setPushType(type: "0")
+        _ = self.navigationController?.popViewController(animated: true)
+        
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)

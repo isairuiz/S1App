@@ -17,7 +17,6 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
     @IBOutlet weak var profilePersona: UIBarButtonItem!
     @IBOutlet weak var bloquearBarButton: UIBarButtonItem!
     @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
-    @IBOutlet weak var bottomConstTF: NSLayoutConstraint!
     @IBOutlet weak var audioButton: UIImageView!
     @IBOutlet weak var mensajeTextField: UITextField!
     @IBOutlet weak var infoRecord: UILabel!
@@ -70,38 +69,27 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
         self.idReceptor = DataUserDefaults.getIdVerPerfil()
         
         if let dataFromString = jsonPerfilString.data(using: .utf8, allowLossyConversion: false){
-            var fotitos = Dictionary<String, String>()
-            jsonPerfilObject = JSON(data: dataFromString)
-            var fotoUrl = String()
             if let nombre = jsonPerfilObject?["nombre"].string{
                 subtituloTexto.text = nombre
                 DataUserDefaults.setNombrePersona(nombre: nombre)
             }
             
             let foto_visible = jsonPerfilObject?["foto_visible"].floatValue
-            let tabGuardada:Int = 0
-            guard tabGuardada == DataUserDefaults.getTab() else{
-                return
-            }
-            if tabGuardada == 2{
-                if !(jsonPerfilObject?["fotografias"].isEmpty)!{
-                    fotoUrl += Constantes.BASE_URL
-                    fotitos = jsonPerfilObject?["fotografias"].dictionaryObject as! Dictionary<String, String>
-                    fotoUrl += Array(fotitos.values)[0]
+            
+            
+            if let imagen = jsonPerfilObject?["imagen"].string
+            {
+                var fotoUrl = String()
+                
+                if !(imagen.isEmpty){
+                    fotoUrl = Constantes.BASE_URL
+                    fotoUrl += imagen
                     imageTes.downloadedFrom(link: fotoUrl,withBlur:true,maxBlur:foto_visible!)
                 }else{
                     imageTes.image = UIImage(named: "UsuarioIcon")
                 }
-            }else{
-                let imagen = jsonPerfilObject?["imagen"].string
-                var fotoUrl = String()
-                
-                if !(imagen?.isEmpty)!{
-                    fotoUrl = Constantes.BASE_URL
-                    fotoUrl += imagen!
-                    imageTes.downloadedFrom(link: fotoUrl,withBlur:true,maxBlur:foto_visible!)
-                }
             }
+            
             
         }
         
@@ -132,17 +120,22 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
         mensajeTextField.delegate = self
         mensajeTextField.returnKeyType = .send
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: .UIKeyboardDidShow, object: nil)
+        
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: .UIKeyboardDidHide, object: nil)
         
         
         NotificationCenter.default.addObserver(self, selector: #selector(tryCloseKeyboard), name: NSNotification.Name(rawValue: "closeKeyboardNotif"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(habilitarTextField), name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
         
-        NotificationCenter.default.addObserver(self,selector:#selector(routeChange(_:)),name:NSNotification.Name.AVAudioSessionRouteChange,                                 object:nil)
+        NotificationCenter.default.addObserver(self,selector:#selector(routeChange(_:)),name:NSNotification.Name.AVAudioSessionRouteChange, object:nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.paintMessage(_:)), name: NSNotification.Name(rawValue: "paintMessage"), object: nil)
         
+
+        DataUserDefaults.setPushType(type: "0")
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -151,6 +144,12 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
         }
     }
     
+    func paintMessage(_ notification: NSNotification) {
+        
+        if let mensaje = notification.userInfo?["mensaje"] as? String {
+            self.childViewController.pintarMensajeEnviado(mensaje: mensaje, id: self.idReceptor, audioUrl: "", loadingCell: false)
+        }
+    }
     
     func tryCloseKeyboard(notification:NSNotification){
         self.view.endEditing(true)
@@ -182,10 +181,9 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
         UIView.animate(withDuration: animationDurarion, animations: { () -> Void in
             if show{
                 self.bottomConstraint.constant += changeInHeight
-                self.bottomConstTF.constant += changeInHeight
+                
             }else{
                 self.bottomConstraint.constant = 60
-                self.bottomConstTF.constant = 8
             }
         })
         
@@ -415,6 +413,7 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
     }
     
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        debugPrint("Funciona esta mierda de begin editing?")
         if textField == self.mensajeTextField {
             debugPrint("empezare a escribir!!!")
             self.childViewController.scrollToBottom()
@@ -423,6 +422,7 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
         return true
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+                debugPrint("Funciona esta mierda de should return?")
         if textField == self.mensajeTextField {
             
             if !(self.mensajeTextField.text?.isEmpty)!{

@@ -14,7 +14,6 @@ class ChatS1TableViewController: UITableViewController {
     
     var listaMessages:[MessageItem] = []
     var currentIdUsuario = Int()
-    var idPersona = Int()
     var scrollView = UIScrollView()
     
     let headers: HTTPHeaders = [
@@ -29,7 +28,6 @@ class ChatS1TableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         currentIdUsuario = DataUserDefaults.getCurrentId()
-        idPersona = 19
         scrollView.delegate = self
         
     }

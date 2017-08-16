@@ -13,6 +13,8 @@ import FirebaseAnalytics
 import FirebaseMessaging
 import FirebaseInstanceID
 import UserNotifications
+import SwiftyJSON
+import MZFormSheetPresentationController
 
 //import OneSignal
 
@@ -25,6 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         debugPrint("--->messaging:\(messaging)")
         debugPrint("--->TOKEN REFRESCADO**********************************************************:\(fcmToken)")
     }
+    
+    
     
     func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
         debugPrint("--->messaging:\(messaging)")
@@ -45,15 +49,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         Messaging.messaging().delegate = self
         Messaging.messaging().shouldEstablishDirectChannel = true
         
+        DataUserDefaults.setPushType(type: "0")
+        
         return true 
     }
     
     
-    
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        debugPrint("Mensaje ID: \(userInfo["gcm.message_id"]!)")
-        debugPrint("Toda la notificacion:\(userInfo)")
+        let json = JSON(userInfo)
+        debugPrint(json)
+        if(DataUserDefaults.isLoggedIn()){
+            if let tipo = json["tipo"].string{
+                debugPrint("Tipo de notificacion al picar: \(tipo)")
+                DataUserDefaults.setPushType(type: tipo)
+                DataUserDefaults.setJsonPerfilPersona(json: json.description)
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "enterForeground"), object: nil)
+                if let id = json["id"].string{
+                    DataUserDefaults.setIdVerPerfil(id: Int(id)!)
+                }
+            }
+        }
     }
+    
     
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -69,6 +86,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        /*Volver false esta bandera para 
+         saber que el usuario cerro la app y que cuando la abra regresara au estado normal*/
+        DataUserDefaults.setCurrentlyLogged(flag: false)
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -129,6 +150,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
         }
     }
+    
+    /*func showNotification(tipo:Int,titulo:String,cuerpo:String,urlImagen:String,nombrePerfil:String, fotoVisible:Float) {
+        var heightPercent:CGFloat = 0.70
+        if tipo != 2{
+            heightPercent = 0.50
+        }
+        let maxWidth = UIScreen.main.bounds.width * 0.90
+        let maxHeight = UIScreen.main.bounds.height * heightPercent
+        let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let viewController = mainStoryboard.instantiateViewController(withIdentifier: "NotificationAlert") as! NotificationAlert
+        viewController.tituloNotif = titulo
+        viewController.tipoNotif = tipo
+        viewController.cuerpoNotif = cuerpo
+        viewController.urlNotif = urlImagen
+        viewController.visible = fotoVisible
+        viewController.nombreNotif = nombrePerfil
+        let formSheetController = MZFormSheetPresentationViewController(contentViewController: viewController)
+        formSheetController.presentationController?.contentViewSize = CGSize(width: maxWidth, height: maxHeight)
+        formSheetController.presentationController?.isTransparentTouchEnabled = false
+        self.window?.rootViewController?.present(formSheetController, animated: true, completion: nil)
+    }*/
 
 }
 

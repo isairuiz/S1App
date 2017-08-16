@@ -108,17 +108,6 @@ class ResultadoTableViewController: UITableViewController{
             debugPrint(error)
         }
         
-        /*if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeFacebook){
-            var facebookSheet:SLComposeViewController = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
-            facebookSheet.setInitialText("resultado test")
-            
-            facebookSheet.add(self.imagenTest.image)
-            self.present(facebookSheet, animated: true, completion: nil)
-        } else {
-            var alert = UIAlertController(title: "Accounts", message: "Please login to a Facebook account to share.", preferredStyle: UIAlertControllerStyle.alert)
-            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-        }*/
         
     }
     

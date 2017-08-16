@@ -14,6 +14,7 @@ import FirebaseAnalytics
 import FirebaseMessaging
 import FirebaseInstanceID
 import UserNotifications
+import MZFormSheetPresentationController
 
 class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,UNUserNotificationCenterDelegate {
     @IBOutlet weak var creditsButton: UIView!
@@ -80,7 +81,33 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
             debugPrint("Token vacion =(")
         }
         
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(checkPushNotification), name: NSNotification.Name(rawValue: "enterForeground"), object: nil)
+        
+        checkPushNotification()
     }
+    func checkPushNotification(){
+        let pushType = DataUserDefaults.getPushType()
+        if pushType == "0"{
+            
+        }else if pushType == "1"{
+            /*Llevar al listado de s1ngulares*/
+            DataUserDefaults.setTab(tab: 2)
+            tabBarController?.selectedIndex = 1
+            
+            
+        }else if pushType == "2"{
+            /*Llevar a interfaz S1 "El inicio de tu gran historia"*/
+            //NotificationCenter.default.post(name: NSNotification.Name(rawValue: "gotoNuevoS1"), object: nil)
+            tabBarController?.selectedIndex = 1
+            //DataUserDefaults.setPushType(type: "0")
+        }else if pushType == "3"{
+            /*LLevar a interfaz de chat*/
+            tabBarController?.selectedIndex = 1
+            
+        }
+    }
+    
     
     func gotoS1(sender: UITapGestureRecognizer){
         DataUserDefaults.setTab(tab: 2)
@@ -354,6 +381,57 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
         }
     }
     
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        let json = JSON(notification.request.content.userInfo)
+        debugPrint(json)
+        var mensajeTipo:String = "0"
+        var mensajeTitulo:String = ""
+        var mensajeCuerpo:String = ""
+        var mensajeUrl:String = ""
+        var mensajeNombre:String = ""
+        var mensajeMensaje:String = ""
+        var fotoVisible:Float = 0.0
+        var mensajeRemitente = ""
+        if let tipo = json["tipo"].string{
+            mensajeTipo = tipo
+        }
+        if let titulo = json["titulo"].string{
+            mensajeTitulo = titulo
+        }
+        if let cuerpo = json["cuerpo"].string{
+            mensajeCuerpo = cuerpo
+        }
+        if let url = json["imagen"].string{
+            mensajeUrl = url
+        }
+        if let nombre = json["nombre"].string{
+            mensajeNombre = nombre
+        }
+        if let mensaje = json["mensaje"].string{
+            mensajeMensaje = mensaje
+        }
+        if let idRemitente = json["id"].string{
+            mensajeRemitente = idRemitente
+        }
+        
+        fotoVisible = json["foto_visible"].floatValue
+        if mensajeTipo == "3"{
+            if let topController = UIApplication.topViewController() {
+                if topController is ChatS1ViewController{
+                    let messageData:[String: String] = [
+                        "mensaje": mensajeMensaje
+                    ]
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "paintMessage"), object: nil, userInfo: messageData)
+                    return
+                }
+            }
+        }
+        
+        
+        self.showNotification(tipo: mensajeTipo, titulo: mensajeTitulo, cuerpo: mensajeCuerpo, urlImagen: mensajeUrl, nombrePerfil: mensajeNombre,fotoVisible: fotoVisible)
+        //completionHandler([.alert, .badge, .sound])
+    }
+    
     func setPerfilFoto(idFotoPerfil:Int){
         for (key,value):(String, String) in self.fotitos {
             if(key == String(idFotoPerfil)){
@@ -395,6 +473,7 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
         locationManager.requestWhenInUseAuthorization()
         ubicacion = nil
         locationManager.startUpdatingLocation()
+        
     }
    
 
@@ -442,5 +521,25 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
         self.present(alert, animated: true, completion: nil)
     }
     
+    
+    func showNotification(tipo:String,titulo:String,cuerpo:String,urlImagen:String,nombrePerfil:String, fotoVisible:Float) {
+        var heightPercent:CGFloat = 0.70
+        if tipo != "2"{
+            heightPercent = 0.50
+        }
+        let maxWidth = UIScreen.main.bounds.width * 0.90
+        let maxHeight = UIScreen.main.bounds.height * heightPercent
+        let viewController = self.storyboard!.instantiateViewController(withIdentifier: "NotificationAlert") as! NotificationAlert
+        viewController.tituloNotif = titulo
+        viewController.tipoNotif = tipo
+        viewController.cuerpoNotif = cuerpo
+        viewController.urlNotif = urlImagen
+        viewController.visible = fotoVisible
+        viewController.nombreNotif = nombrePerfil
+        let formSheetController = MZFormSheetPresentationViewController(contentViewController: viewController)
+        formSheetController.presentationController?.contentViewSize = CGSize(width: maxWidth, height: maxHeight)
+        formSheetController.presentationController?.isTransparentTouchEnabled = false
+        self.present(formSheetController, animated: true, completion: nil)
+    }
 
 }

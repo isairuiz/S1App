@@ -357,11 +357,13 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
                 if let status = json["status"].bool{
                     if status{
                         Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                        if respuesta == 0{
-                            _ = self.navigationController?.popViewController(animated: true)
+                        /*if respuesta == 0{
+                            //
+                            
                         }else{
-                            self.performSegue(withIdentifier: "gotoYeah", sender: nil)
-                        }
+                            //self.performSegue(withIdentifier: "gotoYeah", sender: nil)
+                        }*/
+                        _ = self.navigationController?.popViewController(animated: true)
                         
                     }else{
                         Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
