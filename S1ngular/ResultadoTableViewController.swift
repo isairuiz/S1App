@@ -24,11 +24,11 @@ class ResultadoTableViewController: UITableViewController{
     @IBOutlet weak var imagenTest: UIImageView!
     var urlImagenResultadoTest = String()
     
+    @IBOutlet weak var reiniciarTestTableViewCell: UITableViewCell!
     var shareButton = ShareButton<LinkShareContent>()
     
-    @IBOutlet weak var responderNuevoCell: UITableViewCell!
-    
     @IBOutlet weak var compartirCheckInViewButton: UIView!
+    @IBOutlet weak var reinicarTestViewButton: UIView!
     
     let headers: HTTPHeaders = [
         "Authorization": "Bearer "+DataUserDefaults.getUserToken()
@@ -41,11 +41,10 @@ class ResultadoTableViewController: UITableViewController{
         self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
         
         let compartirTestTap = UITapGestureRecognizer(target: self, action: #selector(self.compartirCheckIn))
-        
         self.compartirCheckInTableViewCell.addGestureRecognizer(compartirTestTap)
         
-        //let responderNuevoTap = UITapGestureRecognizer(target: self, action: #selector(self.responderNuevo))
-        //self.responderNuevoCell.addGestureRecognizer(responderNuevoTap)
+        let responderNuevoTap = UITapGestureRecognizer(target: self, action: #selector(self.responderNuevo))
+        self.reiniciarTestTableViewCell.addGestureRecognizer(responderNuevoTap)
 
         
         /*shareButton.layer.shadowColor = UIColor.black.cgColor
@@ -56,6 +55,12 @@ class ResultadoTableViewController: UITableViewController{
         self.compartirCheckInViewButton.layer.shadowOpacity = 0.5
         self.compartirCheckInViewButton.layer.shadowOffset = CGSize(width: 2, height: 2)
         self.compartirCheckInViewButton.layer.shadowRadius = 3
+        
+        
+        self.reinicarTestViewButton.layer.shadowColor = UIColor.black.cgColor
+        self.reinicarTestViewButton.layer.shadowOpacity = 0.5
+        self.reinicarTestViewButton.layer.shadowOffset = CGSize(width: 2, height: 2)
+        self.reinicarTestViewButton.layer.shadowRadius = 3
         
 
         self.idTest = DataUserDefaults.getIdComprarTest()
@@ -204,6 +209,56 @@ class ResultadoTableViewController: UITableViewController{
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    
+    func responderNuevo(){
+        let alert = UIAlertController(title: "¿Deseas responder nuevamente este test?", message: "Contesta de nuevo para encontrar a nuevos s1ngulares. Se descontara nuevamente el costo del test de tus S1 Credits.", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: { action in
+            let idTest:Int = DataUserDefaults.getIdComprarTest()
+            self.resetearTest(idTest: idTest)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancelar", style: UIAlertActionStyle.cancel, handler: {action in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
+    func resetearTest(idTest:Int){
+        let lView = UIView()
+        let lLabel = UILabel()
+        let spinner = UIActivityIndicatorView()
+        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+        let parameters: Parameters = ["id": idTest]
+        Alamofire.request(Constantes.RESET_TEST, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                debugPrint(json)
+                if let status = json["status"].bool{
+                    Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                    if status{
+                        /*hacer aqui la funcionalidad para regresar e ir a contestar test.*/
+                        DataUserDefaults.setJsonTest(json: json.description)
+                        DataUserDefaults.setAdquirido(flag: true)
+                        
+                        let viewControllers: [UIViewController] = self.navigationController!.viewControllers
+                        for aViewController in viewControllers {
+                            if aViewController is TestsTableViewController {
+                                self.navigationController!.popToViewController(aViewController, animated: true)
+                            }
+                        }
+                        
+                        
+                    }else{
+                        if let errorMessage = json["mensaje_plain"].string{
+                            
+                        }
+                    }
+                }
+        }
+    }
+    
 
     // MARK: - Table view data source
 

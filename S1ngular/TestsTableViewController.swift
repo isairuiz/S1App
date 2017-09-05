@@ -26,11 +26,13 @@ class TestsTableViewController: UITableViewController {
         "Authorization": "Bearer "+DataUserDefaults.getUserToken()
     ]
     
+    var jsonTests : [JSON]? = [JSON.null]
+    
     var theTEST: Test?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
         
         
@@ -312,7 +314,7 @@ class TestsTableViewController: UITableViewController {
         var item: TestItem?
         var itemRes: TestItem?
         if self.tab.tabSeleccionada == 0 {
-            let alert = UIAlertController(title: "¿Desea comprar este test?", message: "Se descontara el costo del test de sus S1 Credits", preferredStyle: UIAlertControllerStyle.alert)
+            /*let alert = UIAlertController(title: "¿Desea comprar este test?", message: "Se descontara el costo del test de sus S1 Credits", preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "Lo quiero", style: UIAlertActionStyle.default, handler: { action in
                 item = self.listaNuevos[(indexPath as NSIndexPath).row]
                 self.comprarTest(id: (item?.id)!,costo:(item?.costo)!)
@@ -322,10 +324,14 @@ class TestsTableViewController: UITableViewController {
             alert.addAction(UIAlertAction(title: "No lo quiero", style: UIAlertActionStyle.cancel, handler: {action in
                 
             }))
-            self.present(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)*/
+            item = self.listaNuevos[(indexPath as NSIndexPath).row]
+            DataUserDefaults.setJsonTest(json: (self.jsonTests?[(indexPath as NSIndexPath).row].description)!)
+            DataUserDefaults.setIdComprarTest(idTest: (item?.id)!)
+            self.performSegue(withIdentifier: "MostrarTest", sender: self)
             
         }else{
-            itemRes = self.listaResultados[(indexPath as NSIndexPath).row]
+            /*itemRes = self.listaResultados[(indexPath as NSIndexPath).row]
             let alert = UIAlertController(title: "Selecciona una acción", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
             alert.addAction(UIAlertAction(title: "Ver resultado", style: UIAlertActionStyle.default, handler: { action in
                 
@@ -339,51 +345,20 @@ class TestsTableViewController: UITableViewController {
             alert.addAction(UIAlertAction(title: "Cancelar", style: UIAlertActionStyle.cancel, handler: {action in
                 alert.dismiss(animated: true, completion: nil)
             }))
-            self.present(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)*/
             
+            itemRes = self.listaResultados[(indexPath as NSIndexPath).row]
+            DataUserDefaults.setIdComprarTest(idTest: (itemRes?.id)!)
+            self.performSegue(withIdentifier: "MostrarResultadoSegue", sender: nil)
             
         }
         
     }
     
-    func responderNuevo(idTest:Int){
-        let alert = UIAlertController(title: "¿Deseas responder nuevamente este test?", message: "Contesta de nuevo para encontrar a nuevos s1ngulares. Se descontara nuevamente el costo del test de tus S1 Credits.", preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: { action in
-            self.resetearTest(idTest: idTest)
-        }))
-        alert.addAction(UIAlertAction(title: "Cancelar", style: UIAlertActionStyle.cancel, handler: {action in
-            alert.dismiss(animated: true, completion: nil)
-        }))
-        self.present(alert, animated: true, completion: nil)
-    }
+   
     
     
-    func resetearTest(idTest:Int){
-        let lView = UIView()
-        let lLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
-        let parameters: Parameters = ["id": idTest]
-        Alamofire.request(Constantes.RESET_TEST, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                    if status{
-                        
-                        DataUserDefaults.setJsonTest(json: json.description)
-                        self.performSegue(withIdentifier: "MostrarTest", sender: self)
-                    }else{
-                        if let errorMessage = json["mensaje_plain"].string{
-                            
-                        }
-                    }
-                }
-        }
-    }
-    
+   
     // MARK: - Acciones y eventos
     
     func comprarTest(id:Int,costo:Int){
@@ -466,8 +441,8 @@ class TestsTableViewController: UITableViewController {
                 if let status = json["status"].bool{
                     if(status){
                         if !json["mensaje_plain"].isEmpty{
-                            var jsonTests : [JSON] = json["mensaje_plain"].arrayValue
-                            for test in jsonTests{
+                            self.jsonTests? = json["mensaje_plain"].arrayValue
+                            for test in self.jsonTests!{
                                 var urlImagen = Constantes.BASE_URL
                                 let id = test["id"].int
                                 let nombre = test["nombre"].string
@@ -509,6 +484,10 @@ class TestsTableViewController: UITableViewController {
             //self.cambiarSegundoTab()
         }
         
+        if(DataUserDefaults.fueAdquirido()){
+            
+            self.performSegue(withIdentifier: "MostrarTest", sender: self)
+        }
         
     }
 

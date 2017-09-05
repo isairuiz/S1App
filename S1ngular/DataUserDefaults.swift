@@ -64,6 +64,8 @@ class DataUserDefaults{
         "nombrePersona", //Index 48
         "isCurrentlyLogged", //INDEX 49
         "pushType", //index 50
+        "testadquirido", //INDEX 51
+        "imagens1" //index 52
         
     ]
     static func setDefaultData(){
@@ -402,7 +404,7 @@ class DataUserDefaults{
     static func setJsonTest(json:String){
         defaults.set(json, forKey: keys[43])
     }
-    static func getJsonTest()->String{
+    static func getJsonTest()->String?{
         return defaults.string(forKey: keys[43])!
     }
     static func setTestPendiente(flag:Bool){
@@ -420,8 +422,8 @@ class DataUserDefaults{
     static func setJsonCheckin(json:String){
         defaults.set(json, forKey: keys[46])
     }
-    static func getJsonCheckin()->String{
-        return defaults.string(forKey: keys[46])!
+    static func getJsonCheckin()->String?{
+        return defaults.string(forKey: keys[46])
     }
     static func setControllsCheckin(type:Int){
         defaults.set(type, forKey: keys[47])
@@ -447,7 +449,19 @@ class DataUserDefaults{
     static func setPushType(type:String){
         defaults.set(type, forKey: keys[50])
     }
-    static func getPushType()->String{
-        return defaults.string(forKey: keys[50])!
+    static func getPushType()->String?{
+        return defaults.string(forKey: keys[50])
+    }
+    static func setAdquirido(flag:Bool){
+        defaults.set(flag, forKey: keys[51])
+    }
+    static func fueAdquirido()->Bool{
+        return defaults.bool(forKey: keys[51])
+    }
+    static func setImagenS1(url:String){
+        defaults.set(url, forKey: keys[52])
+    }
+    static func getImagenS1()->String?{
+        return defaults.string(forKey: keys[52])
     }
 }

@@ -48,7 +48,7 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
         
         self.creditsButton.layer.shadowColor = UIColor.black.cgColor
@@ -87,13 +87,17 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
         checkPushNotification()
     }
     func checkPushNotification(){
-        let pushType = DataUserDefaults.getPushType()
+        var pushType:String? = "0"
+        if DataUserDefaults.getPushType() != nil{
+            pushType = DataUserDefaults.getPushType()
+            debugPrint("No hay push type")
+        }
         if pushType == "0"{
             
         }else if pushType == "1"{
             /*Llevar al listado de s1ngulares*/
             DataUserDefaults.setTab(tab: 2)
-            tabBarController?.selectedIndex = 1
+            //tabBarController?.selectedIndex = 1
             
             
         }else if pushType == "2"{
@@ -390,7 +394,7 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
         var mensajeUrl:String = ""
         var mensajeNombre:String = ""
         var mensajeMensaje:String = ""
-        var fotoVisible:Float = 0.0
+        var fotoVisible:Float? = 0.0
         var mensajeRemitente = ""
         if let tipo = json["tipo"].string{
             mensajeTipo = tipo
@@ -403,6 +407,7 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
         }
         if let url = json["imagen"].string{
             mensajeUrl = url
+            DataUserDefaults.setImagenS1(url: url)
         }
         if let nombre = json["nombre"].string{
             mensajeNombre = nombre
@@ -414,7 +419,7 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
             mensajeRemitente = idRemitente
         }
         
-        fotoVisible = json["foto_visible"].floatValue
+        fotoVisible = json["foto_visible"].float
         if mensajeTipo == "3"{
             if let topController = UIApplication.topViewController() {
                 if topController is ChatS1ViewController{
@@ -522,7 +527,7 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
     }
     
     
-    func showNotification(tipo:String,titulo:String,cuerpo:String,urlImagen:String,nombrePerfil:String, fotoVisible:Float) {
+    func showNotification(tipo:String,titulo:String,cuerpo:String,urlImagen:String,nombrePerfil:String, fotoVisible:Float?) {
         var heightPercent:CGFloat = 0.70
         if tipo != "2"{
             heightPercent = 0.50

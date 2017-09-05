@@ -26,7 +26,7 @@ class NotificationAlert: UIViewController {
     var cuerpoNotif = String()
     var urlNotif = String()
     var nombreNotif = String()
-    var visible = Float()
+    var visible:Float? = 0.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,7 +66,7 @@ class NotificationAlert: UIViewController {
             if !urlNotif.isEmpty{
                 var urlImage = Constantes.BASE_URL
                 urlImage+=urlNotif
-                imagenPerfil.downloadedFrom(link: urlImage, withBlur: true, maxBlur: visible)
+                imagenPerfil.downloadedFrom(link: urlImage, withBlur: true, maxBlur: 0.0)
             }else{
                 imagenPerfil.downloadedFrom(link: "https://d500.epimg.net/cincodias/imagenes/2016/07/04/lifestyle/1467646262_522853_1467646344_noticia_normal.jpg", withBlur: false, maxBlur: 0.0)
             }

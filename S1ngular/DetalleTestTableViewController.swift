@@ -43,7 +43,7 @@ class DetalleTestTableViewController: UITableViewController {
     var testComenzado:Bool = false
     var testFinalizado:Bool = false
     
-    let jsonTestString = DataUserDefaults.getJsonTest()
+    var jsonTestString:String? = DataUserDefaults.getJsonTest()
     var jsonTestObject : JSON?
     
     var idsRespuestasTest : [Int] = []
@@ -77,56 +77,109 @@ class DetalleTestTableViewController: UITableViewController {
         self.badgeView.layoutIfNeeded()
         self.badgeView.layer.cornerRadius = self.badgeView.bounds.height / 2
         
-        if let dataFromString = jsonTestString.data(using: .utf8, allowLossyConversion: false){
-            jsonTestObject = JSON(data: dataFromString)
-            //debugPrint(jsonTestObject)
-            let id = jsonTestObject?["test"]["id"].int
-            let nombre = jsonTestObject?["test"]["nombre"].string
-            var urlImage = Constantes.BASE_URL
-            if let urlll = jsonTestObject?["test"]["url"].string{
-                urlImage += urlll
-            }
-            
-            let ambito = jsonTestObject?["test"]["ambito"].string
-            let contestado = jsonTestObject?["test"]["contestado"].bool
-            
-            var preguntasTest = [TestPregunta]()
-            
-            if !(jsonTestObject?["test"]["preguntas"].arrayValue.isEmpty)!{
-                var respuestasPregunta = [TestRespuesta]()
-                let preguntasJSON: [JSON] = jsonTestObject!["test"]["preguntas"].arrayValue
-                for pregunta in preguntasJSON{
-                    let idP = pregunta["id"].int
-                    let preg = pregunta["descripcion"].string
-                    let tipoP = pregunta["tipo"].int == 1 ? TipoPregunta.texto : TipoPregunta.imagen
-                    let tipoRes = TipoRespuesta.texto
-                    var url = Constantes.BASE_URL
-                    url += pregunta["url"].string!
-                    if !pregunta["respuestas"].arrayValue.isEmpty{
-                        let respuestasJSON: [JSON] = pregunta["respuestas"].arrayValue
-                        for respuesta in respuestasJSON{
-                            /*Extrayendo respuesta*/
-                            let idR = respuesta["id"].int
-                            let descR = respuesta["descripcion"].string
-                            var urlR = Constantes.BASE_URL
-                            urlR += respuesta["url"].string!
-                            
-                            let respuestaPregunta = TestRespuesta(id: idR!, respuesta: descR!, descripcion: "", imagen: urlR)
-                            
-                            /*Agregando respuesta al array de respuestas*/
-                            respuestasPregunta.append(respuestaPregunta)
-                        }
-                    }
-                    let preguntaTest = TestPregunta(id: idP!, pregunta: preg!, tipo: tipoP, imagen: url, tipoRespuestas: tipoRes, respuestas: respuestasPregunta)
-                    respuestasPregunta.removeAll()
-                    preguntasTest.append(preguntaTest)
+        
+        
+        if DataUserDefaults.fueAdquirido(){
+            DataUserDefaults.setAdquirido(flag: false)
+            self.parent?.navigationItem.leftBarButtonItem?.isEnabled = false
+            self.rehacerPantalla()
+            return
+        }
+        
+        if DataUserDefaults.isTestPendiente(){
+            self.parent?.navigationItem.leftBarButtonItem?.isEnabled = false
+            self.rehacerPantalla()
+        }else{
+            if let dataFromString = jsonTestString?.data(using: .utf8, allowLossyConversion: false){
+                jsonTestObject = JSON(data: dataFromString)
+                //debugPrint(jsonTestObject)
+                let id = jsonTestObject?["id"].int
+                let nombre = jsonTestObject?["nombre"].string
+                var urlImage = Constantes.BASE_URL
+                if let urlll = jsonTestObject?["url"].string{
+                    urlImage += urlll
                 }
-                let testCompleto = Test(id: id!, nombre: nombre!, descripcion: "", tag: "", costo: 0, recompensa: 0, imagen: urlImage, preguntas: preguntasTest, ambito: ambito!, contestado: contestado!)
+                
+                let ambito = jsonTestObject?["ambito"].string
+                let contestado = jsonTestObject?["contestado"].bool
+                
+                var preguntasTest = [TestPregunta]()
+                
+                if !(jsonTestObject?["preguntas"].arrayValue.isEmpty)!{
+                    var respuestasPregunta = [TestRespuesta]()
+                    let preguntasJSON: [JSON] = jsonTestObject!["preguntas"].arrayValue
+                    for pregunta in preguntasJSON{
+                        let idP = pregunta["id"].int
+                        let preg = pregunta["descripcion"].string
+                        let tipoP = pregunta["tipo"].int == 1 ? TipoPregunta.texto : TipoPregunta.imagen
+                        let tipoRes = TipoRespuesta.texto
+                        var url = Constantes.BASE_URL
+                        url += pregunta["url"].string!
+                        if !pregunta["respuestas"].arrayValue.isEmpty{
+                            let respuestasJSON: [JSON] = pregunta["respuestas"].arrayValue
+                            for respuesta in respuestasJSON{
+                                /*Extrayendo respuesta*/
+                                let idR = respuesta["id"].int
+                                let descR = respuesta["descripcion"].string
+                                var urlR = Constantes.BASE_URL
+                                urlR += respuesta["url"].string!
+                                
+                                let respuestaPregunta = TestRespuesta(id: idR!, respuesta: descR!, descripcion: "", imagen: urlR)
+                                
+                                /*Agregando respuesta al array de respuestas*/
+                                respuestasPregunta.append(respuestaPregunta)
+                            }
+                        }
+                        let preguntaTest = TestPregunta(id: idP!, pregunta: preg!, tipo: tipoP, imagen: url, tipoRespuestas: tipoRes, respuestas: respuestasPregunta)
+                        respuestasPregunta.removeAll()
+                        preguntasTest.append(preguntaTest)
+                    }
+                    
+                }
+                let testCompleto = Test(id: id!, nombre: nombre!, descripcion: "", tag: "", costo: 0, recompensa: 0, imagen: urlImage, preguntas: preguntasTest, ambito: "", contestado: false)
                 self.test = testCompleto
             }
+            /*Porque truena aqui?????*/
+            self.testLabel.text = test.nombre
+            self.preguntaLabel.text = self.test.descripcion
+            self.badgeView.isHidden = true
+            self.indiceLabel.isHidden = true
+            self.indiceLabel.text = "0 / \(self.test.preguntas.count)"
+            
+            let url:URL = URL(string: test.imagen )!
+            let session = URLSession.shared;
+            let request : NSMutableURLRequest = NSMutableURLRequest()
+            request.url = url;
+            request.httpMethod = "GET"
+            
+            self.testActivityIndicator.startAnimating()
+            let task = session.dataTask(with: request as URLRequest){data,response, error in
+                
+                
+                guard data != nil else {
+                    self.testImageView.image = nil
+                    DispatchQueue.main.async(execute: { () -> Void in
+                        self.testActivityIndicator.stopAnimating()
+                    })
+                    return
+                    
+                }
+                
+                DispatchQueue.main.async(execute: { () -> Void in
+                    
+                    if let imagen = UIImage(data: data!) {
+                        self.testImageView.image = imagen
+                        
+                    } else {
+                        self.testImageView.image = nil
+                    }
+                    self.testActivityIndicator.stopAnimating()
+                })
+            };
+            task.resume()
         }
-        /*Porque truena aqui?????*/
-        self.testLabel.text = test.nombre
+        
+       
         self.testLabel.layoutIfNeeded()
         self.testLabel.sizeToFit()
         
@@ -134,49 +187,12 @@ class DetalleTestTableViewController: UITableViewController {
         self.heightHeaderLabel.constant = self.testLabel.bounds.height + 41
         self.tagLabel.text = test.ambito
         
-        self.preguntaLabel.text = self.test.descripcion
-        self.indiceLabel.text = "0 / \(self.test.preguntas.count)"
+        
         
         self.comenzarTestView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.comenzarTest)))
         
         
         
-        
-        let url:URL = URL(string: test.imagen )!
-        let session = URLSession.shared;
-        let request : NSMutableURLRequest = NSMutableURLRequest()
-        request.url = url;
-        request.httpMethod = "GET"
-        
-        self.testActivityIndicator.startAnimating()
-        let task = session.dataTask(with: request as URLRequest){data,response, error in
-            
-            
-            guard data != nil else {
-                self.testImageView.image = nil
-                DispatchQueue.main.async(execute: { () -> Void in
-                    self.testActivityIndicator.stopAnimating()
-                })
-                return
-                
-            }
-            
-            DispatchQueue.main.async(execute: { () -> Void in
-                
-                if let imagen = UIImage(data: data!) {
-                    self.testImageView.image = imagen
-                    
-                } else {
-                    self.testImageView.image = nil
-                }
-                self.testActivityIndicator.stopAnimating()
-            })
-        };
-        task.resume()
-        
-        if DataUserDefaults.isTestPendiente(){
-            self.parent?.navigationItem.leftBarButtonItem?.isEnabled = false
-        }
         
     }
     
@@ -184,7 +200,7 @@ class DetalleTestTableViewController: UITableViewController {
     
     func respondToSwipeRight(gesture: UISwipeGestureRecognizer){
         preguntaAnterior()
-        debugPrint("Swiping Rightttt")
+        //debugPrint("Swiping Rightttt")
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -260,18 +276,26 @@ class DetalleTestTableViewController: UITableViewController {
     // MARK: - Actions y Eventos
     
     func comenzarTest() {
-        self.testComenzado = true
-        //self.navigationController?.navigationItem.leftBarButtonItem?.isEnabled = false
-        self.parent?.navigationItem.leftBarButtonItem?.isEnabled = false
-        DataUserDefaults.setTestPendiente(flag: true)
-        self.siguientePregunta()
+        let alert = UIAlertController(title: "¿Desea comprar este test?", message: "Se descontara el costo del test de sus S1 Credits", preferredStyle: UIAlertControllerStyle.alert)
+         alert.addAction(UIAlertAction(title: "Lo quiero", style: UIAlertActionStyle.default, handler: { action in
+         
+        self.comprarTest(id: DataUserDefaults.getIdComprarTest())
+         
+         
+         }))
+         alert.addAction(UIAlertAction(title: "No lo quiero", style: UIAlertActionStyle.cancel, handler: {action in
+         
+         }))
+         self.present(alert, animated: true, completion: nil)
+        
+        
     }
     
     func preguntaAnterior(){
         if self.indicePreguntaActual > 0{
             self.indicePreguntaActual -= 1
             self.idsRespuestasTest.removeLast()
-            debugPrint(self.idsRespuestasTest.description)
+            //debugPrint(self.idsRespuestasTest.description)
             let pregunta = self.test.preguntas[self.indicePreguntaActual]
             if pregunta.tipo == .texto {
                 self.preguntaLabel.text = pregunta.pregunta
@@ -381,7 +405,7 @@ class DetalleTestTableViewController: UITableViewController {
         
         let pregunta = self.test.preguntas[self.indicePreguntaActual]
         
-        debugPrint(pregunta)
+        //debugPrint(pregunta)
         
         if pregunta.tipo == .texto {
             self.preguntaLabel.text = pregunta.pregunta
@@ -520,6 +544,97 @@ class DetalleTestTableViewController: UITableViewController {
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    
+    func comprarTest(id:Int){
+        let parameters: Parameters = ["id": id]
+        Alamofire.request(Constantes.COMPRAR_TEST_URL, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+            .responseJSON{
+                response in
+                let json = JSON(response.result.value)
+                //debugPrint(json)
+                if let status = json["status"].bool{
+                    if status{
+                        DataUserDefaults.setJsonTest(json: json.description)
+                        self.rehacerPantalla()
+                    }else{
+                        if let message = json["mensaje_plain"].string{
+                            self.showAlertWithMessage(title: "Error", message: message)
+                        }
+                    }
+                }
+        }
+        
+    }
+    
+    func rehacerPantalla(){
+        jsonTestString? = DataUserDefaults.getJsonTest()!
+        
+        if let dataFromString = jsonTestString?.data(using: .utf8, allowLossyConversion: false){
+            jsonTestObject = JSON(data: dataFromString)
+            debugPrint(jsonTestObject)
+            let id = jsonTestObject?["test"]["id"].int
+            let nombre = jsonTestObject?["test"]["nombre"].string
+            var urlImage = Constantes.BASE_URL
+            if let urlll = jsonTestObject?["test"]["url"].string{
+                urlImage += urlll
+            }
+            
+            let ambito = jsonTestObject?["test"]["ambito"].string
+            let contestado = jsonTestObject?["test"]["contestado"].bool
+            
+            var preguntasTest = [TestPregunta]()
+            
+            if !(jsonTestObject?["test"]["preguntas"].arrayValue.isEmpty)!{
+                var respuestasPregunta = [TestRespuesta]()
+                let preguntasJSON: [JSON] = jsonTestObject!["test"]["preguntas"].arrayValue
+                for pregunta in preguntasJSON{
+                    let idP = pregunta["id"].int
+                    let preg = pregunta["descripcion"].string
+                    let tipoP = pregunta["tipo"].int == 1 ? TipoPregunta.texto : TipoPregunta.imagen
+                    let tipoRes = TipoRespuesta.texto
+                    var url = Constantes.BASE_URL
+                    url += pregunta["url"].string!
+                    if !pregunta["respuestas"].arrayValue.isEmpty{
+                        let respuestasJSON: [JSON] = pregunta["respuestas"].arrayValue
+                        for respuesta in respuestasJSON{
+                            /*Extrayendo respuesta*/
+                            let idR = respuesta["id"].int
+                            let descR = respuesta["descripcion"].string
+                            var urlR = Constantes.BASE_URL
+                            urlR += respuesta["url"].string!
+                            
+                            let respuestaPregunta = TestRespuesta(id: idR!, respuesta: descR!, descripcion: "", imagen: urlR)
+                            
+                            /*Agregando respuesta al array de respuestas*/
+                            respuestasPregunta.append(respuestaPregunta)
+                        }
+                    }
+                    let preguntaTest = TestPregunta(id: idP!, pregunta: preg!, tipo: tipoP, imagen: url, tipoRespuestas: tipoRes, respuestas: respuestasPregunta)
+                    respuestasPregunta.removeAll()
+                    preguntasTest.append(preguntaTest)
+                }
+                
+                let testCompleto = Test(id: id!, nombre: nombre!, descripcion: "", tag: "", costo: 0, recompensa: 0, imagen: urlImage, preguntas: preguntasTest, ambito: ambito!, contestado: contestado!)
+                self.test = testCompleto
+                
+            }
+            
+        }
+        /*Porque truena aqui?????*/
+        self.testLabel.text = test.nombre
+        self.tagLabel.text = test.ambito
+        
+        self.preguntaLabel.text = self.test.descripcion
+        self.badgeView.isHidden = false
+        self.indiceLabel.isHidden = false
+        self.indiceLabel.text = "0 / \(self.test.preguntas.count)"
+        
+        self.testComenzado = true
+        self.parent?.navigationItem.leftBarButtonItem?.isEnabled = false
+        DataUserDefaults.setTestPendiente(flag: true)
+        self.siguientePregunta()
     }
     
 

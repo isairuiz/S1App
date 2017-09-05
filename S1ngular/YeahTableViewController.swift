@@ -37,6 +37,9 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
         self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "BrandonGrotesque-Black", size: 24)!, NSForegroundColorAttributeName: ColoresTexto.TXTMain ]
         
         self.fotosPersonas.append(DataUserDefaults.getFotoPerfilUrl())
+        var urls1:String = Constantes.BASE_URL
+        urls1 += DataUserDefaults.getImagenS1()!
+        self.fotosPersonas.append(urls1)
         
         self.s1Splash.layer.cornerRadius = self.s1Splash.frame.size.width/2
         self.s1Splash.layer.backgroundColor = Colores.MainK.cgColor
@@ -55,20 +58,7 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
         
         self.microfonoButton.addGestureRecognizer(tapMicro)
         self.escribeDespuesButton.addGestureRecognizer(tapDespues)
-        if let dataFromString = jsonPerfilString.data(using: .utf8, allowLossyConversion: false){
-            jsonPerfilObject = JSON(data: dataFromString)
-            
-            
-            let foto_visible = jsonPerfilObject?["foto_visible"].floatValue
-            self.foto_blur = foto_visible!
-            
-            if let Urlimage = jsonPerfilObject?["imagen"].string{
-                var fotoUrl:String = Constantes.BASE_URL
-                fotoUrl += Urlimage
-                self.fotosPersonas.append(fotoUrl)
-            }
-            
-        }
+        
     }
     
     func gotoChat(sender: UITapGestureRecognizer){
@@ -99,9 +89,9 @@ class YeahTableViewController: UITableViewController, UICollectionViewDelegate, 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! YeahCollectionViewCell
         
         if indexPath.row == 1{
-            cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:true,maxBlur:self.foto_blur)
+            cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:true,maxBlur:0.0)
         }else{
-            cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:false,maxBlur:0)
+            cell.imagenPersona.downloadedFrom(link: fotosPersonas[indexPath.row],withBlur:false,maxBlur:0.0)
         }
         
         

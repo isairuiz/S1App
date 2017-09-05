@@ -375,6 +375,7 @@ class S1ngularesTableViewController: UITableViewController {
             DataUserDefaults.setIdVerPerfil(id: (item?.id)!)
             DataUserDefaults.setJsonPerfilPersona(json: mischats[(indexPath! as NSIndexPath).row].description)
             DataUserDefaults.setTab(tab: 1)
+            DataUserDefaults.setNombrePersona(nombre: (item?.nombre)!)
             performSegue(withIdentifier: "gotoMesajesChat", sender: nil)
         }
     }

@@ -69,6 +69,8 @@ class ChatS1ViewController: UIViewController,UITextFieldDelegate, AVAudioRecorde
         self.idReceptor = DataUserDefaults.getIdVerPerfil()
         
         if let dataFromString = jsonPerfilString.data(using: .utf8, allowLossyConversion: false){
+            jsonPerfilObject = JSON(data: dataFromString)
+            debugPrint(dataFromString)
             if let nombre = jsonPerfilObject?["nombre"].string{
                 subtituloTexto.text = nombre
                 DataUserDefaults.setNombrePersona(nombre: nombre)

@@ -60,7 +60,7 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
     
     var showControllsFor : Int = DataUserDefaults.getControllsCheckin()
     
-    let jsonCheckinString = DataUserDefaults.getJsonCheckin()
+    let jsonCheckinString:String? = DataUserDefaults.getJsonCheckin()
     var jsonCheckin : JSON?
 
     @IBOutlet weak var mapa: MKMapView!
@@ -100,7 +100,7 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
         let tapView = UITapGestureRecognizer(target: self, action: #selector(self.finalizarEdicion(_:)))
         self.view.addGestureRecognizer(tapView)
         
-        if let dataFromString = jsonCheckinString.data(using: .utf8, allowLossyConversion: false){
+        if let dataFromString = jsonCheckinString?.data(using: .utf8, allowLossyConversion: false){
             jsonCheckin = JSON(data: dataFromString)
             debugPrint(jsonCheckin)
         }
