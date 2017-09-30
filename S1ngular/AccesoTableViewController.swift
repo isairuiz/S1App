@@ -185,7 +185,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
             if !(mail.isEmpty){
                 self.RecuperarPassword(correo: mail)
             }else{
-                self.showAlerWithMessage(title: "Error", message: "Ingresa tu corre por favor.")
+                self.alertWithMessage(title: "Error", message: "Ingresa tu corre por favor.")
             }
             
         }))
@@ -234,12 +234,6 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     }
     
     
-    func showAlerWithMessage(title:String,message:String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
-    
     func clearFields(){
         self.passwordTextField.text = ""
         self.confirmarPasswordTextfield.text = ""
@@ -255,7 +249,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
             let password = self.passwordTextField.text
             
             if((mail?.isEmpty)! || (password?.isEmpty)!){
-                showAlerWithMessage(title: "Error", message: "Todos los campos son requeridos")
+                self.alertWithMessage(title: "Error", message: "Todos los campos son requeridos")
             }else{
                 self.loginToSingular(mail: mail!,password: password!)
 
@@ -268,7 +262,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
             let repeatPass = self.confirmarPasswordTextfield.text
             let equalPass = (repeatPass == password)
             if((mail?.isEmpty)! || (password?.isEmpty)!){
-                showAlerWithMessage(title: "Error", message: "Todos los campos son requeridos")
+                self.alertWithMessage(title: "Error", message: "Todos los campos son requeridos")
             }else{
                 if(equalPass){
                     if self.terminosAceptados{
@@ -276,7 +270,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                         let label = UILabel()
                         let spiner = UIActivityIndicatorView()
                         Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spiner)
-                    Alamofire.upload(
+                    AFManager.upload(
                         multipartFormData: { multipartFormData in
                             multipartFormData.append((mail?.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "mail")
                             multipartFormData.append((password?.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "password")
@@ -296,7 +290,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                                             }
                                             if var message = json["mensaje_plain"].string{
                                                 message+=" Por favor inicia sesión."
-                                                self.showAlerWithMessage(title:"Bien",message: message)
+                                                self.alertWithMessage(title:"Bien",message: message)
                                                 self.clearFields()
                                                 self.tab.botonIzquierda?.sendActions(for: .touchUpInside)
                                             }
@@ -304,7 +298,7 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                                         }else{
                                             Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
                                             if let message = json["mensaje_plain"].string{
-                                                self.showAlerWithMessage(title:"Error",message: message)
+                                                self.alertWithMessage(title:"Error",message: message)
                                             }
                                         }
                                     }
@@ -312,16 +306,20 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
                                 }
                                 
                             case .failure(let encodingError):
-                                
+                                if encodingError._code == NSURLErrorTimedOut {
+                                    self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                                }else{
+                                    self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                                }
                                 print(encodingError)
                             }
                     }
                     )
                     }else{
-                        showAlerWithMessage(title:"Error",message: "Debes estar de acuerdo con las Politicas de Privacidad y con los Terminos y Condiciones para poder continuar.")
+                        self.alertWithMessage(title:"Error",message: "Debes estar de acuerdo con las Politicas de Privacidad y con los Terminos y Condiciones para poder continuar.")
                     }
                 }else{
-                    showAlerWithMessage(title:"Error",message: "Las contraseñas no coinciden")
+                    self.alertWithMessage(title:"Error",message: "Las contraseñas no coinciden")
                 }
             }
             
@@ -376,149 +374,184 @@ class AccesoTableViewController: UITableViewController, UITextFieldDelegate {
     }
     
     func loginToSingular(mail:String, password:String){
-        let view = UIView()
-        let label = UILabel()
-        let spiner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spiner)
-        Alamofire.upload(
-            multipartFormData: { multipartFormData in
-                multipartFormData.append((mail.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "mail")
-                multipartFormData.append((password.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "password")
-        },
-            to: Constantes.LOGIN_URL,
-            encodingCompletion: { encodingResult in
-                switch encodingResult {
-                case .success(let upload, _, _):
-                    upload.responseJSON { response in
-                        let json = JSON(response.result.value)
-                        debugPrint(json)
-                        if let status = json["status"].bool {
-                            if (status){
-                                DataUserDefaults.setCurrentlyLogged(flag: true)
-                                if let idSingular = json["id"].int{
-                                    DataUserDefaults.setCurrentId(id: idSingular)
-                                }
-                                if let authtoken = json["token"].string{
-                                    DataUserDefaults.setUserToken(token: authtoken)
-                                    DataUserDefaults.setUserData(email: mail, user: "", password: password)
-                                    DataUserDefaults.setIsLogged(logged: true)
-                                    
-                                }
-                                /*Descomntar para produccion*/
-                                if let primerLogin = json["primerlogin"].bool{
-                                    if(primerLogin){
-                                        self.performSegue(withIdentifier: "MostrarBienvenida", sender: self)
-                                    }else{
-                                        self.performSegue(withIdentifier: "MostrarApp", sender: self)
+        if Utilerias.isConnectedToNetwork(){
+            let view = UIView()
+            let label = UILabel()
+            let spiner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spiner)
+            AFManager.upload(
+                multipartFormData: { multipartFormData in
+                    multipartFormData.append((mail.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "mail")
+                    multipartFormData.append((password.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "password")
+            },
+                to: Constantes.LOGIN_URL,
+                encodingCompletion: { encodingResult in
+                    switch encodingResult {
+                    case .success(let upload, _, _):
+                        upload.responseJSON { response in
+                            let json = JSON(response.result.value)
+                            debugPrint(json)
+                            if let status = json["status"].bool {
+                                if (status){
+                                    DataUserDefaults.setCurrentlyLogged(flag: true)
+                                    if let idSingular = json["id"].int{
+                                        DataUserDefaults.setCurrentId(id: idSingular)
+                                    }
+                                    if let authtoken = json["token"].string{
+                                        DataUserDefaults.setUserToken(token: authtoken)
+                                        DataUserDefaults.setUserData(email: mail, user: "", password: password)
+                                        DataUserDefaults.setIsLogged(logged: true)
+                                        
+                                    }
+                                    /*Descomntar para produccion*/
+                                    if let primerLogin = json["primerlogin"].bool{
+                                        if(primerLogin){
+                                            self.performSegue(withIdentifier: "MostrarBienvenida", sender: self)
+                                        }else{
+                                            self.performSegue(withIdentifier: "MostrarApp", sender: self)
+                                        }
+                                    }
+                                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
+                                }else{
+                                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
+                                    if let message = json["mensaje_plain"].string{
+                                        self.alertWithMessage(title:"Error",message: message)
                                     }
                                 }
-                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
-                            }else{
-                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
-                                if let message = json["mensaje_plain"].string{
-                                    self.showAlerWithMessage(title:"Error",message: message)
-                                    
-                                }
                             }
+                            
                         }
                         
+                    case .failure(let encodingError):
+                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
+                        debugPrint("No se puede :c")
+                        if encodingError._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
                     }
-                    
-                case .failure(let encodingError):
-                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
-                    print(encodingError)
-                }
+            }
+            )
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
-        )
     }
 
     func FBLoginSingular(fbid:String,email:String){
-        let view = UIView()
-        let label = UILabel()
-        let spiner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spiner)
-        Alamofire.upload(
-            multipartFormData: { multipartFormData in
-                multipartFormData.append((email.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "mail")
-                multipartFormData.append((fbid.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "facebook_id")
-        },
-            to: Constantes.LOGIN_URL,
-            encodingCompletion: { encodingResult in
-                switch encodingResult {
-                case .success(let upload, _, _):
-                    upload.responseJSON { response in
-                        let json = JSON(response.result.value)
-                        debugPrint(json)
-                        if let status = json["status"].bool {
-                            debugPrint(status)
-                            if (status){
-                                DataUserDefaults.setCurrentlyLogged(flag: true)
-                                if let idSingular = json["id"].int{
-                                    DataUserDefaults.setCurrentId(id: idSingular)
-                                }
-                                if let authtoken = json["token"].string{
-                                    debugPrint(authtoken)
-                                    DataUserDefaults.setUserToken(token: authtoken)
-                                    DataUserDefaults.setUserData(email: email, user: "", password:"")
-                                    DataUserDefaults.setIsLogged(logged: true)
+        if Utilerias.isConnectedToNetwork(){
+            let view = UIView()
+            let label = UILabel()
+            let spiner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spiner)
+            AFManager.upload(
+                multipartFormData: { multipartFormData in
+                    multipartFormData.append((email.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "mail")
+                    multipartFormData.append((fbid.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "facebook_id")
+            },
+                to: Constantes.LOGIN_URL,
+                encodingCompletion: { encodingResult in
+                    switch encodingResult {
+                    case .success(let upload, _, _):
+                        upload.responseJSON { response in
+                            let json = JSON(response.result.value)
+                            debugPrint(json)
+                            if let status = json["status"].bool {
+                                debugPrint(status)
+                                if (status){
+                                    DataUserDefaults.setCurrentlyLogged(flag: true)
+                                    if let idSingular = json["id"].int{
+                                        DataUserDefaults.setCurrentId(id: idSingular)
+                                    }
+                                    if let authtoken = json["token"].string{
+                                        debugPrint(authtoken)
+                                        DataUserDefaults.setUserToken(token: authtoken)
+                                        DataUserDefaults.setUserData(email: email, user: "", password:"")
+                                        DataUserDefaults.setIsLogged(logged: true)
+                                        
+                                    }
+                                    self.performSegue(withIdentifier: "MostrarBienvenida", sender: self)
                                     
-                                }
-                                self.performSegue(withIdentifier: "MostrarBienvenida", sender: self)
-                                
-                                /*Descomntar para produccion*/
-                                if let primerLogin = json["primerlogin"].bool{
-                                 debugPrint(primerLogin)
-                                 if(primerLogin){
-                                 self.performSegue(withIdentifier: "MostrarBienvenida", sender: self)
-                                 }else{
-                                 self.performSegue(withIdentifier: "MostrarApp", sender: self)
-                                 }
-                                 }
-                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
-                            }else{
-                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
-                                if let message = json["mensaje_plain"].string{
-                                    self.showAlerWithMessage(title:"Error",message: message)
+                                    /*Descomntar para produccion*/
+                                    if let primerLogin = json["primerlogin"].bool{
+                                        debugPrint(primerLogin)
+                                        if(primerLogin){
+                                            self.performSegue(withIdentifier: "MostrarBienvenida", sender: self)
+                                        }else{
+                                            self.performSegue(withIdentifier: "MostrarApp", sender: self)
+                                        }
+                                    }
+                                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
+                                }else{
+                                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
+                                    if let message = json["mensaje_plain"].string{
+                                        self.alertWithMessage(title:"Error",message: message)
+                                    }
                                 }
                             }
+                            
                         }
                         
+                    case .failure(let encodingError):
+                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
+                        if encodingError._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
                     }
-                    
-                case .failure(let encodingError):
-                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spiner)
-                    print(encodingError)
-                }
+            }
+            )
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
-        )
-    
     }
     
     func RecuperarPassword(correo:String){
-        let lView = UIView()
-        let lLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
-        let parameters: Parameters = ["mail": correo]
-        Alamofire.request(Constantes.RECUPERAR_PASS, method: .post, parameters: parameters, encoding: URLEncoding.default)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if status{
-                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                        if let mensaje = json["mensaje_plain"].string{
-                            self.showAlerWithMessage(title: "Bien!", message: mensaje)
+        if Utilerias.isConnectedToNetwork(){
+            let lView = UIView()
+            let lLabel = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+            let parameters: Parameters = ["mail": correo]
+            AFManager.request(Constantes.RECUPERAR_PASS, method: .post, parameters: parameters, encoding: URLEncoding.default)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if status{
+                                Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                                if let mensaje = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "Bien!", message: mensaje)
+                                }
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                                if let mensaje = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "Bien!", message: mensaje)
+                                }
+                            }
                         }
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                        if let mensaje = json["mensaje_plain"].string{
-                            self.showAlerWithMessage(title: "Bien!", message: mensaje)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                         }
+                        break
                     }
-                }
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     

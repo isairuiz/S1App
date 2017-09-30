@@ -22,7 +22,6 @@
 		7D433F3C1F04846F006231E6 /* AgregarFotoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D433F3B1F04846F006231E6 /* AgregarFotoTableViewController.swift */; };
 		7D50FECB1EB39084002E1C80 /* DataUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50FECA1EB39084002E1C80 /* DataUserDefaults.swift */; };
 		7D50FECD1EB3B6FC002E1C80 /* Constantes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50FECC1EB3B6FC002E1C80 /* Constantes.swift */; };
-		7D5391CF1EFCB0A20094FA4F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D5391CE1EFCB0A20094FA4F /* GoogleService-Info.plist */; };
 		7D5B068F1ED16F9F0084AA3C /* YeahTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D5B068E1ED16F9F0084AA3C /* YeahTableViewController.swift */; };
 		7D78CAB11EE701460097BD53 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D78CAB01EE701460097BD53 /* StoreKit.framework */; };
 		7D860E751F1866B200BC02D5 /* SocialMediaShareable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D860E741F1866B200BC02D5 /* SocialMediaShareable.swift */; };
@@ -32,6 +31,7 @@
 		7D949A141EB1B7AC008213C5 /* CustomAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D949A131EB1B7AC008213C5 /* CustomAlert.swift */; };
 		7D9675021EC55FC7008A967D /* MisFotosChildViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9675011EC55FC7008A967D /* MisFotosChildViewController.swift */; };
 		7D99D3D51EEA40CB00C9D62D /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D99D3D41EEA40CB00C9D62D /* test.m */; };
+		7D9CFB881F7F0258003F7C11 /* Reach.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9CFB871F7F0258003F7C11 /* Reach.swift */; };
 		7DA054501EEB9C42009668D0 /* TuSingleChildTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA0544F1EEB9C42009668D0 /* TuSingleChildTableViewController.swift */; };
 		7DA054521EEB9CA4009668D0 /* AfinidadTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA054511EEB9CA4009668D0 /* AfinidadTableViewCell.swift */; };
 		7DA24D301ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA24D2F1ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift */; };
@@ -158,7 +158,6 @@
 		7D433F3B1F04846F006231E6 /* AgregarFotoTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgregarFotoTableViewController.swift; sourceTree = "<group>"; };
 		7D50FECA1EB39084002E1C80 /* DataUserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataUserDefaults.swift; sourceTree = "<group>"; };
 		7D50FECC1EB3B6FC002E1C80 /* Constantes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constantes.swift; sourceTree = "<group>"; };
-		7D5391CE1EFCB0A20094FA4F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7D5B068E1ED16F9F0084AA3C /* YeahTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YeahTableViewController.swift; sourceTree = "<group>"; };
 		7D78CAB01EE701460097BD53 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		7D860E741F1866B200BC02D5 /* SocialMediaShareable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialMediaShareable.swift; sourceTree = "<group>"; };
@@ -169,6 +168,7 @@
 		7D9675011EC55FC7008A967D /* MisFotosChildViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MisFotosChildViewController.swift; sourceTree = "<group>"; };
 		7D99D3D31EEA40CA00C9D62D /* S1ngular-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "S1ngular-Bridging-Header.h"; sourceTree = "<group>"; };
 		7D99D3D41EEA40CB00C9D62D /* test.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; };
+		7D9CFB871F7F0258003F7C11 /* Reach.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reach.swift; sourceTree = "<group>"; };
 		7DA0544F1EEB9C42009668D0 /* TuSingleChildTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TuSingleChildTableViewController.swift; sourceTree = "<group>"; };
 		7DA054511EEB9CA4009668D0 /* AfinidadTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AfinidadTableViewCell.swift; sourceTree = "<group>"; };
 		7DA24D2F1ED3C9D000E9BC52 /* MisFotosChildTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MisFotosChildTableViewController.swift; sourceTree = "<group>"; };
@@ -388,7 +388,6 @@
 				AB2465991DB83DC60010A814 /* Assets.xcassets */,
 				AB24659B1DB83DC60010A814 /* LaunchScreen.storyboard */,
 				AB24659E1DB83DC60010A814 /* Info.plist */,
-				7D5391CE1EFCB0A20094FA4F /* GoogleService-Info.plist */,
 				AB2465961DB83DC60010A814 /* S1ngular.xcdatamodeld */,
 			);
 			path = S1ngular;
@@ -453,6 +452,7 @@
 				7D99D3D31EEA40CA00C9D62D /* S1ngular-Bridging-Header.h */,
 				7D860E741F1866B200BC02D5 /* SocialMediaShareable.swift */,
 				7DC6123B1F3AC42500C4C48E /* NotificationAlert.swift */,
+				7D9CFB871F7F0258003F7C11 /* Reach.swift */,
 			);
 			name = Common;
 			sourceTree = "<group>";
@@ -695,7 +695,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AB2465D11DB9CFDA0010A814 /* Brandon_bld.otf in Resources */,
-				7D5391CF1EFCB0A20094FA4F /* GoogleService-Info.plist in Resources */,
 				AB2465D21DB9CFDA0010A814 /* Brandon_blk.otf in Resources */,
 				AB2465D31DB9CFDA0010A814 /* Brandon_light.otf in Resources */,
 				AB2465D41DB9CFDA0010A814 /* Brandon_med.otf in Resources */,
@@ -939,6 +938,7 @@
 				AB0201851E9F1EE900EA505E /* BancoTableViewController.swift in Sources */,
 				AB15CFF11DBA29FD002ED6D1 /* BienvenidaPaso1TableViewController.swift in Sources */,
 				7D5B068F1ED16F9F0084AA3C /* YeahTableViewController.swift in Sources */,
+				7D9CFB881F7F0258003F7C11 /* Reach.swift in Sources */,
 				AB09AED31DBAF6A30050F882 /* BienvenidaPaso2ViewController.swift in Sources */,
 				7D2399E01EC2A46C00996179 /* EditarMiPerfil2TableViewController.swift in Sources */,
 				7DDD16F51EDBDC60004347DB /* FotosS1ViewController.swift in Sources */,

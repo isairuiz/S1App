@@ -511,40 +511,53 @@ class DetalleTestTableViewController: UITableViewController {
     }
     
     func responderTestS1(idTest:Int){
-        let loadingView = UIView()
-        let loadinLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadinLabel, spinner: spinner)
-        debugPrint(self.idsRespuestasTest)
-        let parameters: Parameters = [
-            "id_test": idTest,
-            "respuestas": self.idsRespuestasTest
-        ]
-        Alamofire.request(Constantes.RESPONDER_TEST, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if status{
-                        DataUserDefaults.setTestPendiente(flag: false)
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "gotoResultado"), object: nil)
-                    }else{
-                        if let message = json["mensaje_plain"].string{
-                            self.showAlertWithMessage(title: "Error", message: message)
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let loadinLabel = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadinLabel, spinner: spinner)
+            debugPrint(self.idsRespuestasTest)
+            let parameters: Parameters = [
+                "id_test": idTest,
+                "respuestas": self.idsRespuestasTest
+            ]
+            AFManager.request(Constantes.RESPONDER_TEST, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if status{
+                                DataUserDefaults.setTestPendiente(flag: false)
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "gotoResultado"), object: nil)
+                            }else{
+                                if let message = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "Error", message: message)
+                                }
+                                
+                            }
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadinLabel, spinner: spinner)
                         }
-                        
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadinLabel, spinner: spinner)
-                }
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
     }
     
-    func showAlertWithMessage(title:String,message:String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
+    
     
     
     func comprarTest(id:Int){
@@ -560,7 +573,7 @@ class DetalleTestTableViewController: UITableViewController {
                         self.rehacerPantalla()
                     }else{
                         if let message = json["mensaje_plain"].string{
-                            self.showAlertWithMessage(title: "Error", message: message)
+                            self.alertWithMessage(title: "Error", message: message)
                         }
                     }
                 }

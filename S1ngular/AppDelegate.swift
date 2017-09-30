@@ -15,6 +15,9 @@ import FirebaseInstanceID
 import UserNotifications
 import SwiftyJSON
 import MZFormSheetPresentationController
+import Alamofire
+
+var AFManager = SessionManager()
 
 //import OneSignal
 
@@ -22,6 +25,7 @@ import MZFormSheetPresentationController
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate,MessagingDelegate {
 
     var window: UIWindow?
+    
     
     func messaging(_ messaging: Messaging, didRefreshRegistrationToken fcmToken: String) {
         debugPrint("--->messaging:\(messaging)")
@@ -42,8 +46,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 15
+        configuration.timeoutIntervalForResource = 15
+        AFManager = Alamofire.SessionManager(configuration: configuration)
         
+        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+        /*UNCOMMENT THIS FOR PRODUCTION OR COMMENT FOR SIMULATOR TESTING*/
         /*Firebase shit*/
         FirebaseApp.configure()
         Messaging.messaging().delegate = self

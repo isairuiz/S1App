@@ -337,112 +337,147 @@ class CheckInsTableViewController: UITableViewController {
     }
     
     func obtenerCheckinsOtros(){
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        Alamofire.request(Constantes.LISTAR_CHECKS_OTROS, headers: self.headers)
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if !json["checkins"].isEmpty{
-                            self.otrosCheckins = json["checkins"].arrayValue
-                            for checkin in self.otrosCheckins{
-                                let id = checkin["id"].int
-                                let id_singular = checkin["id_singular"].int
-                                let nombre = checkin["nombre"].string
-                                let edad = checkin["edad"].int
-                                let imagen = checkin["imagen"].string
-                                let foto_visible = checkin["foto_visible"].floatValue
-                                let fecha = checkin["fecha"].string
-                                let lat = checkin["latitud"].double
-                                let long = checkin["longitud"].double
-                                let distancia = checkin["distancia"].intValue
-                                let titulo = checkin["titulo"].string
-                                let contenido = checkin["contenido"].string
-                                let cal = checkin["calificacion"].int
-                                var urlFoto = Constantes.BASE_URL
-                                urlFoto += imagen!
-                                self.listaCercanos.append(
-                                    GeneralTableItem(id: id!, nombre:nombre!, distancia: "\(distancia) Metros", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: urlFoto, badge: "0", compartir: false, resaltar: false, restriccion: foto_visible)
-                                )
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+            AFManager.request(Constantes.LISTAR_CHECKS_OTROS, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if !json["checkins"].isEmpty{
+                                    self.otrosCheckins = json["checkins"].arrayValue
+                                    for checkin in self.otrosCheckins{
+                                        let id = checkin["id"].int
+                                        let id_singular = checkin["id_singular"].int
+                                        let nombre = checkin["nombre"].string
+                                        let edad = checkin["edad"].int
+                                        let imagen = checkin["imagen"].string
+                                        let foto_visible = checkin["foto_visible"].floatValue
+                                        let fecha = checkin["fecha"].string
+                                        let lat = checkin["latitud"].double
+                                        let long = checkin["longitud"].double
+                                        let distancia = checkin["distancia"].intValue
+                                        let titulo = checkin["titulo"].string
+                                        let contenido = checkin["contenido"].string
+                                        let cal = checkin["calificacion"].int
+                                        var urlFoto = Constantes.BASE_URL
+                                        urlFoto += imagen!
+                                        self.listaCercanos.append(
+                                            GeneralTableItem(id: id!, nombre:nombre!, distancia: "\(distancia) Metros", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: urlFoto, badge: "0", compartir: false, resaltar: false, restriccion: foto_visible)
+                                        )
+                                    }
+                                }
+                                self.tableView.reloadData()
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                            }else{
+                                self.tableView.reloadData()
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                             }
                         }
-                        self.tableView.reloadData()
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                    }else{
-                        self.tableView.reloadData()
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     func obtenerMisCheckins(){
-        let fotoPerfilUrl = DataUserDefaults.getFotoPerfilUrl()
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        Alamofire.request(Constantes.MIS_CHECKINS, headers: self.headers)
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if !json["checkins"]["singular"].isEmpty{
-                            self.checkins = json["checkins"]["singular"].arrayValue
-                            for checkin in self.checkins{
-                                let idCheck  = checkin["id"].int
-                                let fecha = checkin["fecha"].string
-                                _ = checkin["latitud"].double
-                                _ = checkin["longitud"].double
-                                let titulo = checkin["titulo"].string
-                                let contenido = checkin["contenido"].string
-                                let cal = checkin["calificacion"].int
-                                
-                                self.listaMisCheckIns.append(
-                                    GeneralTableItem(id: idCheck!, nombre:"Yo", distancia: "", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: fotoPerfilUrl, badge: "0", compartir: false, resaltar: false, restriccion: 1.0)
-                                )
+        if Utilerias.isConnectedToNetwork(){
+            let fotoPerfilUrl = DataUserDefaults.getFotoPerfilUrl()
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+            AFManager.request(Constantes.MIS_CHECKINS, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if !json["checkins"]["singular"].isEmpty{
+                                    self.checkins = json["checkins"]["singular"].arrayValue
+                                    for checkin in self.checkins{
+                                        let idCheck  = checkin["id"].int
+                                        let fecha = checkin["fecha"].string
+                                        _ = checkin["latitud"].double
+                                        _ = checkin["longitud"].double
+                                        let titulo = checkin["titulo"].string
+                                        let contenido = checkin["contenido"].string
+                                        let cal = checkin["calificacion"].int
+                                        
+                                        self.listaMisCheckIns.append(
+                                            GeneralTableItem(id: idCheck!, nombre:"Yo", distancia: "", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: fotoPerfilUrl, badge: "0", compartir: false, resaltar: false, restriccion: 1.0)
+                                        )
+                                    }
+                                    self.tableView.reloadData()
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                                }
+                                if !json["checkins"]["amigos"].isEmpty{
+                                    let checkamigos:[JSON] = json["checkins"]["amigos"].arrayValue
+                                    for check in checkamigos{
+                                        self.checkins.append(check)
+                                        let id = check["id"].int
+                                        let id_singular = check["id_singular"].int
+                                        let nombre = check["nombre"].string
+                                        let edad = check["edad"].int
+                                        let image = check["imagen"].string
+                                        let foto_visible = check["foto_visible"].floatValue
+                                        debugPrint("wtf el blur: \(foto_visible)")
+                                        let fecha = check["fecha"].string
+                                        let lat = check["latitud"].double
+                                        let long = check["longitud"].double
+                                        let titulo = check["titulo"].string
+                                        let contenido = check["contenido"].string
+                                        let calif = check["calificacion"] != JSON.null && !check["calificacion"].isEmpty ? check["calificacion"].int : 0
+                                        var urlFoto = Constantes.BASE_URL
+                                        urlFoto += image!
+                                        self.listaMisCheckIns.append(
+                                            GeneralTableItem(id: id!, nombre:nombre!, distancia: "", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: urlFoto, badge: "0", compartir: false, resaltar: false, restriccion: foto_visible)
+                                        )
+                                    }
+                                }
+                                self.tableView.reloadData()
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                            }else{
+                                self.tableView.reloadData()
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                             }
-                            self.tableView.reloadData()
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         }
-                        if !json["checkins"]["amigos"].isEmpty{
-                            let checkamigos:[JSON] = json["checkins"]["amigos"].arrayValue
-                            for check in checkamigos{
-                                self.checkins.append(check)
-                                let id = check["id"].int
-                                let id_singular = check["id_singular"].int
-                                let nombre = check["nombre"].string
-                                let edad = check["edad"].int
-                                let image = check["imagen"].string
-                                let foto_visible = check["foto_visible"].floatValue
-                                debugPrint("wtf el blur: \(foto_visible)")
-                                let fecha = check["fecha"].string
-                                let lat = check["latitud"].double
-                                let long = check["longitud"].double
-                                let titulo = check["titulo"].string
-                                let contenido = check["contenido"].string
-                                let calif = check["calificacion"] != JSON.null && !check["calificacion"].isEmpty ? check["calificacion"].int : 0
-                                var urlFoto = Constantes.BASE_URL
-                                urlFoto += image!
-                                self.listaMisCheckIns.append(
-                                    GeneralTableItem(id: id!, nombre:nombre!, distancia: "", tiempo: fecha!, lugar: titulo!, descripcion: contenido!, avatar: urlFoto, badge: "0", compartir: false, resaltar: false, restriccion: foto_visible)
-                                )
-                            }
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                         }
-                        self.tableView.reloadData()
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                    }else{
-                        self.tableView.reloadData()
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        break
                     }
-                }
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {

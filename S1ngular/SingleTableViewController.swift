@@ -229,37 +229,53 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
     }
     
     func tryDesbloquearFoto(){
-        
-        let lView = UIView()
-        let lLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
-        let parameters: Parameters = ["id": self.idPerfil]
-        Alamofire.request(Constantes.COMPRAR_FOTO, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if status{
-                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                        if let isVisible = json["foto_visible"].bool{
-                            if isVisible{
-                                /*quitar el blur de la foto*/
-                                self.imagePerifl.downloadedFrom(link: self.urlFotoPerfil,withBlur:false,maxBlur:0.0)
-                            }
-                            if let mensaje = json["mensaje_plain"].string{
-                                self.showAlertWithMessage(title: "¡Espera!", message: mensaje)
+        if Utilerias.isConnectedToNetwork(){
+            let lView = UIView()
+            let lLabel = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+            let parameters: Parameters = ["id": self.idPerfil]
+            AFManager.request(Constantes.COMPRAR_FOTO, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if status{
+                                Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                                if let isVisible = json["foto_visible"].bool{
+                                    if isVisible{
+                                        /*quitar el blur de la foto*/
+                                        self.imagePerifl.downloadedFrom(link: self.urlFotoPerfil,withBlur:false,maxBlur:0.0)
+                                    }
+                                    if let mensaje = json["mensaje_plain"].string{
+                                        self.alertWithMessage(title: "¡Espera!", message: mensaje)
+                                    }
+                                }
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                                if let errorMessage = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                                }
                             }
                         }
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                        if let errorMessage = json["mensaje_plain"].string{
-                            self.showAlertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                         }
+                        break
                     }
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     
@@ -341,45 +357,56 @@ class SingleTableViewController: UITableViewController,UIGestureRecognizerDelega
     
     
     func responderS1(respuesta:Int,id:Int){
-        let lView = UIView()
-        let lLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
-        let parameters: Parameters = [
-            "id": id,
-            "respuesta":respuesta
-        ]
-        Alamofire.request(Constantes.RESPONDER_S1, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if status{
-                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                        /*if respuesta == 0{
-                            //
-                            
-                        }else{
-                            //self.performSegue(withIdentifier: "gotoYeah", sender: nil)
-                        }*/
-                        _ = self.navigationController?.popViewController(animated: true)
-                        
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                        if let message = json["mensaje_plain"].string{
-                            self.showAlertWithMessage(title: "Error!", message: message)
+        if Utilerias.isConnectedToNetwork(){
+            let lView = UIView()
+            let lLabel = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+            let parameters: Parameters = [
+                "id": id,
+                "respuesta":respuesta
+            ]
+            AFManager.request(Constantes.RESPONDER_S1, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if status{
+                                Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                                /*if respuesta == 0{
+                                 //
+                                 
+                                 }else{
+                                 //self.performSegue(withIdentifier: "gotoYeah", sender: nil)
+                                 }*/
+                                _ = self.navigationController?.popViewController(animated: true)
+                                
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                                if let message = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "Error!", message: message)
+                                }
+                                
+                            }
                         }
-                        
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
-    }
-    
-    func showAlertWithMessage(title:String,message:String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+        
     }
 
     // MARK: - Table view data source

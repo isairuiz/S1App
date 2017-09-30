@@ -7,8 +7,6 @@
 //
 
 import UIKit
-import Alamofire
-import SwiftyJSON
 
 class BienvenidaPaso3ViewController: UIViewController {
 

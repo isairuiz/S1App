@@ -59,6 +59,28 @@ class Utilerias {
         return current
     }
     
+    static func alertWithMessageOnTableView(title:String,message:String,view:UITableViewController){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
+        view.present(alert, animated: true, completion: nil)
+    }
+    static func alertWithMessageOnView(title:String,message:String,view:UIViewController){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
+        view.present(alert, animated: true, completion: nil)
+    }
+    
+    static func isConnectedToNetwork()->Bool{
+        let status = Reach().connectionStatus()
+        switch status {
+        case .unknown, .offline:
+            return false
+            break
+        case .online(.wwan), .online(.wiFi):
+            return true
+            break
+        }
+    }
     
     static func setCustomLoadingScreen(loadingView:UIView,tableView:UITableView,loadingLabel:UILabel,spinner:UIActivityIndicatorView) {
         UIApplication.shared.beginIgnoringInteractionEvents()
@@ -178,6 +200,15 @@ public extension UIImageView {
         debugPrint(url)
         downloadedFrom(url: url, contentMode: mode, withBlur:withBlur, maxBlur:maxBlur)
     }
+}
+extension UIViewController {
+    func alertWithMessage(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let OKAction = UIAlertAction(title: "Continuar", style: .default, handler: nil)
+        alertController.addAction(OKAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
 }
 
 

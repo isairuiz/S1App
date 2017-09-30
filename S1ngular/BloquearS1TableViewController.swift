@@ -49,41 +49,53 @@ class BloquearS1TableViewController: UITableViewController {
     
     
     func bloquearUsuario(motivo:Int){
-        let lView = UIView()
-        let lLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
-        let parameters: Parameters = [
-            "id_bloqueado": idPersona,
-            "motivo": motivo
-        ]
-        Alamofire.request(Constantes.BLOQUEAR_PERFIL, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                    if status{
-                        if let mensaje = json["mensaje_plain"].string{
-                           self.showAlertWithMessage(title: "¡Bien!", message: mensaje)
+        if Utilerias.isConnectedToNetwork(){
+            let lView = UIView()
+            let lLabel = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+            let parameters: Parameters = [
+                "id_bloqueado": idPersona,
+                "motivo": motivo
+            ]
+            AFManager.request(Constantes.BLOQUEAR_PERFIL, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                            if status{
+                                if let mensaje = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "¡Bien!", message: mensaje)
+                                }
+                            }else{
+                                if let errorMessage = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                                }
+                            }
                         }
-                    }else{
-                        if let errorMessage = json["mensaje_plain"].string{
-                            
-                            self.showAlertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                         }
+                        break
                     }
                     
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
-    func showAlertWithMessage(title:String,message:String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
+    
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1{

@@ -143,47 +143,63 @@ class ResultadoTableViewController: UITableViewController{
     
     
     func verMiResultado(idTest:String){
-        let view = UIView()
-        let label = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spinner)
-        var urlFinal = Constantes.VER_RESULTADO_TEST
-        urlFinal += idTest
-        Alamofire.request(urlFinal, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if status{
-                        
-                        if let nombre = json["resultado"]["nombre_test"].string{
-                            self.nombreTest.text = nombre
+        if Utilerias.isConnectedToNetwork(){
+            let view = UIView()
+            let label = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spinner)
+            var urlFinal = Constantes.VER_RESULTADO_TEST
+            urlFinal += idTest
+            AFManager.request(urlFinal, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if status{
+                                
+                                if let nombre = json["resultado"]["nombre_test"].string{
+                                    self.nombreTest.text = nombre
+                                }
+                                if let imagen = json["resultado"]["imagenresultado"].string{
+                                    var url = Constantes.BASE_URL
+                                    url += imagen
+                                    self.urlImagenResultadoTest = url
+                                    self.imagenTest.downloadedFrom(link: url,withBlur:false,maxBlur:0)
+                                }
+                                if let puntaje = json["resultado"]["puntaje"].int{
+                                    
+                                }
+                                if let ambito = json["resultado"]["ambito"].string{
+                                    self.categoriaTest.text = ambito
+                                }
+                                if let resultadoNombre = json["resultado"]["resultado"].string{
+                                    self.tituloResultadoTest.text = resultadoNombre
+                                }
+                                if let contenido = json["resultado"]["contenido"].string{
+                                    self.descripcionResultadoTEst.text = contenido
+                                }
+                                self.tableView.reloadData()
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
+                            }
                         }
-                        if let imagen = json["resultado"]["imagenresultado"].string{
-                            var url = Constantes.BASE_URL
-                            url += imagen
-                            self.urlImagenResultadoTest = url
-                            self.imagenTest.downloadedFrom(link: url,withBlur:false,maxBlur:0)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                         }
-                        if let puntaje = json["resultado"]["puntaje"].int{
-                            
-                        }
-                        if let ambito = json["resultado"]["ambito"].string{
-                            self.categoriaTest.text = ambito
-                        }
-                        if let resultadoNombre = json["resultado"]["resultado"].string{
-                            self.tituloResultadoTest.text = resultadoNombre
-                        }
-                        if let contenido = json["resultado"]["contenido"].string{
-                            self.descripcionResultadoTEst.text = contenido
-                        }
-                        self.tableView.reloadData()
-                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
+                        break
                     }
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
     }
     
@@ -225,38 +241,55 @@ class ResultadoTableViewController: UITableViewController{
     
     
     func resetearTest(idTest:Int){
-        let lView = UIView()
-        let lLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
-        let parameters: Parameters = ["id": idTest]
-        Alamofire.request(Constantes.RESET_TEST, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                    if status{
-                        /*hacer aqui la funcionalidad para regresar e ir a contestar test.*/
-                        DataUserDefaults.setJsonTest(json: json.description)
-                        DataUserDefaults.setAdquirido(flag: true)
-                        
-                        let viewControllers: [UIViewController] = self.navigationController!.viewControllers
-                        for aViewController in viewControllers {
-                            if aViewController is TestsTableViewController {
-                                self.navigationController!.popToViewController(aViewController, animated: true)
+        if Utilerias.isConnectedToNetwork(){
+            let lView = UIView()
+            let lLabel = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+            let parameters: Parameters = ["id": idTest]
+            AFManager.request(Constantes.RESET_TEST, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                            if status{
+                                /*hacer aqui la funcionalidad para regresar e ir a contestar test.*/
+                                DataUserDefaults.setJsonTest(json: json.description)
+                                DataUserDefaults.setAdquirido(flag: true)
+                                
+                                let viewControllers: [UIViewController] = self.navigationController!.viewControllers
+                                for aViewController in viewControllers {
+                                    if aViewController is TestsTableViewController {
+                                        self.navigationController!.popToViewController(aViewController, animated: true)
+                                    }
+                                }
+                                
+                                
+                            }else{
+                                if let errorMessage = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "Error", message: errorMessage)
+                                }
                             }
                         }
-                        
-                        
-                    }else{
-                        if let errorMessage = json["mensaje_plain"].string{
-                            
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                         }
+                        break
                     }
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
 

@@ -54,39 +54,56 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
     
     
     func getUserData(){
-        let view = UIView()
-        let label = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spinner)
-        
-        Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
-            .validate(contentType: ["application/json"])
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        debugPrint("..........,....................................................")
-                        if !json["perfil"]["fotografias"].isEmpty{
-                            self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
-                            debugPrint(self.fotitos)
-                            if !self.fotitos.isEmpty{
-                                self.setPerfilFoto()
-                                self.myCollection.reloadData()
-                                self.tableView.reloadData()
+        if Utilerias.isConnectedToNetwork(){
+            let view = UIView()
+            let label = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spinner)
+            
+            AFManager.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
+                .validate(contentType: ["application/json"])
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                debugPrint("..........,....................................................")
+                                if !json["perfil"]["fotografias"].isEmpty{
+                                    self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
+                                    debugPrint(self.fotitos)
+                                    if !self.fotitos.isEmpty{
+                                        self.setPerfilFoto()
+                                        self.myCollection.reloadData()
+                                        self.tableView.reloadData()
+                                    }
+                                    
+                                }else{
+                                    self.inforMessage.isHidden = false
+                                    debugPrint("No hay fotos...")
+                                }
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
                             }
-                            
-                        }else{
-                            self.inforMessage.isHidden = false
-                            debugPrint("No hay fotos...")
                         }
-                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
-                
+                    
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
     }
     
@@ -101,64 +118,91 @@ class MisFotosChildTableViewController: UITableViewController,UICollectionViewDa
     }
     
     func cambiarIdFotoPerfil(idFoto: String){
-        let view = UIView()
-        let label = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spinner)
-        let params: Parameters = [
-            "id_fotografia": idFoto,
-        ]
-        
-        Alamofire.request(Constantes.DEF_FOTO_PERFIL_URL, method: .post, parameters:params, encoding: URLEncoding.httpBody,headers:self.headers)
-            .responseJSON{response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
-                    if(status){
-                        self.getUserData()
-                        
-                    }else{
-                        if var message = json["mensaje_plain"].string{
-                            self.showAlerWithMessage(title: "¡Error!",message: message )
+        if Utilerias.isConnectedToNetwork(){
+            let view = UIView()
+            let label = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: view, tableView: self.tableView, loadingLabel: label, spinner: spinner)
+            let params: Parameters = [
+                "id_fotografia": idFoto,
+                ]
+            
+            AFManager.request(Constantes.DEF_FOTO_PERFIL_URL, method: .post, parameters:params, encoding: URLEncoding.httpBody,headers:self.headers)
+                .responseJSON{response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: label, spinner: spinner)
+                            if(status){
+                                self.getUserData()
+                                
+                            }else{
+                                if var message = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "¡Error!",message: message )
+                                }
+                            }
                         }
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
-                
+                    
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
-
     }
     
     func eliminarFotografia(idFoto:Int){
-        let lView = UIView()
-        let lLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
-        let parameters: Parameters = ["id_fotografia": idFoto]
-        Alamofire.request(Constantes.ELIMINAR_FOTO, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                    if status{
-                        let mensaje = json["mensaje_plain"].string
-                        self.showAlerWithMessage(title: "Bien!", message: mensaje!)
-                        self.getUserData()
-                    }else{
-                        if let errorMessage = json["mensaje_plain"].string{
-                            self.showAlerWithMessage(title: "Error", message: errorMessage)
+        if Utilerias.isConnectedToNetwork(){
+            let lView = UIView()
+            let lLabel = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+            let parameters: Parameters = ["id_fotografia": idFoto]
+            AFManager.request(Constantes.ELIMINAR_FOTO, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                            if status{
+                                let mensaje = json["mensaje_plain"].string
+                                self.alertWithMessage(title: "Bien!", message: mensaje!)
+                                self.getUserData()
+                            }else{
+                                if let errorMessage = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "Error", message: errorMessage)
+                                }
+                            }
                         }
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
-    }
-    
-    func showAlerWithMessage(title:String,message:String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {

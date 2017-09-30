@@ -91,136 +91,181 @@ class ChatS1TableViewController: UITableViewController {
     }
     
     func ListarMensajesChat(paginado:Int){
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        var url:String = Constantes.LISTAR_MENSAJES_CHAT
-        url += "id=\(DataUserDefaults.getIdVerPerfil())"
-        url += "&paginado=\(paginado)"
-        debugPrint(url)
-        Alamofire.request(url, headers: self.headers)
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if !json["mensajes"].isEmpty{
-                            self.mensajesChat = self.mensajesChat.reversed()
-                            self.mensajesChat += json["mensajes"].arrayValue
-                            self.mensajesChat = self.mensajesChat.reversed()
-                            self.listaMessages.removeAll()
-                            for mensaje in self.mensajesChat{
-                                //let id = mensaje["id"].int
-                                //let fecha = mensaje["fecha"].string
-                                let idEmisor = mensaje["singular1"].int
-                                let idReceptor = mensaje["singular2"].int
-                                var contenido : String = ""
-                                var soundUrl : String = ""
-                                if let cont = mensaje["contenido"].string{
-                                    contenido = cont
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+            var url:String = Constantes.LISTAR_MENSAJES_CHAT
+            url += "id=\(DataUserDefaults.getIdVerPerfil())"
+            url += "&paginado=\(paginado)"
+            debugPrint(url)
+            AFManager.request(url, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if !json["mensajes"].isEmpty{
+                                    self.mensajesChat = self.mensajesChat.reversed()
+                                    self.mensajesChat += json["mensajes"].arrayValue
+                                    self.mensajesChat = self.mensajesChat.reversed()
+                                    self.listaMessages.removeAll()
+                                    for mensaje in self.mensajesChat{
+                                        //let id = mensaje["id"].int
+                                        //let fecha = mensaje["fecha"].string
+                                        let idEmisor = mensaje["singular1"].int
+                                        let idReceptor = mensaje["singular2"].int
+                                        var contenido : String = ""
+                                        var soundUrl : String = ""
+                                        if let cont = mensaje["contenido"].string{
+                                            contenido = cont
+                                        }
+                                        if let audio = mensaje["multimedia"].string{
+                                            soundUrl = audio
+                                        }
+                                        //let _ = mensaje["leido"].bool
+                                        self.listaMessages.append(
+                                            MessageItem(text: contenido, image: nil, date: NSDate(), id: idReceptor!, audioUrl: soundUrl, fromNetwork:true, loadingCell:false)
+                                        )
+                                    }
+                                    self.isPaginando = false
+                                    self.tableView.reloadData()
+                                    if self.numPaginado >= 2{
+                                        
+                                    }else{
+                                        self.tableViewScrollToBottom(animated: false)
+                                    }
+                                    
+                                }else{
+                                    self.numPaginado -= 1
                                 }
-                                if let audio = mensaje["multimedia"].string{
-                                    soundUrl = audio
-                                }
-                                //let _ = mensaje["leido"].bool
-                                self.listaMessages.append(
-                                    MessageItem(text: contenido, image: nil, date: NSDate(), id: idReceptor!, audioUrl: soundUrl, fromNetwork:true, loadingCell:false)
-                                )
-                            }
-                            self.isPaginando = false
-                            self.tableView.reloadData()
-                            if self.numPaginado >= 2{
-                                
+                                self.isPaginando = false
+                                self.tableView.reloadData()
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                             }else{
-                                self.tableViewScrollToBottom(animated: false)
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                                if let mensaje = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "Error", message: mensaje)
+                                }
                             }
-                            
+                        }
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
                         }else{
-                            self.numPaginado -= 1
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                         }
-                        self.isPaginando = false
-                        self.tableView.reloadData()
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                        if let mensaje = json["mensaje_plain"].string{
-                            self.showAlertWithMessage(title: "Error", message: mensaje)
-                        }
-                        
+                        break
                     }
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     func enviarMensajeMultimedia(audioUrl:URL,receptor:Int){
-        self.pintarCeldaCargadora()
-        let idString:String = String(receptor)
-        let audioName = "audio"+Utilerias.getCurrentDateAndTime()+".m4a"
-        var audioData = Data()
-        do{
-            audioData = try Data(contentsOf: audioUrl)
-        }catch{
-            debugPrint(error)
-        }
-        
-        Alamofire.upload(
-            multipartFormData: { multipartFormData in
-                multipartFormData.append(("necesita contenido".data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "contenido")
-                multipartFormData.append((idString.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "id_singular")
-                multipartFormData.append(audioData, withName: "multimedia", fileName: audioName, mimeType: "audio/x-m4a")
-        },
-            to: Constantes.ENVIAR_MENSAJE, headers:self.headers,
-            encodingCompletion: { encodingResult in
-                switch encodingResult {
-                case .success(let upload, _, _):
-                    upload.responseJSON { response in
-                        let json = JSON(response.result.value)
-                        debugPrint(json)
-                        if let status = json["status"].bool {
-                            if (status){
-                                
-                                self.pintarMensajeEnviado(mensaje:"",id: receptor, audioUrl: audioUrl.description,loadingCell: true)
-                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
-                            }else{
-                                
-                                if let message = json["mensaje_plain"].string{
-                                    self.showAlertWithMessage(title: "Error", message: message)
+        if Utilerias.isConnectedToNetwork(){
+            self.pintarCeldaCargadora()
+            let idString:String = String(receptor)
+            let audioName = "audio"+Utilerias.getCurrentDateAndTime()+".m4a"
+            var audioData = Data()
+            do{
+                audioData = try Data(contentsOf: audioUrl)
+            }catch{
+                debugPrint(error)
+            }
+            
+            AFManager.upload(
+                multipartFormData: { multipartFormData in
+                    multipartFormData.append(("necesita contenido".data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "contenido")
+                    multipartFormData.append((idString.data(using: String.Encoding.utf8, allowLossyConversion: false))!, withName: "id_singular")
+                    multipartFormData.append(audioData, withName: "multimedia", fileName: audioName, mimeType: "audio/x-m4a")
+            },
+                to: Constantes.ENVIAR_MENSAJE, headers:self.headers,
+                encodingCompletion: { encodingResult in
+                    switch encodingResult {
+                    case .success(let upload, _, _):
+                        upload.responseJSON { response in
+                            let json = JSON(response.result.value)
+                            debugPrint(json)
+                            if let status = json["status"].bool {
+                                if (status){
+                                    
+                                    self.pintarMensajeEnviado(mensaje:"",id: receptor, audioUrl: audioUrl.description,loadingCell: true)
+                                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
+                                }else{
+                                    
+                                    if let message = json["mensaje_plain"].string{
+                                        self.alertWithMessage(title: "Error", message: message)
+                                    }
                                 }
                             }
                         }
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
                     }
-                case .failure(let encodingError):
-                    print(encodingError)
-                    self.showAlertWithMessage(title: "Error", message: encodingError.localizedDescription)
-                }
+            }
+            )
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
-        )
+        
     }
     
     func enviarMensaje(mensaje:String,receptor:Int){
-        
-        let parameters: Parameters = ["id_singular": receptor,
-                                      "contenido": mensaje]
-        Alamofire.request(Constantes.ENVIAR_MENSAJE, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if status{
-                        let id = json["id"].int
-                        self.pintarMensajeEnviado(mensaje:mensaje,id: receptor, audioUrl: "",loadingCell:false)
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
-                    }else{
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
-                        if let mensaje = json["mensaje_plain"].string{
-                            self.showAlertWithMessage(title: "Error", message: mensaje)
+        if Utilerias.isConnectedToNetwork(){
+            let parameters: Parameters = ["id_singular": receptor,
+                                          "contenido": mensaje]
+            AFManager.request(Constantes.ENVIAR_MENSAJE, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if status{
+                                let id = json["id"].int
+                                self.pintarMensajeEnviado(mensaje:mensaje,id: receptor, audioUrl: "",loadingCell:false)
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
+                            }else{
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unlockTextField"), object: nil)
+                                if let mensaje = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "Error", message: mensaje)
+                                }
+                            }
                         }
+                        break
+                    case .failure(let error):
+                        //self.alertWithMessage(title: "Error", message: encodingError.localizedDescription)
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
+                        
                     }
-                }
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
+        
     }
     
     func pintarMensajeEnviado(mensaje:String, id:Int, audioUrl:String, loadingCell:Bool){
@@ -248,12 +293,6 @@ class ChatS1TableViewController: UITableViewController {
             self.tableViewScrollToBottom(animated: false)
         }
         
-    }
-    
-    func showAlertWithMessage(title:String,message:String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
     }
     
     

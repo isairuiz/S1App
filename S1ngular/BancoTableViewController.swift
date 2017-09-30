@@ -152,63 +152,99 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
     }
     
     func comprarPaqueteS1(id:Int){
-        let lView = UIView()
-        let lLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
-        let parameters: Parameters = ["id_paquete": id]
-        Alamofire.request(Constantes.COMPRAR_PAQUETE, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if status{
-                        if let saldos1 = json["saldo"].int{
-                            self.s1credits.text = "\(saldos1) S1 Credits"
-                            DataUserDefaults.setSaldo(saldo: saldos1)
-                            Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+        if Utilerias.isConnectedToNetwork(){
+            let lView = UIView()
+            let lLabel = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+            let parameters: Parameters = ["id_paquete": id]
+            AFManager.request(Constantes.COMPRAR_PAQUETE, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if status{
+                                if let saldos1 = json["saldo"].int{
+                                    self.s1credits.text = "\(saldos1) S1 Credits"
+                                    DataUserDefaults.setSaldo(saldo: saldos1)
+                                    Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                                }
+                            }else{
+                                if let errorMessage = json["mensaje_plain"].string{
+                                    Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                                    self.alertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                                }
+                            }
                         }
-                    }else{
-                        if let errorMessage = json["mensaje_plain"].string{
-                            Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                            self.showAlertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                         }
+                        break
                     }
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     func canjearCupon(cupon:String){
-        let lView = UIView()
-        let lLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
-        let parameters: Parameters = ["codigo": cupon]
-        Alamofire.request(Constantes.CANJEAR_CUPON, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if status{
-                        if let saldo = json["saldo"].int{
-                            self.s1credits.text = "\(saldo) S1 Credits"
-                            DataUserDefaults.setSaldo(saldo: saldo)
-                            if let message = json["mensaje_plain"].string{
-                                self.showAlertWithMessage(title: "¡Bien!", message: message)
-                                Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+        if Utilerias.isConnectedToNetwork(){
+            let lView = UIView()
+            let lLabel = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreen(loadingView: lView, tableView: self.tableView, loadingLabel: lLabel, spinner: spinner)
+            let parameters: Parameters = ["codigo": cupon]
+            AFManager.request(Constantes.CANJEAR_CUPON, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if status{
+                                if let saldo = json["saldo"].int{
+                                    self.s1credits.text = "\(saldo) S1 Credits"
+                                    DataUserDefaults.setSaldo(saldo: saldo)
+                                    if let message = json["mensaje_plain"].string{
+                                        self.alertWithMessage(title: "¡Bien!", message: message)
+                                        Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                                    }
+                                }
+                            }else{
+                                if let errorMessage = json["mensaje_plain"].string{
+                                    Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
+                                    self.alertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                                }
                             }
+                            self.cuponTextField.text = ""
                         }
-                    }else{
-                        if let errorMessage = json["mensaje_plain"].string{
-                            Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
-                            self.showAlertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                         }
+                        break
+                        
                     }
-                    self.cuponTextField.text = ""
-                }
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     func selectPaquete1(sender: UITapGestureRecognizer){
@@ -243,11 +279,7 @@ class BancoTableViewController: UITableViewController, UITextFieldDelegate, SKPr
         self.transactionInProgress = true
     }
     
-    func showAlertWithMessage(title:String,message:String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
+    
     
     func showCustomAlert(){
         

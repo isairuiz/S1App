@@ -21,6 +21,7 @@ class EditarMiPerfilTableViewController: UITableViewController {
     @IBOutlet weak var info: UILabel!
     @IBOutlet weak var descripcionUsuario: UITextView!
     
+    
     var tapViewImage = UIGestureRecognizer()
     let headers: HTTPHeaders = [
         "Authorization": "Bearer "+DataUserDefaults.getUserToken()
@@ -37,9 +38,6 @@ class EditarMiPerfilTableViewController: UITableViewController {
         tapViewImage = UITapGestureRecognizer(target: self, action: #selector(self.gotoMisFotos(sender:)))
         tapViewImage.cancelsTouchesInView = false
         fotoPerfil.addGestureRecognizer(tapViewImage)
-        
-        
-        
         
     }
     
@@ -62,67 +60,82 @@ class EditarMiPerfilTableViewController: UITableViewController {
     }
     
     func fillWindow(){
-        
-        
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        
-        Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if let nombre = json["perfil"]["nombre"].string{
-                            if nombre != ""{
-                                DataUserDefaults.saveDataNombre(nombre: nombre)
-                                self.nombreUsuario.text = nombre
-                            }else{
-                                self.nombreUsuario.text = "Configura tu nombre de usuario"
-                            }
-                            
-                        }
-                        if let prof = json["perfil"]["profesion"].string{
-                            if prof != ""{
-                                self.profesion.text = prof
-                                DataUserDefaults.saveDataProfesion(profesion: prof)
-                            }else{
-                                self.profesion.text = "Configura tu profesion"
-                            }
-                            
-                        }
-                        if let descripcion = json["perfil"]["sobre_mi"].string{
-                            if !descripcion.isEmpty{
-                                self.descripcionUsuario.text = descripcion
-                                DataUserDefaults.saveDataSobreMi(sobreti: descripcion)
-                            }else{
-                                self.descripcionUsuario.text = "Aún no has escrito sobre ti."
-                            }
-                        }
-                        if let idFoto = json["perfil"]["id_fotografia_perfil"].int{
-                            if idFoto > 0{
-                                DataUserDefaults.saveIdFotoPerfil(id: idFoto)
-                                if !json["perfil"]["fotografias"].isEmpty{
-                                    self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
-                                    let fotoo:String = self.getUrlPerfilFoto(idFotoPerfil: idFoto)
-                                    self.fotoPerfil.downloadedFrom(link: fotoo,withBlur:false,maxBlur:1.0)
-                                }else{
-                                    DataUserDefaults.setFotoPerfilUrl(url: "")
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+            
+            AFManager.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if let nombre = json["perfil"]["nombre"].string{
+                                    if nombre != ""{
+                                        DataUserDefaults.saveDataNombre(nombre: nombre)
+                                        self.nombreUsuario.text = nombre
+                                    }else{
+                                        self.nombreUsuario.text = "Configura tu nombre de usuario"
+                                    }
+                                    
                                 }
+                                if let prof = json["perfil"]["profesion"].string{
+                                    if prof != ""{
+                                        self.profesion.text = prof
+                                        DataUserDefaults.saveDataProfesion(profesion: prof)
+                                    }else{
+                                        self.profesion.text = "Configura tu profesion"
+                                    }
+                                    
+                                }
+                                if let descripcion = json["perfil"]["sobre_mi"].string{
+                                    if !descripcion.isEmpty{
+                                        self.descripcionUsuario.text = descripcion
+                                        DataUserDefaults.saveDataSobreMi(sobreti: descripcion)
+                                    }else{
+                                        self.descripcionUsuario.text = "Aún no has escrito sobre ti."
+                                    }
+                                }
+                                if let idFoto = json["perfil"]["id_fotografia_perfil"].int{
+                                    if idFoto > 0{
+                                        DataUserDefaults.saveIdFotoPerfil(id: idFoto)
+                                        if !json["perfil"]["fotografias"].isEmpty{
+                                            self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
+                                            let fotoo:String = self.getUrlPerfilFoto(idFotoPerfil: idFoto)
+                                            self.fotoPerfil.downloadedFrom(link: fotoo,withBlur:false,maxBlur:1.0)
+                                        }else{
+                                            DataUserDefaults.setFotoPerfilUrl(url: "")
+                                        }
+                                    }else{
+                                        self.info.isHidden = false
+                                    }
+                                    
+                                }
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                             }else{
-                                self.info.isHidden = false
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                             }
-                            
                         }
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     func getUrlPerfilFoto(idFotoPerfil:Int) -> String{

@@ -68,60 +68,68 @@ class AgregarFotoTableViewController: UITableViewController, UIImagePickerContro
     }
     
     func subirFotoTap(_ sender: UITapGestureRecognizer){
-        let photo = imageData
-        let noFoto = photo.count<=0
-        if(!noFoto){
-            let view = UIView()
-            let labell = UILabel()
-            let spinner = UIActivityIndicatorView()
-            Utilerias.setCustomLoadingScreenForView(loadingView: view, view: self.view, loadingLabel: labell, spinner: spinner)
-            var imageName = "image"+Utilerias.getCurrentDateAndTime()+".jpeg"
-            
-            Alamofire.upload(
-                multipartFormData: { multipartFormData in
-                    multipartFormData.append(photo, withName: "imagen", fileName: imageName, mimeType: "image/jpeg")
-            },
-                to: Constantes.AGREGAR_FOTO, headers:self.headers,
-                encodingCompletion: { encodingResult in
-                    switch encodingResult {
-                    case .success(let upload, _, _):
-                        upload.responseJSON { response in
-                            let json = JSON(response.result.value)
-                            debugPrint(json)
-                            if let status = json["status"].bool {
-                                if (status){
-                                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
-                                    self.showAlerWithMessage(title:"¡Bien!",message: "Has agregado una foto.")
-                                    
-                                    self.foto.image = nil
-                                    self.foto.isUserInteractionEnabled = false
-                                    self.fotoFooterView.isHidden = true
-                                    self.quitarFotoButton.isHidden = true
-                                    self.camaraButton.isHidden = true
-                                    
-                                    self.fotoDifuminada.isHidden = true
-                                    self.fotoFooterLabel.text = "¡Listo!"
-                                    
-                                    self.imageData = Data()
-                                    
-                                }else{
-                                    if let message = json["mensaje_plain"].string{
+        if Utilerias.isConnectedToNetwork(){
+            let photo = imageData
+            let noFoto = photo.count<=0
+            if(!noFoto){
+                let view = UIView()
+                let labell = UILabel()
+                let spinner = UIActivityIndicatorView()
+                Utilerias.setCustomLoadingScreenForView(loadingView: view, view: self.view, loadingLabel: labell, spinner: spinner)
+                var imageName = "image"+Utilerias.getCurrentDateAndTime()+".jpeg"
+                
+                AFManager.upload(
+                    multipartFormData: { multipartFormData in
+                        multipartFormData.append(photo, withName: "imagen", fileName: imageName, mimeType: "image/jpeg")
+                },
+                    to: Constantes.AGREGAR_FOTO, headers:self.headers,
+                    encodingCompletion: { encodingResult in
+                        switch encodingResult {
+                        case .success(let upload, _, _):
+                            upload.responseJSON { response in
+                                let json = JSON(response.result.value)
+                                debugPrint(json)
+                                if let status = json["status"].bool {
+                                    if (status){
                                         Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
-                                        self.showAlerWithMessage(title:"Error",message: message)
+                                        self.showAlerWithMessage(title:"¡Bien!",message: "Has agregado una foto.")
+                                        
+                                        self.foto.image = nil
+                                        self.foto.isUserInteractionEnabled = false
+                                        self.fotoFooterView.isHidden = true
+                                        self.quitarFotoButton.isHidden = true
+                                        self.camaraButton.isHidden = true
+                                        
+                                        self.fotoDifuminada.isHidden = true
+                                        self.fotoFooterLabel.text = "¡Listo!"
+                                        
+                                        self.imageData = Data()
+                                        
+                                    }else{
+                                        if let message = json["mensaje_plain"].string{
+                                            Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                                            self.showAlerWithMessage(title:"Error",message: message)
+                                        }
+                                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
                                     }
-                                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
                                 }
                             }
+                        case .failure(let encodingError):
+                            Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                            if encodingError._code == NSURLErrorTimedOut {
+                                self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                                debugPrint("timeOut")
+                            }else{
+                                self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                            }
                         }
-                    case .failure(let encodingError):
-                        print(encodingError)
-                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
-                    }
+                }
+                )
             }
-            )
         }else{
-            
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     func showAlerWithMessage(title:String,message:String){

@@ -75,65 +75,82 @@ class TuS1ngleTableViewController: UITableViewController {
     
     
     func verPerfil(){
-        Utilerias.setCustomLoadingScreen(loadingView: loaderContainer, tableView: self.tableView, loadingLabel: loaderLabel, spinner: spinner)
-        let finalUrl = "\(Constantes.VER_PERFIL_URL)\(idPerfil)"
-        debugPrint("final url:\(finalUrl)")
-        Alamofire.request(finalUrl, headers: self.headers)
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if status{
-                        if let nombre = json["perfil"]["nombre"].string{
-                            self.nombrePerfil.text = nombre
-                        }
-                        if let genero = json["perfil"]["genero"].int{
-                            
-                        }
-                        if let edad = json["perfil"]["edad"].int{
-                            
-                        }
-                        if let estado = json["perfil"]["estado"].int{
-                            
-                        }
-                        if let hijos = json["perfil"]["hijos"].bool{
-                            
-                        }
-                        if let profesion = json["perfil"]["profesion"].string{
-                            self.profesionPerfil.text = profesion
-                        }
-                        if let fumo = json["perfil"]["fumo"].bool{
-                            
-                        }
-                        if let sombre_mi_text = json["perfil"]["sobre_mi"].string{
-                            self.sobre_mi.text = sombre_mi_text
-                        }
-                        if json["perfil"]["busco"].array != nil{
-                            
-                        }
-                        if json["perfil"]["afinidad"].arrayValue != nil{
-                            self.childView.setAfinidadesForTable(afinidades: json["perfil"]["afinidad"].arrayValue)
-                        }
-                        if !json["perfil"]["fotografias"].isEmpty{
-                            self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
-                            if let idFotoPerfil = json["perfil"]["id_fotografia_perfil"].int{
-                                for foto in self.fotitos{
-                                    if Int(foto.key) == idFotoPerfil{
-                                        var urlImage = self.baseUrl
-                                        urlImage += foto.value
-                                        self.imagePerifl.downloadedFrom(link: urlImage, withBlur:false,maxBlur:0)
-                                    }
+        if Utilerias.isConnectedToNetwork(){
+            Utilerias.setCustomLoadingScreen(loadingView: loaderContainer, tableView: self.tableView, loadingLabel: loaderLabel, spinner: spinner)
+            let finalUrl = "\(Constantes.VER_PERFIL_URL)\(idPerfil)"
+            debugPrint("final url:\(finalUrl)")
+            AFManager.request(finalUrl, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if status{
+                                if let nombre = json["perfil"]["nombre"].string{
+                                    self.nombrePerfil.text = nombre
                                 }
+                                if let genero = json["perfil"]["genero"].int{
+                                    
+                                }
+                                if let edad = json["perfil"]["edad"].int{
+                                    
+                                }
+                                if let estado = json["perfil"]["estado"].int{
+                                    
+                                }
+                                if let hijos = json["perfil"]["hijos"].bool{
+                                    
+                                }
+                                if let profesion = json["perfil"]["profesion"].string{
+                                    self.profesionPerfil.text = profesion
+                                }
+                                if let fumo = json["perfil"]["fumo"].bool{
+                                    
+                                }
+                                if let sombre_mi_text = json["perfil"]["sobre_mi"].string{
+                                    self.sobre_mi.text = sombre_mi_text
+                                }
+                                if json["perfil"]["busco"].array != nil{
+                                    
+                                }
+                                if json["perfil"]["afinidad"].arrayValue != nil{
+                                    self.childView.setAfinidadesForTable(afinidades: json["perfil"]["afinidad"].arrayValue)
+                                }
+                                if !json["perfil"]["fotografias"].isEmpty{
+                                    self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
+                                    if let idFotoPerfil = json["perfil"]["id_fotografia_perfil"].int{
+                                        for foto in self.fotitos{
+                                            if Int(foto.key) == idFotoPerfil{
+                                                var urlImage = self.baseUrl
+                                                urlImage += foto.value
+                                                self.imagePerifl.downloadedFrom(link: urlImage, withBlur:false,maxBlur:0)
+                                            }
+                                        }
+                                    }
+                                    
+                                    
+                                }
+                                Utilerias.removeCustomLoadingScreen(loadingView: self.loaderContainer, loadingLabel: self.loaderLabel, spinner: self.spinner)
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: self.loaderContainer, loadingLabel: self.loaderLabel, spinner: self.spinner)
                             }
-                            
-                            
                         }
-                        Utilerias.removeCustomLoadingScreen(loadingView: self.loaderContainer, loadingLabel: self.loaderLabel, spinner: self.spinner)
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: self.loaderContainer, loadingLabel: self.loaderLabel, spinner: self.spinner)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
     }
     

@@ -362,105 +362,151 @@ class TestsTableViewController: UITableViewController {
     // MARK: - Acciones y eventos
     
     func comprarTest(id:Int,costo:Int){
-        let parameters: Parameters = ["id": id]
-        Alamofire.request(Constantes.COMPRAR_TEST_URL, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-            .responseJSON{
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if status{
-                        DataUserDefaults.setJsonTest(json: json.description)
-                        self.restarSaldo(costo: costo)
-                        self.performSegue(withIdentifier: "MostrarTest", sender: self)
-                    }else{
-                        if let message = json["mensaje_plain"].string{
-                            self.showAlertWithMessage(title: "Error", message: message)
+        if Utilerias.isConnectedToNetwork(){
+            let parameters: Parameters = ["id": id]
+            AFManager.request(Constantes.COMPRAR_TEST_URL, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                .responseJSON{
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if status{
+                                DataUserDefaults.setJsonTest(json: json.description)
+                                self.restarSaldo(costo: costo)
+                                self.performSegue(withIdentifier: "MostrarTest", sender: self)
+                            }else{
+                                if let message = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "Error", message: message)
+                                }
+                            }
                         }
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
         
     }
     
-    func showAlertWithMessage(title:String,message:String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
     
     func obtenerMisResultados(){
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        Alamofire.request(Constantes.MIS_RESULTADOS_TEST, headers: self.headers)
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if !json["resultados"].isEmpty{
-                            var resultados : [JSON] = json["resultados"].arrayValue
-                            for res in resultados{
-                                let idTest  = res["id_test"].int
-                                let nombre = res["nombre_test"].string
-                                let imgTest = res["imagentest"].string
-                                let imgRes = res["imagenresultado"].string
-                                let puntaje = res["puntaje"].int
-                                let nombreRes = res["resultado"].string
-                                let contenido = res["contenido"].string
-                                var urlImg = Constantes.BASE_URL
-                                urlImg += imgRes!
-                                self.listaResultados.append(TestItem(id: idTest!, nombre: nombre!, descripcion: contenido!, costo: 0, recompensa: 0, imagen: urlImg, resultado:nombreRes!, preguntas: 0))
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+            AFManager.request(Constantes.MIS_RESULTADOS_TEST, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if !json["resultados"].isEmpty{
+                                    var resultados : [JSON] = json["resultados"].arrayValue
+                                    for res in resultados{
+                                        let idTest  = res["id_test"].int
+                                        let nombre = res["nombre_test"].string
+                                        let imgTest = res["imagentest"].string
+                                        let imgRes = res["imagenresultado"].string
+                                        let puntaje = res["puntaje"].int
+                                        let nombreRes = res["resultado"].string
+                                        let contenido = res["contenido"].string
+                                        var urlImg = Constantes.BASE_URL
+                                        urlImg += imgRes!
+                                        self.listaResultados.append(TestItem(id: idTest!, nombre: nombre!, descripcion: contenido!, costo: 0, recompensa: 0, imagen: urlImg, resultado:nombreRes!, preguntas: 0))
+                                    }
+                                    self.tableView.reloadData()
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                                }else{
+                                    self.tableView.reloadData()
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                                }
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                             }
-                            self.tableView.reloadData()
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                        }else{
-                            self.tableView.reloadData()
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         }
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
     }
     
     func obtenerTestsNuevos(){
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        Alamofire.request(Constantes.LISTAR_TESTS_URL, headers: self.headers)
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if !json["mensaje_plain"].isEmpty{
-                            self.jsonTests? = json["mensaje_plain"].arrayValue
-                            for test in self.jsonTests!{
-                                var urlImagen = Constantes.BASE_URL
-                                let id = test["id"].int
-                                let nombre = test["nombre"].string
-                                let descripcion = test["descripcion"].string
-                                urlImagen += test["url"].string!
-                                let preguntas = test["preguntas"].int
-                                let costo = test["costo"].int
-                                let recompensa = test["recompensa"].int
-                                self.listaNuevos.append(TestItem(id: id!, nombre: nombre!, descripcion: descripcion!, costo: costo!, recompensa: recompensa!, imagen: urlImagen, preguntas:preguntas!))
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+            AFManager.request(Constantes.LISTAR_TESTS_URL, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if !json["mensaje_plain"].isEmpty{
+                                    self.jsonTests? = json["mensaje_plain"].arrayValue
+                                    for test in self.jsonTests!{
+                                        var urlImagen = Constantes.BASE_URL
+                                        let id = test["id"].int
+                                        let nombre = test["nombre"].string
+                                        let descripcion = test["descripcion"].string
+                                        urlImagen += test["url"].string!
+                                        let preguntas = test["preguntas"].int
+                                        let costo = test["costo"].int
+                                        let recompensa = test["recompensa"].int
+                                        self.listaNuevos.append(TestItem(id: id!, nombre: nombre!, descripcion: descripcion!, costo: costo!, recompensa: recompensa!, imagen: urlImagen, preguntas:preguntas!))
+                                    }
+                                    self.tableView.reloadData()
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                                }
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                             }
-                            self.tableView.reloadData()
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         }
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {

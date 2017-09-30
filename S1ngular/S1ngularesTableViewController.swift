@@ -381,99 +381,135 @@ class S1ngularesTableViewController: UITableViewController {
     }
     
     func listarChats(){
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        Alamofire.request(Constantes.LISTAR_MIS_CHATS, headers: self.headers)
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if !json["s1"].isEmpty{
-                            self.mischats = json["s1"].arrayValue
-                            for michat in self.mischats{
-                                
-                                let id  = michat["id"].int
-                                let nombre = michat["nombre"].string
-                                let imagen = michat["imagen"].string
-                                let foto_visible = michat["foto_visible"].floatValue
-                                let hora_ultimo = michat["hora_ultimo_mensaje"].string
-                                let ultimo_mensaje = michat["ultimo_mensaje"].string
-                                let sin_leer = michat["mensajes_sin_leer"].int
-                                let es_primer_contacto = michat["es_primer_contacto"].int
-                                var fotoUrl = String()
-                                
-                                if !(imagen?.isEmpty)!{
-                                    fotoUrl = Constantes.BASE_URL
-                                    fotoUrl += imagen!
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+            AFManager.request(Constantes.LISTAR_MIS_CHATS, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if !json["s1"].isEmpty{
+                                    self.mischats = json["s1"].arrayValue
+                                    for michat in self.mischats{
+                                        
+                                        let id  = michat["id"].int
+                                        let nombre = michat["nombre"].string
+                                        let imagen = michat["imagen"].string
+                                        let foto_visible = michat["foto_visible"].floatValue
+                                        let hora_ultimo = michat["hora_ultimo_mensaje"].string
+                                        let ultimo_mensaje = michat["ultimo_mensaje"].string
+                                        let sin_leer = michat["mensajes_sin_leer"].int
+                                        let es_primer_contacto = michat["es_primer_contacto"].int
+                                        var fotoUrl = String()
+                                        
+                                        if !(imagen?.isEmpty)!{
+                                            fotoUrl = Constantes.BASE_URL
+                                            fotoUrl += imagen!
+                                        }
+                                        
+                                        self.listaChat.append(
+                                            GeneralTableItem(id: id!, nombre: nombre!, distancia: "", tiempo: hora_ultimo!, lugar: "", descripcion: ultimo_mensaje!, avatar: fotoUrl, badge: String(sin_leer!), compartir: false, resaltar: false, restriccion: foto_visible)
+                                        )
+                                    }
+                                    self.tableView.reloadData()
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                                }else{
+                                    self.tableView.reloadData()
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                                 }
-                                
-                                self.listaChat.append(
-                                    GeneralTableItem(id: id!, nombre: nombre!, distancia: "", tiempo: hora_ultimo!, lugar: "", descripcion: ultimo_mensaje!, avatar: fotoUrl, badge: String(sin_leer!), compartir: false, resaltar: false, restriccion: foto_visible)
-                                )
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                             }
-                            self.tableView.reloadData()
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                        }else{
-                            self.tableView.reloadData()
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         }
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     func listarNuevosProspectos(){
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        Alamofire.request(Constantes.LISTAR_PROSPECTOS, headers: self.headers)
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if !json["mensaje_plain"].isEmpty{
-                            self.prospectos = json["mensaje_plain"].arrayValue
-                            for prospecto in self.prospectos{
-                                var fotitos = Dictionary<String, String>()
-                                let id  = prospecto["id"].int
-                                var nombre:String = "Sin Nombre";
-                                if let nom = prospecto["nombre"].string{
-                                    nombre = nom
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+            AFManager.request(Constantes.LISTAR_PROSPECTOS, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if !json["mensaje_plain"].isEmpty{
+                                    self.prospectos = json["mensaje_plain"].arrayValue
+                                    for prospecto in self.prospectos{
+                                        var fotitos = Dictionary<String, String>()
+                                        let id  = prospecto["id"].int
+                                        var nombre:String = "Sin Nombre";
+                                        if let nom = prospecto["nombre"].string{
+                                            nombre = nom
+                                        }
+                                        var sobre_mi:String = "Sin descripcion"
+                                        if let sobre = prospecto["sobre_mi"].string{
+                                            sobre_mi = sobre
+                                        }
+                                        let foto_visible = prospecto["foto_visible"].floatValue
+                                        var fotoUrl = String()
+                                        if !prospecto["fotografias"].isEmpty{
+                                            fotoUrl += Constantes.BASE_URL
+                                            fotitos = prospecto["fotografias"].dictionaryObject as! Dictionary<String, String>
+                                            fotoUrl += Array(fotitos.values)[0]
+                                            
+                                        }
+                                        self.listaNuevos.append(GeneralTableItem(id: id!, nombre: nombre, distancia: "", tiempo: "", lugar: "", descripcion: sobre_mi, avatar: fotoUrl, badge: "", compartir: false, resaltar: false, restriccion: foto_visible))
+                                    }
+                                    self.tableView.reloadData()
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                                }else{
+                                    self.tableView.reloadData()
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                                 }
-                                var sobre_mi:String = "Sin descripcion"
-                                if let sobre = prospecto["sobre_mi"].string{
-                                    sobre_mi = sobre
-                                }
-                                let foto_visible = prospecto["foto_visible"].floatValue
-                                var fotoUrl = String()
-                                if !prospecto["fotografias"].isEmpty{
-                                    fotoUrl += Constantes.BASE_URL
-                                    fotitos = prospecto["fotografias"].dictionaryObject as! Dictionary<String, String>
-                                    fotoUrl += Array(fotitos.values)[0]
-                                    
-                                }
-                                self.listaNuevos.append(GeneralTableItem(id: id!, nombre: nombre, distancia: "", tiempo: "", lugar: "", descripcion: sobre_mi, avatar: fotoUrl, badge: "", compartir: false, resaltar: false, restriccion: foto_visible))
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                             }
-                            self.tableView.reloadData()
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                        }else{
-                            self.tableView.reloadData()
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         }
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
-                }
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {

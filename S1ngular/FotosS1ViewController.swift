@@ -83,38 +83,56 @@ class FotosS1ViewController: UIViewController {
     }
 
     func getUserData(){
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreenForView(loadingView: loadingView, view: self.view, loadingLabel: loadingLabel, spinner: spinner)
-        let finalUrl = "\(Constantes.VER_PERFIL_URL)\(idPerfil)"
-        Alamofire.request(finalUrl, headers: self.headers)
-            .responseJSON {
-                response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if !json["perfil"]["fotografias"].isEmpty{
-                            self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
-                            debugPrint(self.fotitos)
-                            var urlImage = self.baseUrl
-                            let urlPrimerFoto = Array(self.fotitos.values)[0]
-                            urlImage += urlPrimerFoto
-                            self.imageContainer.downloadedFrom(link: urlImage,withBlur:false,maxBlur:0)
-                            self.subtituloTexto.text = "\((self.imageIndex+1))/\(self.fotitos.keys.count)"
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                        }else{
-                            self.inforMessage.isHidden = false
-                            debugPrint("No hay fotos para mostrar")
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreenForView(loadingView: loadingView, view: self.view, loadingLabel: loadingLabel, spinner: spinner)
+            let finalUrl = "\(Constantes.VER_PERFIL_URL)\(idPerfil)"
+            AFManager.request(finalUrl, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if !json["perfil"]["fotografias"].isEmpty{
+                                    self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
+                                    debugPrint(self.fotitos)
+                                    var urlImage = self.baseUrl
+                                    let urlPrimerFoto = Array(self.fotitos.values)[0]
+                                    urlImage += urlPrimerFoto
+                                    self.imageContainer.downloadedFrom(link: urlImage,withBlur:false,maxBlur:0)
+                                    self.subtituloTexto.text = "\((self.imageIndex+1))/\(self.fotitos.keys.count)"
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                                }else{
+                                    self.inforMessage.isHidden = false
+                                    debugPrint("No hay fotos para mostrar")
+                                }
+                            }else{
+                                
+                            }
+                            
                         }
-                    }else{
-                        
+                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
                     }
                     
-                }
-                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     

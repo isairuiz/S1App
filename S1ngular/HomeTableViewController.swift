@@ -71,7 +71,7 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
         self.gotoCheckinsCell.addGestureRecognizer(tapViewCheckins)
         
         let app = UIApplication.shared
-        
+        /*UNCOMMENT THIS FOR PRODUCTION OR COMMENT FOR SIMULATOR TESTING*/
         self.initializeFCM(app)
         let token = InstanceID.instanceID().token()
         if !(token?.isEmpty)!{
@@ -135,183 +135,218 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
     }
     
     func getUserData(){
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        
-        Alamofire.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
-            .responseJSON {
-            response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                if(status){
-                    if let saldo = json["perfil"]["saldo"].int{
-                        debugPrint("saldo:")
-                        debugPrint(saldo)
-                        DataUserDefaults.setSaldo(saldo: saldo)
-                        self.misaldo.text = "\(saldo) S1NGLE CREDITS"
-                    }
-                    if let nombre = json["perfil"]["nombre"].string{
-                        debugPrint("nombre:")
-                        debugPrint(nombre)
-                        DataUserDefaults.saveDataNombre(nombre: nombre)
-                    }
-                    if let genero = json["perfil"]["genero"].int{
-                        debugPrint("genero:")
-                        debugPrint(genero)
-                        DataUserDefaults.saveDataGenero(genero: genero)
-                    }
-                    if let edad = json["perfil"]["edad"].int{
-                        debugPrint("edad:")
-                        debugPrint(edad)
-                        DataUserDefaults.saveDataEdad(edad: String(edad))
-                    }
-                    if let estado = json["perfil"]["estado"].int{
-                        debugPrint("estado:")
-                        debugPrint(estado)
-                        DataUserDefaults.saveDataEstado(estado: estado)
-                    }
-                    if let prof = json["perfil"]["profesion"].string{
-                        debugPrint("profesion:")
-                        debugPrint(prof)
-                        DataUserDefaults.saveDataProfesion(profesion: prof)
-                    }
-                    if let idFoto = json["perfil"]["id_fotografia_perfil"].int{
-                        debugPrint("idFotoPerfil:")
-                        debugPrint(idFoto)
-                        DataUserDefaults.saveIdFotoPerfil(id: idFoto)
-                        if !json["perfil"]["fotografias"].isEmpty{
-                            self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
-                            debugPrint(self.fotitos)
-                            self.setPerfilFoto(idFotoPerfil: idFoto)
-                        }else{
-                            DataUserDefaults.setFotoPerfilUrl(url: "")
-                        }
-                    }
-                    if let fumo = json["perfil"]["fumo"].bool{
-                        debugPrint("fumo:")
-                        debugPrint(fumo)
-                        DataUserDefaults.saveDataFumo(fumo: fumo)
-                    }
-                    if let bgenero = json["perfil"]["que_busco"]["genero"].int{
-                        debugPrint("Busco genero:")
-                        debugPrint(bgenero)
-                        DataUserDefaults.saveDataBuscoGenero(buscoGenero: bgenero)
-                    }
-                    if let bedadMinima = json["perfil"]["que_busco"]["edad_minima"].int{
-                        debugPrint("Edad minima:")
-                        debugPrint(bedadMinima)
-                        DataUserDefaults.saveDataBuscoEdadMinima(edad: bedadMinima)
-                    }
-                    
-                    if let bedadMaxima = json["perfil"]["que_busco"]["edad_maxima"].int{
-                        debugPrint("Edad Maxima:")
-                        debugPrint(bedadMaxima)
-                        DataUserDefaults.saveDataBuscoEdadMaxima(edad: bedadMaxima)
-                    }
-                    if let bdistancia = json["perfil"]["que_busco"]["radio"].int{
-                        debugPrint("distancia radio")
-                        debugPrint(bdistancia)
-                        DataUserDefaults.saveDataBuscoDistancia(distancia: bdistancia)
-                    }
-                    if let bfuma = json["perfil"]["que_busco"]["fuma"].int{
-                        debugPrint("busco fuma:")
-                        debugPrint(bfuma)
-                        DataUserDefaults.saveDataBuscoFuma(buscoFuma: bfuma)
-                    }
-                    
-                    
-                    let estados: Array<JSON> = json["perfil"]["que_busco"]["estado"].arrayValue
-                    if estados.count > 0{
-                        debugPrint("Busco Estados civiles:")
-                        debugPrint(estados)
-                        for estado in estados{
-                            if estado=="1"{
-                                DataUserDefaults.saveBuscoSoltero(num: 1)
-                            }
-                            if estado=="2"{
-                                DataUserDefaults.saveBuscoCasado(num: 1)
-                            }
-                            if estado=="3"{
-                                DataUserDefaults.saveBuscoDivorciado(num: 1)
-                            }
-                            if estado=="4"{
-                                DataUserDefaults.saveBuscoSeparado(num: 1)
-                            }
-                            if estado=="5"{
-                                DataUserDefaults.saveBuscoUnionlibre(num: 1)
-                            }
-                            if estado=="6"{
-                                DataUserDefaults.saveBuscoViudo(num: 1)
-                            }
-                        }
-                    }
-                    
-                    let que_deseo: Array<JSON> = json["perfil"]["que_busco"]["que_deseo"].arrayValue
-                    if que_deseo.count > 0{
-                        debugPrint("Que deseo:")
-                        debugPrint(que_deseo)
-                        for deseo in que_deseo{
-                            if deseo == "1"{
-                                DataUserDefaults.saveDataBuscoAmistad(relacion: 1)
-                            }
-                            if deseo == "2"{
-                                DataUserDefaults.saveDataBuscoCortoPlazo(relacion: 1)
-                            }
-                            if deseo == "3"{
-                                DataUserDefaults.saveDataBuscoLargoPlazo(relacion: 1)
-                            }
-                            if deseo == "4"{
-                                DataUserDefaults.saveDataBuscoSalir(relacion: 1)
-                            }
-                            
-                        }
-                    }
-                    
-                    
-                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                }else{
-                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                }
-            }
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
             
+            AFManager.request(Constantes.VER_MI_PERFIL_URL, headers: self.headers)
+                .responseJSON {
+                    response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if let saldo = json["perfil"]["saldo"].int{
+                                    debugPrint("saldo:")
+                                    debugPrint(saldo)
+                                    DataUserDefaults.setSaldo(saldo: saldo)
+                                    self.misaldo.text = "\(saldo) S1NGLE CREDITS"
+                                }
+                                if let nombre = json["perfil"]["nombre"].string{
+                                    debugPrint("nombre:")
+                                    debugPrint(nombre)
+                                    DataUserDefaults.saveDataNombre(nombre: nombre)
+                                }
+                                if let genero = json["perfil"]["genero"].int{
+                                    debugPrint("genero:")
+                                    debugPrint(genero)
+                                    DataUserDefaults.saveDataGenero(genero: genero)
+                                }
+                                if let edad = json["perfil"]["edad"].int{
+                                    debugPrint("edad:")
+                                    debugPrint(edad)
+                                    DataUserDefaults.saveDataEdad(edad: String(edad))
+                                }
+                                if let estado = json["perfil"]["estado"].int{
+                                    debugPrint("estado:")
+                                    debugPrint(estado)
+                                    DataUserDefaults.saveDataEstado(estado: estado)
+                                }
+                                if let prof = json["perfil"]["profesion"].string{
+                                    debugPrint("profesion:")
+                                    debugPrint(prof)
+                                    DataUserDefaults.saveDataProfesion(profesion: prof)
+                                }
+                                if let idFoto = json["perfil"]["id_fotografia_perfil"].int{
+                                    debugPrint("idFotoPerfil:")
+                                    debugPrint(idFoto)
+                                    DataUserDefaults.saveIdFotoPerfil(id: idFoto)
+                                    if !json["perfil"]["fotografias"].isEmpty{
+                                        self.fotitos = json["perfil"]["fotografias"].dictionaryObject as! Dictionary<String, String>
+                                        debugPrint(self.fotitos)
+                                        self.setPerfilFoto(idFotoPerfil: idFoto)
+                                    }else{
+                                        DataUserDefaults.setFotoPerfilUrl(url: "")
+                                    }
+                                }
+                                if let fumo = json["perfil"]["fumo"].bool{
+                                    debugPrint("fumo:")
+                                    debugPrint(fumo)
+                                    DataUserDefaults.saveDataFumo(fumo: fumo)
+                                }
+                                if let bgenero = json["perfil"]["que_busco"]["genero"].int{
+                                    debugPrint("Busco genero:")
+                                    debugPrint(bgenero)
+                                    DataUserDefaults.saveDataBuscoGenero(buscoGenero: bgenero)
+                                }
+                                if let bedadMinima = json["perfil"]["que_busco"]["edad_minima"].int{
+                                    debugPrint("Edad minima:")
+                                    debugPrint(bedadMinima)
+                                    DataUserDefaults.saveDataBuscoEdadMinima(edad: bedadMinima)
+                                }
+                                
+                                if let bedadMaxima = json["perfil"]["que_busco"]["edad_maxima"].int{
+                                    debugPrint("Edad Maxima:")
+                                    debugPrint(bedadMaxima)
+                                    DataUserDefaults.saveDataBuscoEdadMaxima(edad: bedadMaxima)
+                                }
+                                if let bdistancia = json["perfil"]["que_busco"]["radio"].int{
+                                    debugPrint("distancia radio")
+                                    debugPrint(bdistancia)
+                                    DataUserDefaults.saveDataBuscoDistancia(distancia: bdistancia)
+                                }
+                                if let bfuma = json["perfil"]["que_busco"]["fuma"].int{
+                                    debugPrint("busco fuma:")
+                                    debugPrint(bfuma)
+                                    DataUserDefaults.saveDataBuscoFuma(buscoFuma: bfuma)
+                                }
+                                
+                                
+                                let estados: Array<JSON> = json["perfil"]["que_busco"]["estado"].arrayValue
+                                if estados.count > 0{
+                                    debugPrint("Busco Estados civiles:")
+                                    debugPrint(estados)
+                                    for estado in estados{
+                                        if estado=="1"{
+                                            DataUserDefaults.saveBuscoSoltero(num: 1)
+                                        }
+                                        if estado=="2"{
+                                            DataUserDefaults.saveBuscoCasado(num: 1)
+                                        }
+                                        if estado=="3"{
+                                            DataUserDefaults.saveBuscoDivorciado(num: 1)
+                                        }
+                                        if estado=="4"{
+                                            DataUserDefaults.saveBuscoSeparado(num: 1)
+                                        }
+                                        if estado=="5"{
+                                            DataUserDefaults.saveBuscoUnionlibre(num: 1)
+                                        }
+                                        if estado=="6"{
+                                            DataUserDefaults.saveBuscoViudo(num: 1)
+                                        }
+                                    }
+                                }
+                                
+                                let que_deseo: Array<JSON> = json["perfil"]["que_busco"]["que_deseo"].arrayValue
+                                if que_deseo.count > 0{
+                                    debugPrint("Que deseo:")
+                                    debugPrint(que_deseo)
+                                    for deseo in que_deseo{
+                                        if deseo == "1"{
+                                            DataUserDefaults.saveDataBuscoAmistad(relacion: 1)
+                                        }
+                                        if deseo == "2"{
+                                            DataUserDefaults.saveDataBuscoCortoPlazo(relacion: 1)
+                                        }
+                                        if deseo == "3"{
+                                            DataUserDefaults.saveDataBuscoLargoPlazo(relacion: 1)
+                                        }
+                                        if deseo == "4"{
+                                            DataUserDefaults.saveDataBuscoSalir(relacion: 1)
+                                        }
+                                        
+                                    }
+                                }
+                                
+                                
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                            }else{
+                                Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                            }
+                        }
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
+                    }
+                    
+                    
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     func visitarHome(){
+        if Utilerias.isConnectedToNetwork(){
+            
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
+        }
         let loadingView = UIView()
         let spinner = UIActivityIndicatorView()
         let loadingLabel = UILabel()
         Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        Alamofire.request(Constantes.VISITAR_HOME_URL, headers: self.headers)
+        AFManager.request(Constantes.VISITAR_HOME_URL, headers: self.headers)
             .responseJSON {
                 response in
-                
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if let s1Nuevos = json["home"]["singulares_nuevos"].int{
-                            self.nuevosSingulares.text = "¡\(s1Nuevos) NUEVOS S1!"
-                            
+                switch response.result{
+                case .success:
+                    let json = JSON(response.result.value)
+                    debugPrint(json)
+                    if let status = json["status"].bool{
+                        if(status){
+                            if let s1Nuevos = json["home"]["singulares_nuevos"].int{
+                                self.nuevosSingulares.text = "¡\(s1Nuevos) NUEVOS S1!"
+                                
+                            }
+                            if let mensajesNuevos = json["home"]["mensajes_nuevos"].int{
+                                self.nuevosMensajes.text = "¡\(mensajesNuevos) MENSAJES NUEVOS!"
+                                
+                            }
+                            if let testsNuevos = json["home"]["nuevos_test"].int{
+                                self.nuevosTests.text = "¡\(testsNuevos) NUEVOS TESTS!"
+                            }
+                            if let checkinsNuevos = json["home"]["chekins_cercanos"].int{
+                                self.nuevosCheckins.text = "¡\(checkinsNuevos) S1NGULARES A TU ALREDEDOR!"
+                            }
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                        }else{
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                         }
-                        if let mensajesNuevos = json["home"]["mensajes_nuevos"].int{
-                            self.nuevosMensajes.text = "¡\(mensajesNuevos) MENSAJES NUEVOS!"
-                            
-                        }
-                        if let testsNuevos = json["home"]["nuevos_test"].int{
-                            self.nuevosTests.text = "¡\(testsNuevos) NUEVOS TESTS!"
-                        }
-                        if let checkinsNuevos = json["home"]["chekins_cercanos"].int{
-                            self.nuevosCheckins.text = "¡\(checkinsNuevos) S1NGULARES A TU ALREDEDOR!"
-                        }
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
                     }
+                    break
+                case .failure(let error):
+                    if error._code == NSURLErrorTimedOut {
+                        self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                        debugPrint("timeOut")
+                    }else{
+                        self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                    }
+                    break
                 }
+                
         }
     }
     
@@ -329,7 +364,7 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
                         
                     }else{
                         if let errorMessage = json["mensaje_plain"].string{
-                            self.showAlertWithMessage(title: "Error", message: errorMessage)
+                            self.alertWithMessage(title: "Error", message: errorMessage)
                         }
                     }
                 }
@@ -378,7 +413,7 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
                     }else{
                         Utilerias.removeCustomLoadingScreen(loadingView: lView, loadingLabel: lLabel, spinner: spinner)
                         if let errorMessage = json["mensaje_plain"].string{
-                            self.showAlertWithMessage(title: "¡Algo va mal!", message: errorMessage)
+                            self.alertWithMessage(title: "¡Algo va mal!", message: errorMessage)
                         }
                     }
                 }
@@ -515,16 +550,10 @@ class HomeTableViewController: UITableViewController,CLLocationManagerDelegate,U
     func locationManager(_ manager: CLLocationManager,
                          didFailWithError error: Error) {
         debugPrint("ubicacion no pudo ser obtenida =(")
-        self.showAlertWithMessage(title:"Error",message: "No se pudo obtener tu ubicación")
+        self.alertWithMessage(title:"Error",message: "No se pudo obtener tu ubicación")
         self.ubicacion = nil;
     }
     
-    
-    func showAlertWithMessage(title:String,message:String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
     
     
     func showNotification(tipo:String,titulo:String,cuerpo:String,urlImagen:String,nombrePerfil:String, fotoVisible:Float?) {

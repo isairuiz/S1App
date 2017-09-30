@@ -261,50 +261,66 @@ class HacerCheckInTableViewController: UITableViewController,  CLLocationManager
     }
     
     func hacerCheckIn(){
-        let loadingView = UIView()
-        let loadinLabel = UILabel()
-        let spinner = UIActivityIndicatorView()
-        
-        let titulo:String = self.dondeEstasTextField.text!
-        let contenido:String = self.queHacesTextField.text!
-        
-        if titulo.isEmpty || contenido.isEmpty{
-            self.showAlertWithMessage(title: "Error", message: "Escribe el lugar donde te encuentras y que haces, para que tus S1ngulares lo sepan.")
-        }else{
-            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadinLabel, spinner: spinner)
-            let parameters: Parameters = [
-                "latitud": self.ubicacion.latitude,
-                "longitud": self.ubicacion.longitude,
-                "titulo": titulo,
-                "contenido": contenido,
-                "calificacion": self.calificacion
-            ]
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let loadinLabel = UILabel()
+            let spinner = UIActivityIndicatorView()
             
-            Alamofire.request(Constantes.AGREGAR_CHECKIN, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
-                .responseJSON{
-                    response in
-                    let json = JSON(response.result.value)
-                    debugPrint(json)
-                    if let status = json["status"].bool{
-                        if status{
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadinLabel, spinner: spinner)
-                            self.checkInRealizado = true
-                            if let mensaje = json["mensaje_plain"].string{
-                                self.showAlertWithMessage(title: "Muy bien!", message: mensaje)
+            let titulo:String = self.dondeEstasTextField.text!
+            let contenido:String = self.queHacesTextField.text!
+            
+            if titulo.isEmpty || contenido.isEmpty{
+                self.showAlertWithMessage(title: "Error", message: "Escribe el lugar donde te encuentras y que haces, para que tus S1ngulares lo sepan.")
+            }else{
+                Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadinLabel, spinner: spinner)
+                let parameters: Parameters = [
+                    "latitud": self.ubicacion.latitude,
+                    "longitud": self.ubicacion.longitude,
+                    "titulo": titulo,
+                    "contenido": contenido,
+                    "calificacion": self.calificacion
+                ]
+                
+                AFManager.request(Constantes.AGREGAR_CHECKIN, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: self.headers)
+                    .responseJSON{
+                        response in
+                        switch response.result{
+                        case .success:
+                            let json = JSON(response.result.value)
+                            debugPrint(json)
+                            if let status = json["status"].bool{
+                                if status{
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadinLabel, spinner: spinner)
+                                    self.checkInRealizado = true
+                                    if let mensaje = json["mensaje_plain"].string{
+                                        self.showAlertWithMessage(title: "Muy bien!", message: mensaje)
+                                    }
+                                    self.dondeEstasTextField.text = ""
+                                    self.queHacesTextField.text = ""
+                                }else{
+                                    Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadinLabel, spinner: spinner)
+                                    if let mensaje = json["mensaje_plain"].string{
+                                        self.showAlertWithMessage(title: "Error!", message: mensaje)
+                                    }
+                                }
                             }
-                            self.dondeEstasTextField.text = ""
-                            self.queHacesTextField.text = ""
-                        }else{
-                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadinLabel, spinner: spinner)
-                            if let mensaje = json["mensaje_plain"].string{
-                                self.showAlertWithMessage(title: "Error!", message: mensaje)
+                            break
+                        case .failure(let error):
+                            if error._code == NSURLErrorTimedOut {
+                                self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                                debugPrint("timeOut")
+                            }else{
+                                self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                             }
+                            break
                         }
-                    }
+                }
+                self.tableView.reloadData()
             }
-            
-            self.tableView.reloadData()
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
+        
     }
     
     func compartirCheckIn(){

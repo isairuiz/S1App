@@ -240,52 +240,67 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
     }
     
     func processDataForEditarPerfil(){
-        let view = UIView()
-        let labell = UILabel()
-        let spinner = UIActivityIndicatorView()
-        Utilerias.setCustomLoadingScreenForView(loadingView: view, view: self.view, loadingLabel: labell, spinner: spinner)
-        let nombre = DataUserDefaults.getDataNombre()
-        let genero = DataUserDefaults.getDataGenero()
-        let edad = DataUserDefaults.getDataEdad()
-        let estado = DataUserDefaults.getDataEstado()
-        let profesion = DataUserDefaults.getDataProfesion()
-        let fumo = DataUserDefaults.getDataFumo()
-        let sobre_mi = DataUserDefaults.getDataSobreMi()
-        
-        let parametersPerfil: Parameters = [
-            "nombre": nombre,
-            "genero": genero,
-            "edad": edad,
-            "estado":estado,
-            "profesion":profesion,
-            "fumo":fumo,
-            "sobre_mi":sobre_mi
-        ]
-        
-        Alamofire.request(Constantes.EDITAR_PERFIL_URL, method: .put, parameters:parametersPerfil, encoding: URLEncoding.httpBody,headers:self.headers)
-            .responseJSON{response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        if var message = json["mensaje_plain"].string{
-                            Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
-                            let alert = UIAlertController(title: "¡Bien!", message: "Los datos de tu perfil han sido actualizados", preferredStyle: UIAlertControllerStyle.alert)
-                            alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: { action in
-                                self.processDataForEditarQueBusco()
+        if Utilerias.isConnectedToNetwork(){
+            let view = UIView()
+            let labell = UILabel()
+            let spinner = UIActivityIndicatorView()
+            Utilerias.setCustomLoadingScreenForView(loadingView: view, view: self.view, loadingLabel: labell, spinner: spinner)
+            let nombre = DataUserDefaults.getDataNombre()
+            let genero = DataUserDefaults.getDataGenero()
+            let edad = DataUserDefaults.getDataEdad()
+            let estado = DataUserDefaults.getDataEstado()
+            let profesion = DataUserDefaults.getDataProfesion()
+            let fumo = DataUserDefaults.getDataFumo()
+            let sobre_mi = DataUserDefaults.getDataSobreMi()
+            
+            let parametersPerfil: Parameters = [
+                "nombre": nombre,
+                "genero": genero,
+                "edad": edad,
+                "estado":estado,
+                "profesion":profesion,
+                "fumo":fumo,
+                "sobre_mi":sobre_mi
+            ]
+            
+            AFManager.request(Constantes.EDITAR_PERFIL_URL, method: .put, parameters:parametersPerfil, encoding: URLEncoding.httpBody,headers:self.headers)
+                .responseJSON{response in
+                    switch response.result{
+                    case .success:
+                        let json = JSON(response.result.value)
+                        debugPrint(json)
+                        if let status = json["status"].bool{
+                            if(status){
+                                if var message = json["mensaje_plain"].string{
+                                    Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                                    let alert = UIAlertController(title: "¡Bien!", message: "Los datos de tu perfil han sido actualizados", preferredStyle: UIAlertControllerStyle.alert)
+                                    alert.addAction(UIAlertAction(title: "Continuar", style: UIAlertActionStyle.default, handler: { action in
+                                        self.processDataForEditarQueBusco()
+                                        
+                                    }))
+                                    self.present(alert, animated: true, completion: nil)
+                                }
+                            }else{
                                 
-                            }))
-                            self.present(alert, animated: true, completion: nil)
+                                if var message = json["mensaje_plain"].string{
+                                    self.alertWithMessage(title: "Error!", message: message)
+                                }
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                            }
                         }
-                    }else{
-                        
-                        if var message = json["mensaje_plain"].string{
-                            self.showAlerWithMessage(title: "Error!", message: message)
+                        break
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
                         }
-                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                        break
                     }
-                    
-                }
+            }
+        }else{
+            self.alertWithMessage(title: "Error", message: "No estas conectado, revisa tu conexión a internet.")
         }
         
     }
@@ -358,41 +373,53 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
             "fuma": busco_fuma
         ]
         
-        Alamofire.request(Constantes.EDITAR_QUE_BUSCO_URL, method: .put, parameters:parametersPerfil, encoding: URLEncoding.httpBody,headers:self.headers)
+        AFManager.request(Constantes.EDITAR_QUE_BUSCO_URL, method: .put, parameters:parametersPerfil, encoding: URLEncoding.httpBody,headers:self.headers)
             .responseJSON{response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        let photo = DataUserDefaults.getDataFoto()
-                        let noFoto = photo.count<=0
-                        var buttonTitle = String()
-                        var okMensaje = String()
-                        buttonTitle = "Un paso mas"
-                        okMensaje = "Tus preferencias de busqueda han sido actualizadas"
-                        if(noFoto){
-                            buttonTitle = "Ir a home"
-                            okMensaje = "Listo, ahora responde todos los Tests que puedas, eso mejorará las sugerencias de S1ngulares"
-                        }
-                        if var message = json["mensaje_plain"].string{
+                switch response.result{
+                case .success:
+                    let json = JSON(response.result.value)
+                    debugPrint(json)
+                    if let status = json["status"].bool{
+                        if(status){
+                            let photo = DataUserDefaults.getDataFoto()
+                            let noFoto = photo.count<=0
+                            var buttonTitle = String()
+                            var okMensaje = String()
+                            buttonTitle = "Un paso mas"
+                            okMensaje = "Tus preferencias de busqueda han sido actualizadas"
+                            if(noFoto){
+                                buttonTitle = "Ir a home"
+                                okMensaje = "Listo, ahora responde todos los Tests que puedas, eso mejorará las sugerencias de S1ngulares"
+                            }
+                            if var message = json["mensaje_plain"].string{
+                                Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                                let alert = UIAlertController(title: "¡Bien!", message: okMensaje, preferredStyle: UIAlertControllerStyle.alert)
+                                alert.addAction(UIAlertAction(title: buttonTitle, style: UIAlertActionStyle.default, handler: { action in
+                                    if(noFoto){
+                                        self.performSegue(withIdentifier: "passToMenuSegue", sender: nil)
+                                    }else{
+                                        self.processDataAgregarFoto()
+                                    }
+                                }))
+                                self.present(alert, animated: true, completion: nil)
+                                
+                            }
+                        }else{
+                            if var message = json["mensaje_plain"].string{
+                                self.alertWithMessage(title: "Error!", message: message)
+                            }
                             Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
-                            let alert = UIAlertController(title: "¡Bien!", message: okMensaje, preferredStyle: UIAlertControllerStyle.alert)
-                            alert.addAction(UIAlertAction(title: buttonTitle, style: UIAlertActionStyle.default, handler: { action in
-                                if(noFoto){
-                                    self.performSegue(withIdentifier: "passToMenuSegue", sender: nil)
-                                }else{
-                                    self.processDataAgregarFoto()
-                                }
-                            }))
-                            self.present(alert, animated: true, completion: nil)
-                            
                         }
-                    }else{
-                        if var message = json["mensaje_plain"].string{
-                            self.showAlerWithMessage(title: "Error!", message: message)
-                        }
-                        Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
                     }
+                    break
+                case .failure(let error):
+                    if error._code == NSURLErrorTimedOut {
+                        self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                        debugPrint("timeOut")
+                    }else{
+                        self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                    }
+                    break
                 }
         }
     }
@@ -405,7 +432,7 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
         var imageName = "image"+Utilerias.getCurrentDateAndTime()+".jpeg"
         var photo = Data()
         photo = DataUserDefaults.getDataFoto()
-        Alamofire.upload(
+        AFManager.upload(
             multipartFormData: { multipartFormData in
                 multipartFormData.append(photo, withName: "imagen", fileName: imageName, mimeType: "image/jpeg")
         },
@@ -427,7 +454,7 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
                             }else{
                                 if let message = json["mensaje_plain"].string{
                                     Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
-                                    self.showAlerWithMessage(title:"Error",message: message)
+                                    self.alertWithMessage(title:"Error",message: message)
                                 }
                                 Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
                             }
@@ -436,17 +463,17 @@ class BienvenidaPaso4ViewController: UIViewController, UITabBarDelegate {
                 case .failure(let encodingError):
                     print(encodingError)
                     Utilerias.removeCustomLoadingScreen(loadingView: view, loadingLabel: labell, spinner: spinner)
+                    if encodingError._code == NSURLErrorTimedOut {
+                        self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                        debugPrint("timeOut")
+                    }else{
+                        self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                    }
                 }
         }
         )
 
         
-    }
-    
-    func showAlerWithMessage(title:String,message:String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
     }
     
     @IBAction func finalizarTour(_ sender: AnyObject) {

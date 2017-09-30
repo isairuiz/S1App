@@ -376,31 +376,48 @@ class EditarMiperfil3TableViewController:UITableViewController{
     }
     
     func uploadChanges(){
-        let loadingView = UIView()
-        let spinner = UIActivityIndicatorView()
-        let loadingLabel = UILabel()
-        Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
-        Alamofire.request(Constantes.EDITAR_QUE_BUSCO_URL, method: .put, parameters:busquedaParametros, encoding: URLEncoding.httpBody,headers:self.headers)
-            .responseJSON{response in
-                let json = JSON(response.result.value)
-                debugPrint(json)
-                if let status = json["status"].bool{
-                    if(status){
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                        let alert = UIAlertController(title: "¡Bien!", message: "Tus preferencias de busqueda han sido actualizadas", preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: { action in
-                            self.getUserData()
-                        }))
-                        self.present(alert, animated: true, completion: nil)
-                        
-                    }else{
-                        Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
-                        if var message = json["mensaje_plain"].string{
-                            debugPrint(message)
+        if Utilerias.isConnectedToNetwork(){
+            let loadingView = UIView()
+            let spinner = UIActivityIndicatorView()
+            let loadingLabel = UILabel()
+            Utilerias.setCustomLoadingScreen(loadingView: loadingView, tableView: self.tableView, loadingLabel: loadingLabel, spinner: spinner)
+            AFManager.request(Constantes.EDITAR_QUE_BUSCO_URL, method: .put, parameters:busquedaParametros, encoding: URLEncoding.httpBody,headers:self.headers)
+                .responseJSON{response in
+                    switch response.result{
+                    case .success:
+                        break;
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            self.alertWithMessage(title: "Error", message: "El servidor esta fuera de linea, por favor intenta mas tarde.")
+                            debugPrint("timeOut")
+                        }else{
+                            self.alertWithMessage(title:"Error",message:"El servidor encontro un error, por favor intenta mas tarde.")
+                        }
+                        break
+                    }
+                    let json = JSON(response.result.value)
+                    debugPrint(json)
+                    if let status = json["status"].bool{
+                        if(status){
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                            let alert = UIAlertController(title: "¡Bien!", message: "Tus preferencias de busqueda han sido actualizadas", preferredStyle: UIAlertControllerStyle.alert)
+                            alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: { action in
+                                self.getUserData()
+                            }))
+                            self.present(alert, animated: true, completion: nil)
+                            
+                        }else{
+                            Utilerias.removeCustomLoadingScreen(loadingView: loadingView, loadingLabel: loadingLabel, spinner: spinner)
+                            if var message = json["mensaje_plain"].string{
+                                debugPrint(message)
+                            }
                         }
                     }
-                }
+            }
+        }else{
+            
         }
+        
     }
     
     func getUserData(){
